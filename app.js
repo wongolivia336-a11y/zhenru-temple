@@ -4,38 +4,38 @@ const stages = [
     title: "移建现址，木上留年",
     description: "现址大殿梁间留有“大元延祐七年”题记。它为建筑年代提供重要线索，也让木构本身成为一份可阅读的档案。",
     question: "此刻值得看",
-    detail: "屋顶以单檐歇山形制示意。现存木构中有元代构件，但不把整座殿堂都标成“元代原物”。",
+    detail: "现状三间单檐形制作为观察起点。进深柱列按研究文章所述5.3、5.1、2.6米不等距表达；具体构件年代仍需逐件核对。",
     shape: "单檐歇山 · 形制示意",
     source: 0,
     grade: "史料节点"
   },
   {
     period: "清 · 光绪二十至二十三年",
-    title: "双檐改制，主体仍在",
-    description: "光绪年间重修，大殿由单檐改为双檐。公开介绍称主体结构未变；正梁还留有光绪二十三年重建题记。",
+    title: "重修之后，檐层与开间之变",
+    description: "公开资料均记载光绪年间重修与双檐变化。上海文旅推广网称主体结构未变；2024年研究文章依据历史照片，提出旧貌为五间重檐。两种描述在开间变化上并不完全一致。",
     question: "此刻值得看",
-    detail: "三维场景增加一层檐顶，表达“双檐”这一可查证变化。具体构造与比例仍须用旧照片、图纸或修缮档案校准。",
-    shape: "双檐 · 形制变化示意",
-    source: 0,
-    grade: "形制记录"
+    detail: "模型以半透明外扩柱列与下层檐顶呈现“五间重檐说”的研究性叠加。外扩尺寸、构件关系和细部均待原始图档核对。",
+    shape: "五间重檐说 · 轮廓推演",
+    source: 2,
+    grade: "公开记载 + 研究文章推断"
   },
   {
     period: "20世纪 · 落架大修",
     title: "拆解测绘，再作选择",
-    description: "1963年启动落架大修，1964年竣工。修缮采取落架方式进行古架测绘与构件复原，并拆除清代加作的重檐。",
+    description: "1963年1月启动落架大修，1964年10月竣工。工程回顾称采用落架方式进行古架测绘与构件复原；研究文章进一步讨论了清代下檐的拆除与屋面细部调整。",
     question: "此刻值得看",
-    detail: "恢复元代单檐面貌，是一次有明确方向的保护选择。哪些部件沿用、替换或补配，应继续追索工程档案。",
-    shape: "落架修缮 · 单檐形制",
+    detail: "模型回到单檐三间形制。修缮中哪些构件沿用、替换或补配，以及山花、起翘与正脊的具体调整，仍应以原始工程档案校准。",
+    shape: "落架大修 · 单檐形制",
     source: 1,
     grade: "修缮记录"
   },
   {
     period: "现状 · 修缮之后",
     title: "仍在使用，也仍可追问",
-    description: "今天看到的单檐大殿，是历代营造、清代改建与20世纪修缮叠合后的现状。它既保存旧构件，也承载近现代的修复判断。",
+    description: "今天看到的是1963—64年修缮后延续的单檐三间形制。它保留部分早期木构，也承载了近现代保护工程的判断。",
     question: "此刻值得看",
-    detail: "公开资料记载，殿内16根柱中有10根为元代柏木柱，另有6个元代旧石柱础。具体位置仍待逐件核验。",
-    shape: "现状形制 · 示意",
+    detail: "公开资料记载16根柱中有10根元代柏木柱、6个元代旧石柱础；模型不将这些数量信息擅自转换成具体构件位置。",
+    shape: "现状 · 修缮后的单檐形制",
     source: 2,
     grade: "现状记录"
   }
@@ -43,20 +43,40 @@ const stages = [
 
 const partNotes = {
   roof: {
-    question: "檐口与屋面",
-    detail: "现状为单檐歇山顶。公开记载称光绪年间曾改作双檐，1963—64年大修后恢复单檐形制。模型中的坡度与瓦作细节仍是示意。"
+    question: "屋面与檐口",
+    detail: "公开资料可确认现状为单檐形制，并记载光绪年间曾改作双檐、1963—64年大修后恢复单檐。模型的举架、起翘、瓦垄与脊饰属于视觉推演。",
+    grade: "形制有记载 · 几何待测绘",
+    source: "上海市文旅推广网"
   },
   frame: {
-    question: "梁架与斗栱",
-    detail: "上海建筑设计研究院回顾：修缮采用落架方式进行古架测绘与构件复原。若取得测绘图，可把具体节点转成可核对模型。"
+    question: "梁架与屋架",
+    detail: "上海建筑设计研究院的工程回顾提到落架测绘与构件复原。当前梁架按柱网和屋面关系程序化搭建，断面、榫卯和具体构件编号均未取得原始测绘依据。",
+    grade: "修缮方式有记录 · 节点待证",
+    source: "上海建筑设计研究院"
+  },
+  dougong: {
+    question: "斗栱与出檐支承",
+    detail: "此处以柱头铺作、横向出跳和承托构件表达木构受力层次。尚未取得可供逐件复原的斗栱测绘图，因此构造类型与尺度仅作形态研究，不应视为真如寺原状复原。",
+    grade: "形制推定 · 待测绘",
+    source: "待补：1963—64年修缮图纸"
+  },
+  door: {
+    question: "门窗与隔扇",
+    detail: "模型用木格栅和局部围护表达殿内外的界面关系。现有照片不足以确定所有门窗的历史样式、开合方式和更替年代，格心纹样与分格均为示意。",
+    grade: "照片观察 + 视觉推演",
+    source: "项目现场照片；待补历史照片"
   },
   columns: {
     question: "柱网与旧木",
-    detail: "公开资料记载殿内16根柱中有10根为元代柏木柱。因尚无可靠的逐柱编号资料，场景不擅自标出这10根的位置。"
+    detail: "公开资料记载殿内16根柱中有10根为元代柏木柱。进深方向按研究文章所述5.3、5.1、2.6米不等距关系组织；10根旧柱的具体位置仍无逐柱编号可核。",
+    grade: "柱网关系有研究依据 · 旧柱位置待证",
+    source: "上海市文旅推广网"
   },
   base: {
     question: "台基与柱础",
-    detail: "公开资料记载有6个石柱础为元代旧物。模型里的柱础只表达柱网关系，位置、形制和更换情况仍需核对。"
+    detail: "公开资料记载有6个元代旧石柱础。模型中的台基、踏步和柱础用于表达建筑与地面的关系；具体尺寸、石作形制及旧柱础分布仍待核验。",
+    grade: "数量有公开记载 · 形制待核",
+    source: "上海市文旅推广网"
   }
 };
 
@@ -71,6 +91,13 @@ const stageFields = {
   index: document.querySelector("#stageIndex"),
   viewerEra: document.querySelector("#viewerEra"),
   viewerShape: document.querySelector("#viewerShape")
+};
+const inspector = {
+  root: document.querySelector("#componentInspector"),
+  title: document.querySelector("#inspectorTitle"),
+  text: document.querySelector("#inspectorText"),
+  grade: document.querySelector("#inspectorGrade"),
+  source: document.querySelector("#inspectorSource")
 };
 
 let activeStage = 0;
@@ -94,6 +121,7 @@ function setStage(index) {
   stageFields.viewerEra.textContent = stage.period;
   stageFields.viewerShape.textContent = stage.shape;
   if (hallScene) hallScene.setStage(activeStage);
+  if (inspector.root) inspector.root.hidden = true;
 }
 
 function setObservation(part) {
@@ -104,9 +132,18 @@ function setObservation(part) {
   document.querySelectorAll(".scene-pin").forEach((pin) => {
     pin.classList.toggle("is-selected", pin.dataset.part === part);
   });
+  inspector.title.textContent = note.question;
+  inspector.text.textContent = note.detail;
+  inspector.grade.textContent = note.grade;
+  inspector.source.textContent = note.source;
+  inspector.root.hidden = false;
 }
 
 timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
+document.querySelector("#closeInspector")?.addEventListener("click", () => {
+  inspector.root.hidden = true;
+  document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
+});
 
 document.querySelectorAll(".view-button[data-view]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -195,6 +232,8 @@ async function bootModel() {
   const pinElements = {
     roof: document.querySelector("#pinRoof"),
     frame: document.querySelector("#pinFrame"),
+    dougong: document.querySelector("#pinDougong"),
+    door: document.querySelector("#pinDoor"),
     columns: document.querySelector("#pinColumns"),
     base: document.querySelector("#pinBase")
   };

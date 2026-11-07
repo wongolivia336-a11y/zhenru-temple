@@ -5,12 +5,12 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
 const POST_X = [-6.7, -3.05, 3.05, 6.7];
-const POST_Z = [-6.5, -2.17, 2.17, 6.5];
+const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 
 export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#26332d");
-  scene.fog = new THREE.Fog("#26332d", 36, 75);
+  scene.background = new THREE.Color("#e9e2d5");
+  scene.fog = new THREE.Fog("#e9e2d5", 44, 88);
 
   const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 120);
   camera.position.copy(CAMERA_HOME);
@@ -20,7 +20,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.02;
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(TARGET_HOME);
@@ -37,8 +37,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   controls.panSpeed = 0.74;
   controls.update();
 
-  scene.add(new THREE.HemisphereLight(0xe8e1cf, 0x45483e, 2.0));
-  const keyLight = new THREE.DirectionalLight(0xffe6bd, 3.1);
+  scene.add(new THREE.HemisphereLight(0xf2eadb, 0x6b6659, 1.85));
+  const keyLight = new THREE.DirectionalLight(0xffedcf, 3.0);
   keyLight.position.set(-13, 22, 15);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -49,31 +49,31 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   keyLight.shadow.bias = -0.00028;
   keyLight.shadow.normalBias = 0.035;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x9cae9d, 1.15);
+  const fillLight = new THREE.DirectionalLight(0x9cae9d, 0.95);
   fillLight.position.set(12, 10, -15);
   scene.add(fillLight);
-  const warmInterior = new THREE.PointLight(0xe5a760, 12, 18, 1.8);
+  const warmInterior = new THREE.PointLight(0xd9a66c, 8, 16, 1.8);
   warmInterior.position.set(0, 4.2, -0.8);
   scene.add(warmInterior);
 
   const mats = {
-    stone: new THREE.MeshStandardMaterial({ color: 0x858474, roughness: 0.93 }),
-    stoneLight: new THREE.MeshStandardMaterial({ color: 0xb3a98e, roughness: 0.87 }),
-    stoneDark: new THREE.MeshStandardMaterial({ color: 0x66685d, roughness: 0.96 }),
-    wood: new THREE.MeshStandardMaterial({ color: 0x59412d, roughness: 0.82 }),
-    woodLight: new THREE.MeshStandardMaterial({ color: 0x806442, roughness: 0.78 }),
-    woodDark: new THREE.MeshStandardMaterial({ color: 0x302c24, roughness: 0.9 }),
-    woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7950, roughness: 0.74 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xc7b99b, roughness: 0.92 }),
-    wallShadow: new THREE.MeshStandardMaterial({ color: 0x8f826a, roughness: 0.94 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x495047, roughness: 0.84, side: THREE.DoubleSide }),
-    roofSide: new THREE.MeshStandardMaterial({ color: 0x3a443c, roughness: 0.86, side: THREE.DoubleSide }),
-    roofSun: new THREE.MeshStandardMaterial({ color: 0x5d5c4b, roughness: 0.8, side: THREE.DoubleSide }),
-    roofTile: new THREE.LineBasicMaterial({ color: 0xaaa081, transparent: true, opacity: 0.72 }),
-    roofRib: new THREE.LineBasicMaterial({ color: 0x393e36, transparent: true, opacity: 0.8 }),
-    brass: new THREE.MeshStandardMaterial({ color: 0xb79a64, roughness: 0.61, metalness: 0.18 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0x55584c, roughness: 1 }),
-    glass: new THREE.MeshStandardMaterial({ color: 0x222a25, roughness: 0.4, metalness: 0.04 })
+    stone: new THREE.MeshStandardMaterial({ color: 0x938d7f, roughness: 0.94 }),
+    stoneLight: new THREE.MeshStandardMaterial({ color: 0xc9bea8, roughness: 0.9 }),
+    stoneDark: new THREE.MeshStandardMaterial({ color: 0x716d62, roughness: 0.96 }),
+    wood: new THREE.MeshStandardMaterial({ color: 0x503724, roughness: 0.86 }),
+    woodLight: new THREE.MeshStandardMaterial({ color: 0x80603d, roughness: 0.82 }),
+    woodDark: new THREE.MeshStandardMaterial({ color: 0x30251d, roughness: 0.92 }),
+    woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7548, roughness: 0.78 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xcbbfa8, roughness: 0.95 }),
+    wallShadow: new THREE.MeshStandardMaterial({ color: 0x9d9079, roughness: 0.96 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x494a42, roughness: 0.9, side: THREE.DoubleSide }),
+    roofSide: new THREE.MeshStandardMaterial({ color: 0x3b4039, roughness: 0.92, side: THREE.DoubleSide }),
+    roofSun: new THREE.MeshStandardMaterial({ color: 0x5a584c, roughness: 0.88, side: THREE.DoubleSide }),
+    roofTile: new THREE.LineBasicMaterial({ color: 0xaaa081, transparent: true, opacity: 0.86 }),
+    roofRib: new THREE.LineBasicMaterial({ color: 0x393e36, transparent: true, opacity: 0.9 }),
+    brass: new THREE.MeshStandardMaterial({ color: 0xa98b59, roughness: 0.68, metalness: 0.12 }),
+    ground: new THREE.MeshStandardMaterial({ color: 0xd5cebf, roughness: 1 }),
+    glass: new THREE.MeshStandardMaterial({ color: 0x35342e, roughness: 0.52, metalness: 0.02 })
   };
 
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), mats.ground);
@@ -108,6 +108,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   extraRoofGroup.userData.part = "roof";
   extraRoofGroup.visible = false;
   hall.add(extraRoofGroup);
+  const qingExtensionGroup = new THREE.Group();
+  qingExtensionGroup.name = "Qing-period-five-bay-outline-study";
+  qingExtensionGroup.userData.part = "frame";
+  qingExtensionGroup.visible = false;
+  hall.add(qingExtensionGroup);
 
   buildStoneBase(baseGroup, mats);
   buildColumnsAndFrame(frameGroup, columnGroup, mats);
@@ -116,20 +121,24 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
   });
   const extraRoofSkin = buildRoof(extraRoofGroup, {
-    width: 15.8, depth: 15.25, baseY: 5.83, ridgeY: 8.16, ridgeHalf: 5.55, mats, style: "lower"
+    width: 19.05, depth: 18.55, baseY: 5.72, ridgeY: 7.55, ridgeHalf: 5.95, mats, style: "lower"
   });
   buildInteriorHint(hall, mats);
+  buildQingExtension(qingExtensionGroup, mats);
 
   const pinAnchors = {
-    roof: new THREE.Vector3(7.3, 7.25, 7.2),
-    frame: new THREE.Vector3(6.25, 6.2, 6.35),
-    columns: new THREE.Vector3(6.55, 3.2, 6.38),
-    base: new THREE.Vector3(6.4, 0.64, 7.1)
+    roof: new THREE.Vector3(7.55, 7.15, 7.35),
+    frame: new THREE.Vector3(5.9, 6.25, 6.42),
+    dougong: new THREE.Vector3(6.8, 6.28, 4.8),
+    door: new THREE.Vector3(0, 3.25, 6.5),
+    columns: new THREE.Vector3(3.05, 3.15, 1.2),
+    base: new THREE.Vector3(6.45, 0.64, 7.1)
   };
   const moving = new Set();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const interactiveGroups = [baseGroup, frameGroup, roofGroup, extraRoofGroup];
+  const interactiveGroups = [baseGroup, frameGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let activeView = "outside";
   let exploded = false;
   let frameMode = false;
@@ -144,13 +153,16 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     currentStage = stage;
     extraRoofGroup.visible = stage === 1;
     extraRoofGroup.position.y = stage === 1 && exploded ? 1.37 : 0;
+    extraRoofGroup.scale.x = stage === 1 ? 1.15 : 1;
+    roofGroup.scale.x = stage === 1 ? 1.2 : 1;
+    qingExtensionGroup.visible = stage === 1;
     extraRoofSkin.visible = !frameMode;
   }
 
   function moveCamera(position, target, nextView) {
     cameraTween = {
       startTime: performance.now(),
-      duration: 850,
+      duration: reducedMotion ? 0 : 850,
       fromPosition: camera.position.clone(),
       toPosition: position.clone(),
       fromTarget: controls.target.clone(),
@@ -243,6 +255,18 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     downPoint = null;
   });
   canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+  canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }));
+
+  function rotateCameraBy(horizontal, vertical) {
+    cameraTween = null;
+    const offset = camera.position.clone().sub(controls.target);
+    const spherical = new THREE.Spherical().setFromVector3(offset);
+    spherical.theta -= horizontal;
+    spherical.phi = THREE.MathUtils.clamp(spherical.phi + vertical, 0.12, activeView === "inside" ? Math.PI * 0.86 : Math.PI * 0.49);
+    camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(spherical));
+    camera.lookAt(controls.target);
+    controls.update();
+  }
 
   function setMove(direction, isDown) {
     if (isDown) moving.add(direction);
@@ -250,9 +274,21 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
   function onKeyDown(event) {
     const key = event.key.toLowerCase();
+    const editing = event.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
+    if (editing) return;
     if (["w", "a", "s", "d"].includes(key) && activeView === "inside") {
       event.preventDefault();
       moving.add(key);
+      return;
+    }
+    if (event.target === canvas) {
+      if (key === "arrowleft") { event.preventDefault(); rotateCameraBy(0.09, 0); }
+      if (key === "arrowright") { event.preventDefault(); rotateCameraBy(-0.09, 0); }
+      if (key === "arrowup") { event.preventDefault(); rotateCameraBy(0, -0.07); }
+      if (key === "arrowdown") { event.preventDefault(); rotateCameraBy(0, 0.07); }
+      if (key === "+" || key === "=") { event.preventDefault(); camera.position.sub(controls.target).multiplyScalar(0.9).add(controls.target); controls.update(); }
+      if (key === "-" || key === "_") { event.preventDefault(); camera.position.sub(controls.target).multiplyScalar(1.1).add(controls.target); controls.update(); }
+      if (key === "home") { event.preventDefault(); resetView(); }
     }
   }
   function onKeyUp(event) { moving.delete(event.key.toLowerCase()); }
@@ -322,12 +358,17 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       if (moving.has("a")) velocity.sub(right);
       if (velocity.lengthSq()) {
         velocity.normalize().multiplyScalar(2.2 * delta);
-        camera.position.add(velocity);
-        controls.target.add(velocity);
-        camera.position.x = THREE.MathUtils.clamp(camera.position.x, -5.9, 5.9);
-        camera.position.z = THREE.MathUtils.clamp(camera.position.z, -5.9, 5.9);
-        controls.target.x = THREE.MathUtils.clamp(controls.target.x, -6.4, 6.4);
-        controls.target.z = THREE.MathUtils.clamp(controls.target.z, -6.4, 6.4);
+        const nextX = THREE.MathUtils.clamp(camera.position.x + velocity.x, -5.9, 5.9);
+        const nextZ = THREE.MathUtils.clamp(camera.position.z + velocity.z, -5.9, 5.9);
+        const blocked = POST_X.some((x) => POST_Z.some((z) => Math.hypot(nextX - x, nextZ - z) < 0.48));
+        if (!blocked) {
+          const dx = nextX - camera.position.x;
+          const dz = nextZ - camera.position.z;
+          camera.position.x = nextX;
+          camera.position.z = nextZ;
+          controls.target.x += dx;
+          controls.target.z += dz;
+        }
         camera.position.y = 2.1;
       }
     }
@@ -353,10 +394,18 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       controls.dispose();
-      renderer.dispose();
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("blur", onBlur);
+      const geometries = new Set();
+      const materials = new Set();
+      scene.traverse((node) => {
+        if (node.geometry) geometries.add(node.geometry);
+        if (node.material) (Array.isArray(node.material) ? node.material : [node.material]).forEach((material) => materials.add(material));
+      });
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.forEach((material) => material.dispose());
+      renderer.dispose();
     }
   };
 }
@@ -466,11 +515,30 @@ function buildStoneBase(group, mats) {
   addLineSegments(group, joints, new THREE.LineBasicMaterial({ color: 0x65665a, transparent: true, opacity: 0.42 }), "base");
 }
 
+function buildTaperedColumn(parent, x, z, material) {
+  const profile = [
+    new THREE.Vector2(0.255, 0), new THREE.Vector2(0.27, 0.09),
+    new THREE.Vector2(0.235, 0.22), new THREE.Vector2(0.222, 0.72),
+    new THREE.Vector2(0.212, 1.7), new THREE.Vector2(0.207, 2.8),
+    new THREE.Vector2(0.205, 4.05), new THREE.Vector2(0.214, 4.78),
+    new THREE.Vector2(0.245, 4.96), new THREE.Vector2(0.26, 5.03)
+  ];
+  const geometry = new THREE.LatheGeometry(profile, 20);
+  geometry.computeVertexNormals();
+  const column = new THREE.Mesh(geometry, material);
+  column.position.set(x, 0.88, z);
+  column.castShadow = true;
+  column.receiveShadow = true;
+  column.userData.part = "columns";
+  parent.add(column);
+  return column;
+}
+
 function buildColumnsAndFrame(group, columns, mats) {
   const xs = POST_X;
   const zs = POST_Z;
   for (const x of xs) for (const z of zs) {
-    meshCylinder(columns, 0.205, 0.255, 5.03, [x, 3.39, z], mats.wood, "columns", 14);
+    buildTaperedColumn(columns, x, z, mats.wood);
     meshCylinder(columns, 0.268, 0.268, 0.09, [x, 0.96, z], mats.woodLight, "columns", 14);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.213, 0.026, 6, 16), mats.woodEdge);
     ring.rotation.x = Math.PI / 2;
@@ -492,7 +560,7 @@ function buildColumnsAndFrame(group, columns, mats) {
   meshBox(group, [13.55, 0.33, 0.38], [0, beamY, -6.5], mats.wood, "frame");
   meshBox(group, [0.38, 0.33, 12.85], [-6.7, beamY, 0], mats.wood, "frame");
   meshBox(group, [0.38, 0.33, 12.85], [6.7, beamY, 0], mats.woodLight, "frame");
-  for (const z of [-2.17, 2.17]) meshBox(group, [13.2, 0.27, 0.3], [0, 5.66, z], mats.wood, "frame");
+  for (const z of [-3.9, 1.2]) meshBox(group, [13.2, 0.27, 0.3], [0, 5.66, z], mats.wood, "frame");
   for (const x of [-3.05, 3.05]) meshBox(group, [0.3, 0.28, 12.7], [x, 5.66, 0], mats.woodLight, "frame");
 
   meshBox(group, [13.45, 0.22, 0.28], [0, 1.25, 6.42], mats.woodDark, "frame");
@@ -509,41 +577,49 @@ function buildFrontPanels(group, mats) {
   const z = 6.36;
   const bays = [[-6.54, -3.14], [3.14, 6.54]];
   for (const [left, right] of bays) {
-    meshBox(group, [right - left, 3.55, 0.14], [(left + right) / 2, 3.25, z], mats.wall, "frame");
-    meshBox(group, [right - left, 0.16, 0.2], [(left + right) / 2, 5.07, z], mats.woodLight, "frame");
-    meshBox(group, [right - left, 0.16, 0.2], [(left + right) / 2, 1.45, z], mats.wood, "frame");
-    const lattice = [];
+    meshBox(group, [right - left, 1.05, 0.18], [(left + right) / 2, 1.98, z], mats.woodDark, "door");
+    meshBox(group, [right - left, 0.13, 0.22], [(left + right) / 2, 2.56, z], mats.woodLight, "door");
+    meshBox(group, [right - left, 0.13, 0.22], [(left + right) / 2, 4.96, z], mats.woodLight, "door");
     for (let i = 0; i <= 10; i += 1) {
       const x = left + (right - left) * i / 10;
-      lattice.push(x, 1.62, z + 0.09, x, 4.95, z + 0.09);
+      beamBetween(group, [x, 2.62, z + 0.1], [x, 4.9, z + 0.1], 0.055, mats.woodLight, "door", 0.075);
     }
-    for (const y of [1.72, 2.25, 2.78, 3.31, 3.84, 4.37, 4.9]) lattice.push(left, y, z + 0.1, right, y, z + 0.1);
-    addLineSegments(group, lattice, new THREE.LineBasicMaterial({ color: 0x765b3a, transparent: true, opacity: 0.87 }), "frame");
+    for (const y of [2.72, 3.18, 3.64, 4.1, 4.56, 4.9]) {
+      beamBetween(group, [left, y, z + 0.1], [right, y, z + 0.1], 0.055, mats.wood, "door", 0.075);
+    }
+    meshBox(group, [0.13, 3.55, 0.22], [left, 3.72, z], mats.wood, "door");
+    meshBox(group, [0.13, 3.55, 0.22], [right, 3.72, z], mats.wood, "door");
   }
-  for (const x of [-3.05, 3.05]) meshBox(group, [0.17, 4.48, 0.2], [x, 3.52, z + 0.05], mats.woodLight, "frame");
-  meshBox(group, [6.1, 0.22, 0.22], [0, 5.62, z + 0.06], mats.woodLight, "frame");
+  for (const x of [-3.05, 3.05]) meshBox(group, [0.19, 4.48, 0.24], [x, 3.52, z + 0.05], mats.woodLight, "frame");
+  meshBox(group, [6.1, 0.22, 0.24], [0, 5.62, z + 0.06], mats.woodLight, "frame");
 }
 
 function buildSidePanels(group, mats) {
   for (const side of [-1, 1]) {
     const x = side * 6.55;
-    for (const [z1, z2] of [[-6.25, -2.35], [-2.0, 2.0], [2.35, 6.25]]) {
-      meshBox(group, [0.13, 3.55, z2 - z1], [x, 3.25, (z1 + z2) / 2], mats.wall, "frame");
-      const lines = [];
+    for (const [z1, z2] of [[-6.35, -4.0], [-3.8, 1.1], [1.3, 6.35]]) {
+      const center = (z1 + z2) / 2;
+      const span = z2 - z1;
+      meshBox(group, [0.17, 1.08, span], [x, 1.98, center], mats.wallShadow, "door");
+      meshBox(group, [0.2, 0.13, span], [x, 2.58, center], mats.woodLight, "door");
+      meshBox(group, [0.2, 0.13, span], [x, 4.92, center], mats.woodLight, "door");
       for (let i = 0; i <= 8; i += 1) {
-        const z = z1 + (z2 - z1) * i / 8;
-        lines.push(x + side * 0.08, 1.6, z, x + side * 0.08, 4.95, z);
+        const z = z1 + span * i / 8;
+        beamBetween(group, [x, 2.65, z], [x, 4.85, z], 0.052, mats.woodLight, "door", 0.075);
       }
-      for (const y of [1.75, 2.5, 3.25, 4, 4.75]) lines.push(x + side * 0.085, y, z1, x + side * 0.085, y, z2);
-      addLineSegments(group, lines, new THREE.LineBasicMaterial({ color: 0x705638, transparent: true, opacity: 0.78 }), "frame");
+      for (const y of [2.78, 3.3, 3.82, 4.34, 4.86]) {
+        beamBetween(group, [x, y, z1], [x, y, z2], 0.052, mats.wood, "door", 0.075);
+      }
     }
   }
   const back = -6.38;
-  meshBox(group, [13.0, 3.55, 0.14], [0, 3.25, back], mats.wallShadow, "frame");
-  const rearLattice = [];
-  for (let x = -6.3; x <= 6.3; x += 0.62) rearLattice.push(x, 1.65, back - 0.08, x, 4.9, back - 0.08);
-  for (const y of [1.8, 2.45, 3.1, 3.75, 4.4, 4.85]) rearLattice.push(-6.4, y, back - 0.08, 6.4, y, back - 0.08);
-  addLineSegments(group, rearLattice, new THREE.LineBasicMaterial({ color: 0x554734, transparent: true, opacity: 0.7 }), "frame");
+  meshBox(group, [13.0, 1.08, 0.17], [0, 1.98, back], mats.wallShadow, "door");
+  for (let x = -6.3; x <= 6.3; x += 0.62) {
+    beamBetween(group, [x, 2.62, back], [x, 4.9, back], 0.052, mats.woodLight, "door", 0.075);
+  }
+  for (const y of [2.75, 3.3, 3.85, 4.4, 4.85]) {
+    beamBetween(group, [-6.4, y, back], [6.4, y, back], 0.052, mats.wood, "door", 0.075);
+  }
 }
 
 function buildGableAndRafters(group, mats) {
@@ -552,40 +628,47 @@ function buildGableAndRafters(group, mats) {
   shape.lineTo(6.55, 6.16);
   shape.lineTo(0, 9.24);
   shape.closePath();
-  const gable = new THREE.Mesh(new THREE.ShapeGeometry(shape), mats.woodDark);
-  gable.position.z = 6.47;
-  gable.userData.part = "frame";
-  gable.castShadow = true;
-  group.add(gable);
-
-  const detail = [
-    -5.8, 6.4, 6.52, 0, 9.1, 6.52,
-    5.8, 6.4, 6.52, 0, 9.1, 6.52,
-    -4.8, 6.45, 6.53, 4.8, 6.45, 6.53,
-    -3.4, 6.78, 6.53, 3.4, 6.78, 6.53,
-    -1.9, 7.48, 6.53, 1.9, 7.48, 6.53
-  ];
-  addLineSegments(group, detail, new THREE.LineBasicMaterial({ color: 0x94754d, transparent: true, opacity: 0.82 }), "frame");
+  for (const z of [6.47, -6.47]) {
+    const gable = new THREE.Mesh(new THREE.ShapeGeometry(shape), mats.woodDark);
+    gable.position.z = z;
+    gable.userData.part = "frame";
+    gable.castShadow = true;
+    group.add(gable);
+    const sign = z > 0 ? 1 : -1;
+    for (let i = -5; i <= 5; i += 1) {
+      const x = i * 1.05;
+      beamBetween(group, [x, 6.38, z + sign * 0.06], [x * 0.22, 8.98 - Math.abs(x) * 0.08, z + sign * 0.06], 0.075, mats.woodLight, "frame", 0.075);
+    }
+    const gableLines = [];
+    for (const y of [6.55, 6.92, 7.38, 7.9, 8.42]) {
+      const half = THREE.MathUtils.mapLinear(y, 6.16, 9.24, 6.55, 0);
+      gableLines.push(-half, y, z + sign * 0.08, half, y, z + sign * 0.08);
+    }
+    addLineSegments(group, gableLines, new THREE.LineBasicMaterial({ color: 0x94754d, transparent: true, opacity: 0.72 }), "frame");
+  }
   for (let i = -5; i <= 5; i += 1) {
     const x = i * 1.05;
-    beamBetween(group, [x, 6.38, 6.54], [x * 0.26, 8.95 - Math.abs(x) * 0.09, 6.54], 0.065, mats.woodLight, "frame", 0.065);
+    for (const side of [-1, 1]) {
+      beamBetween(group, [x, 6.28, side * 6.2], [x * 0.12, 9.05 - Math.abs(x) * 0.07, side * 5.8], 0.095, mats.wood, "frame", 0.11);
+    }
   }
 }
 
 function buildDougong(group, mats, xs, zs) {
   for (const x of xs) for (const z of zs) {
-    meshBox(group, [0.68, 0.18, 0.62], [x, 6.12, z], mats.woodLight, "frame");
-    meshBox(group, [0.8, 0.16, 0.4], [x, 6.31, z], mats.wood, "frame");
-    meshBox(group, [0.45, 0.16, 0.84], [x, 6.48, z], mats.woodLight, "frame");
-    if (z > 5 || z < -5) {
-      const direction = z > 0 ? 1 : -1;
-      for (const height of [6.3, 6.48]) meshBox(group, [0.22, 0.13, 0.76], [x, height, z + direction * 0.43], mats.woodEdge, "frame");
+    meshBox(group, [0.58, 0.18, 0.58], [x, 6.05, z], mats.woodDark, "dougong");
+    meshBox(group, [0.92, 0.15, 0.34], [x, 6.22, z], mats.woodLight, "dougong");
+    meshBox(group, [0.34, 0.15, 0.92], [x, 6.38, z], mats.wood, "dougong");
+    meshBox(group, [0.72, 0.14, 0.28], [x, 6.53, z], mats.woodEdge, "dougong");
+    beamBetween(group, [x - 0.46, 6.24, z], [x + 0.46, 6.24, z], 0.12, mats.woodLight, "dougong", 0.3);
+    beamBetween(group, [x, 6.38, z - 0.46], [x, 6.38, z + 0.46], 0.12, mats.wood, "dougong", 0.3);
+    if (Math.abs(x) > 5 || Math.abs(z) > 5) {
+      const dx = Math.abs(x) > 5 ? Math.sign(x) : 0;
+      const dz = Math.abs(z) > 5 ? Math.sign(z) : 0;
+      if (dx) beamBetween(group, [x, 6.32, z], [x + dx * 0.72, 6.75, z], 0.1, mats.woodEdge, "dougong", 0.12);
+      if (dz) beamBetween(group, [x, 6.32, z], [x, 6.75, z + dz * 0.72], 0.1, mats.woodEdge, "dougong", 0.12);
     }
-    if (x > 5 || x < -5) {
-      const direction = x > 0 ? 1 : -1;
-      meshBox(group, [0.78, 0.13, 0.2], [x + direction * 0.42, 6.39, z], mats.woodEdge, "frame");
-    }
-    meshBox(group, [0.12, 0.22, 0.12], [x, 6.64, z], mats.woodDark, "frame");
+    meshBox(group, [0.14, 0.18, 0.14], [x, 6.69, z], mats.woodDark, "dougong");
   }
   const frieze = [];
   for (const z of [-6.7, 6.7]) frieze.push(-6.8, 6.55, z, 6.8, 6.55, z);
@@ -611,69 +694,117 @@ function buildRoof(parent, options) {
   skin.userData.part = "roof";
   skin.userData.isRoofSkin = true;
   group.add(skin);
-  const x = width / 2;
-  const z = depth / 2;
-  const lf = [-x, baseY, z];
-  const rf = [x, baseY, z];
-  const lb = [-x, baseY, -z];
-  const rb = [x, baseY, -z];
-  const fRidge = [0, ridgeY, ridgeHalf];
-  const bRidge = [0, ridgeY, -ridgeHalf];
-  const variant = style === "lower";
-  polygonMesh(skin, [lf, fRidge, rf], variant ? mats.roofSun : mats.roof, "roof");
-  polygonMesh(skin, [rb, bRidge, lb], mats.roofSide, "roof");
-  polygonMesh(skin, [lf, lb, bRidge, fRidge], mats.roofSide, "roof");
-  polygonMesh(skin, [rb, rf, fRidge, bRidge], variant ? mats.roof : mats.roofSun, "roof");
-
-  const tilePoints = [];
-  const ribPoints = [];
-  for (let row = 1; row < 15; row += 1) {
-    const t = row / 15;
-    tilePoints.push(...raised(lerp3(fRidge, lf, t)), ...raised(lerp3(fRidge, rf, t)));
-    tilePoints.push(...raised(lerp3(bRidge, lb, t)), ...raised(lerp3(bRidge, rb, t)));
-  }
-  for (let rib = 1; rib < 22; rib += 1) {
-    const u = rib / 22;
-    ribPoints.push(...raised(fRidge), ...raised(lerp3(lf, rf, u)));
-    ribPoints.push(...raised(bRidge), ...raised(lerp3(lb, rb, u)));
-  }
-  for (const side of [-1, 1]) {
-    for (let row = 1; row < 15; row += 1) {
-      const t = row / 15;
-      const frontEave = side === -1 ? lf : rf;
-      const backEave = side === -1 ? lb : rb;
-      const a = lerp3(frontEave, fRidge, t);
-      const b = lerp3(backEave, bRidge, t);
-      tilePoints.push(...raised(a), ...raised(b));
-    }
-    for (let rib = 1; rib < 20; rib += 1) {
-      const u = rib / 20;
-      const eave = lerp3(side === -1 ? lf : rf, side === -1 ? lb : rb, u);
-      const ridge = lerp3(fRidge, bRidge, u);
-      ribPoints.push(...raised(eave), ...raised(ridge));
-    }
-  }
-  addLineSegments(skin, tilePoints, mats.roofTile, "roof");
-  addLineSegments(skin, ribPoints, mats.roofRib, "roof");
-
-  const trim = new THREE.MeshStandardMaterial({ color: variant ? 0x77715b : 0x77745f, roughness: 0.78 });
-  const edges = [
-    [[-x, baseY, z], [-x * 0.55, baseY + 0.08, z + 0.12], [0, ridgeY, ridgeHalf]],
-    [[x, baseY, z], [x * 0.55, baseY + 0.08, z + 0.12], [0, ridgeY, ridgeHalf]],
-    [[-x, baseY, -z], [-x * 0.55, baseY + 0.08, -z - 0.12], [0, ridgeY, -ridgeHalf]],
-    [[x, baseY, -z], [x * 0.55, baseY + 0.08, -z - 0.12], [0, ridgeY, -ridgeHalf]],
-    [[-x, baseY, z], [-x - 0.26, baseY + 0.38, z + 0.14]],
-    [[x, baseY, z], [x + 0.26, baseY + 0.38, z + 0.14]]
+  const halfW = width / 2;
+  const halfD = depth / 2;
+  const eaveRise = (u) => 0.34 * Math.pow(Math.abs(u), 2.25);
+  const frontPoint = (u, v, sign = 1) => [
+    u * halfW * v,
+    ridgeY + (baseY - ridgeY) * v + eaveRise(u) * v * v,
+    sign * (ridgeHalf + (halfD - ridgeHalf) * v)
   ];
-  edges.forEach((edge, index) => addTube(group, edge, index < 4 ? 0.075 : 0.09, trim, "roof"));
-  cylinderBetween(group, [0, ridgeY + 0.1, -ridgeHalf], [0, ridgeY + 0.1, ridgeHalf], variant ? 0.13 : 0.16, mats.woodEdge, "roof", 12);
-  meshCylinder(group, 0.18, 0.1, 0.28, [0, ridgeY + 0.28, ridgeHalf], mats.brass, "roof", 10);
-  const ridgeCap = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), mats.brass);
-  ridgeCap.position.set(0, ridgeY + 0.49, ridgeHalf);
-  ridgeCap.scale.set(0.75, 0.62, 0.75);
-  ridgeCap.userData.part = "roof";
-  group.add(ridgeCap);
+  const sidePoint = (u, v, sign = 1) => [
+    sign * halfW * v,
+    ridgeY + (baseY - ridgeY) * v + eaveRise(u) * v * v,
+    u * (ridgeHalf + (halfD - ridgeHalf) * v)
+  ];
+  const roofMaterial = style === "lower" ? mats.roofSun : mats.roof;
+  surfacePatch(skin, (u, v) => frontPoint(u, v, 1), roofMaterial, "roof", 28, 16);
+  surfacePatch(skin, (u, v) => frontPoint(u, v, -1), mats.roofSide, "roof", 28, 16);
+  surfacePatch(skin, (u, v) => sidePoint(u, v, -1), mats.roofSide, "roof", 22, 16);
+  surfacePatch(skin, (u, v) => sidePoint(u, v, 1), roofMaterial, "roof", 22, 16);
+
+  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x555449 : 0x353a34, roughness: 0.94 });
+  const tileCourse = new THREE.MeshStandardMaterial({ color: 0xaaa087, roughness: 0.9 });
+  const drawRoofGrid = (pointFn, ribs, courses) => {
+    for (let i = 0; i <= ribs; i += 1) {
+      const u = -0.96 + 1.92 * i / ribs;
+      const points = [];
+      for (let j = 0; j <= 8; j += 1) points.push(raised(pointFn(u, j / 8)));
+      addTube(skin, points, 0.026, tileRib, "roof");
+    }
+    for (let j = 1; j <= courses; j += 1) {
+      const v = j / (courses + 1);
+      const points = [];
+      for (let i = 0; i <= 20; i += 1) points.push(raised(pointFn(-1 + 2 * i / 20, v)));
+      addTube(skin, points, 0.012, tileCourse, "roof");
+    }
+  };
+  drawRoofGrid((u, v) => frontPoint(u, v, 1), 18, 12);
+  drawRoofGrid((u, v) => frontPoint(u, v, -1), 18, 12);
+  drawRoofGrid((u, v) => sidePoint(u, v, -1), 16, 12);
+  drawRoofGrid((u, v) => sidePoint(u, v, 1), 16, 12);
+
+  for (const sign of [-1, 1]) {
+    const points = [];
+    for (let i = 0; i <= 24; i += 1) points.push(raised(sidePoint(-1 + 2 * i / 24, 1, sign)));
+    addTube(group, points, 0.09, mats.woodDark, "roof");
+  }
+  for (const sign of [-1, 1]) {
+    const points = [];
+    for (let i = 0; i <= 24; i += 1) points.push(raised(frontPoint(-1 + 2 * i / 24, 1, sign)));
+    addTube(group, points, 0.075, mats.woodEdge, "roof");
+  }
+  addTube(group, [[0, ridgeY + 0.08, -ridgeHalf], [0, ridgeY + 0.08, ridgeHalf]], 0.13, mats.woodEdge, "roof");
+  cylinderBetween(group, [0, ridgeY + 0.1, -ridgeHalf], [0, ridgeY + 0.1, ridgeHalf], style === "lower" ? 0.11 : 0.15, mats.woodEdge, "roof", 12);
+  for (const sign of [-1, 1]) {
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.17, 12, 8), mats.brass);
+    cap.position.set(0, ridgeY + 0.16, sign * ridgeHalf);
+    cap.scale.set(0.78, 0.62, 0.78);
+    cap.userData.part = "roof";
+    group.add(cap);
+  }
   return skin;
+}
+
+function surfacePatch(parent, pointAt, material, part, segmentsU = 24, segmentsV = 14) {
+  const positions = [];
+  const indices = [];
+  for (let v = 0; v <= segmentsV; v += 1) {
+    for (let u = 0; u <= segmentsU; u += 1) positions.push(...pointAt(-1 + 2 * u / segmentsU, v / segmentsV));
+  }
+  const row = segmentsU + 1;
+  for (let v = 0; v < segmentsV; v += 1) {
+    for (let u = 0; u < segmentsU; u += 1) {
+      const a = v * row + u;
+      const b = a + 1;
+      const c = a + row;
+      const d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData.part = part;
+  parent.add(mesh);
+  return mesh;
+}
+
+function buildQingExtension(group, mats) {
+  const inferredTimber = new THREE.MeshStandardMaterial({
+    color: 0x85664a, roughness: 0.9, transparent: true, opacity: 0.76, depthWrite: false
+  });
+  const outerX = [-10.05, 10.05];
+  for (const x of outerX) {
+    for (const z of POST_Z) buildTaperedColumn(group, x, z, inferredTimber);
+    meshBox(group, [0.28, 0.28, 13.0], [x, 5.92, 0], inferredTimber, "frame");
+    for (const z of [-6.5, -3.9, 1.2, 6.5]) {
+      meshBox(group, [0.72, 0.15, 0.7], [x, 6.08, z], inferredTimber, "dougong");
+    }
+  }
+  for (const z of [-6.5, 6.5]) {
+    beamBetween(group, [-10.05, 5.92, z], [-6.7, 5.92, z], 0.28, inferredTimber, "frame", 0.38);
+    beamBetween(group, [6.7, 5.92, z], [10.05, 5.92, z], 0.28, inferredTimber, "frame", 0.38);
+  }
+  for (const x of outerX) {
+    for (const z of [-6.5, -3.9, 1.2, 6.5]) {
+      meshBox(group, [0.28, 0.24, 0.3], [x, 5.66, z], inferredTimber, "frame");
+    }
+  }
 }
 
 function buildInteriorHint(hall, mats) {
