@@ -129,7 +129,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const pinAnchors = {
     roof: new THREE.Vector3(7.55, 7.15, 7.35),
     frame: new THREE.Vector3(5.9, 6.25, 6.42),
-    dougong: new THREE.Vector3(6.8, 6.28, 4.8),
+    dougong: new THREE.Vector3(6.7, 6.3, 6.5),
     door: new THREE.Vector3(0, 3.25, 6.5),
     columns: new THREE.Vector3(3.05, 3.15, 1.2),
     base: new THREE.Vector3(6.45, 0.64, 7.1)
@@ -162,7 +162,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function moveCamera(position, target, nextView) {
     cameraTween = {
       startTime: performance.now(),
-      duration: reducedMotion ? 0 : 850,
+      duration: reducedMotion ? 1 : 850,
       fromPosition: camera.position.clone(),
       toPosition: position.clone(),
       fromTarget: controls.target.clone(),
@@ -790,7 +790,11 @@ function buildQingExtension(group, mats) {
   });
   const outerX = [-10.05, 10.05];
   for (const x of outerX) {
-    for (const z of POST_Z) buildTaperedColumn(group, x, z, inferredTimber);
+    for (const z of POST_Z) {
+      meshBox(group, [0.54, 0.16, 0.54], [x, 0.75, z], mats.stoneLight, "base");
+      meshBox(group, [0.38, 0.08, 0.38], [x, 0.87, z], mats.stone, "base");
+      buildTaperedColumn(group, x, z, inferredTimber);
+    }
     meshBox(group, [0.28, 0.28, 13.0], [x, 5.92, 0], inferredTimber, "frame");
     for (const z of [-6.5, -3.9, 1.2, 6.5]) {
       meshBox(group, [0.72, 0.15, 0.7], [x, 6.08, z], inferredTimber, "dougong");
