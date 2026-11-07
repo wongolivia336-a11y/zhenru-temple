@@ -1,40 +1,48 @@
 const stages = [
   {
     period: "元 · 延祐七年",
+    year: "1320",
+    short: "1320，元代题记节点",
     title: "移建现址，木上留年",
-    description: "现址大殿梁间留有“大元延祐七年”题记。它为建筑年代提供重要线索，也让木构本身成为一份可阅读的档案。",
-    question: "此刻值得看",
-    detail: "现状三间单檐形制作为观察起点。进深柱列按研究文章所述5.3、5.1、2.6米不等距表达；具体构件年代仍需逐件核对。",
+    description: "梁间题记为大殿提供重要年代线索。",
+    question: "形制边界",
+    detail: "1320 是纪年节点；当前形制不能直接等同于元代原貌。",
     shape: "单檐歇山 · 形制示意",
     source: 0,
     grade: "史料节点"
   },
   {
     period: "清 · 光绪二十至二十三年",
+    year: "1894—97",
+    short: "1894—97，清代改建",
     title: "重修之后，檐层与开间之变",
-    description: "公开资料均记载光绪年间重修与双檐变化。上海文旅推广网称主体结构未变；2024年研究文章依据历史照片，提出旧貌为五间重檐。两种描述在开间变化上并不完全一致。",
-    question: "此刻值得看",
-    detail: "模型以半透明外扩柱列与下层檐顶呈现“五间重檐说”的研究性叠加。外扩尺寸、构件关系和细部均待原始图档核对。",
-    shape: "五间重檐说 · 轮廓推演",
+    description: "资料记载光绪年间改作双檐；开间范围仍有不同说法。",
+    question: "研究推定",
+    detail: "半透明下檐与外扩柱列呈现一种研究说法，尺寸与节点待档案核验。",
+    shape: "清代双檐说 · 研究推定",
     source: 0,
     grade: "公开记载 + 研究文章推断"
   },
   {
     period: "20世纪 · 落架大修",
+    year: "1963—64",
+    short: "1963—64，落架大修",
     title: "拆解测绘，再作选择",
-    description: "1963年1月启动落架大修，1964年10月竣工。工程回顾称采用落架方式进行古架测绘与构件复原；研究文章进一步讨论了清代下檐的拆除与屋面细部调整。",
-    question: "此刻值得看",
-    detail: "模型回到单檐三间形制。修缮中哪些构件沿用、替换或补配，以及山花、起翘与正脊的具体调整，仍应以原始工程档案校准。",
+    description: "落架大修后，殿堂回到单檐形制。",
+    question: "修缮记录",
+    detail: "模型表现形制变化；构件沿用、替换与补配仍待工程档案核对。",
     shape: "落架大修 · 单檐形制",
     source: 1,
     grade: "修缮记录"
   },
   {
     period: "现状 · 修缮之后",
+    year: "现状",
+    short: "现状，修缮后延续",
     title: "仍在使用，也仍可追问",
-    description: "今天看到的是1963—64年修缮后延续的单檐三间形制。它保留部分早期木构，也承载了近现代保护工程的判断。",
-    question: "此刻值得看",
-    detail: "公开资料记载16根柱中有10根元代柏木柱、6个元代旧石柱础；模型不将这些数量信息擅自转换成具体构件位置。",
+    description: "现状延续了大修后的单檐形制。",
+    question: "现状模型",
+    detail: "柱网与屋面细部为程序几何；元代旧柱位置未作猜定。",
     shape: "现状 · 修缮后的单檐形制",
     source: 0,
     grade: "现状记录"
@@ -44,43 +52,46 @@ const stages = [
 const partNotes = {
   roof: {
     question: "屋面与檐口",
-    detail: "公开资料可确认现状为单檐形制，并记载光绪年间曾改作双檐、1963—64年大修后恢复单檐。模型的举架、起翘、瓦垄与脊饰属于视觉推演。",
-    grade: "形制有记载 · 几何待测绘",
+    detail: "单檐、双檐的变化有公开记载；瓦作与檐口曲线待测绘。",
+    grade: "形制有记载 · 细部待测",
     source: "上海市文旅推广网"
   },
   frame: {
     question: "梁架与屋架",
-    detail: "上海建筑设计研究院的工程回顾提到落架测绘与构件复原。当前梁架按柱网和屋面关系程序化搭建，断面、榫卯和具体构件编号均未取得原始测绘依据。",
-    grade: "修缮方式有记录 · 节点待证",
+    detail: "大修记录提到落架测绘与构件复原；节点与断面待原图校准。",
+    grade: "修缮有记录 · 节点待证",
     source: "上海建筑设计研究院"
   },
   dougong: {
     question: "斗栱与出檐支承",
-    detail: "此处以柱头铺作、横向出跳和承托构件表达木构受力层次。尚未取得可供逐件复原的斗栱测绘图，因此构造类型与尺度仅作形态研究，不应视为真如寺原状复原。",
-    grade: "形制推定 · 待测绘",
+    detail: "斗栱层级与尺度为形态示意，待测绘图复核。",
+    grade: "研究推定",
     source: "待补：1963—64年修缮图纸"
   },
   door: {
     question: "门窗与隔扇",
-    detail: "模型用木格栅和局部围护表达殿内外的界面关系。现有照片不足以确定所有门窗的历史样式、开合方式和更替年代，格心纹样与分格均为示意。",
-    grade: "照片观察 + 视觉推演",
+    detail: "格扇用于表达内外界面；分格与历史样式待核。",
+    grade: "照片观察 · 细节待核",
     source: "项目现场照片；待补历史照片"
   },
   columns: {
     question: "柱网与旧木",
-    detail: "公开资料记载殿内16根柱中有10根为元代柏木柱。进深方向按研究文章所述5.3、5.1、2.6米不等距关系组织；10根旧柱的具体位置仍无逐柱编号可核。",
-    grade: "柱网关系有研究依据 · 旧柱位置待证",
+    detail: "资料记载16根柱中有10根元代柏木柱；旧柱具体位置未证。",
+    grade: "数量有记载 · 位置待证",
     source: "上海市文旅推广网"
   },
   base: {
     question: "台基与柱础",
-    detail: "公开资料记载有6个元代旧石柱础。模型中的台基、踏步和柱础用于表达建筑与地面的关系；具体尺寸、石作形制及旧柱础分布仍待核验。",
-    grade: "数量有公开记载 · 形制待核",
+    detail: "资料记载6个元代旧石柱础；分布与形制待核。",
+    grade: "数量有记载 · 形制待核",
     source: "上海市文旅推广网"
   }
 };
 
 const timelineButtons = [...document.querySelectorAll(".time-step")];
+const stageSlider = document.querySelector("#stageSlider");
+const timelinePeriod = document.querySelector("#timelinePeriod");
+const timelineYear = document.querySelector("#timelineYear");
 const stageFields = {
   period: document.querySelector("#stagePeriod"),
   title: document.querySelector("#stageTitle"),
@@ -101,10 +112,12 @@ const inspector = {
 };
 
 let activeStage = 0;
+let stageProgress = 0;
 let hallScene = null;
 
-function setStage(index) {
-  activeStage = Math.max(0, Math.min(stages.length - 1, index));
+function setStage(value) {
+  stageProgress = Math.max(0, Math.min(stages.length - 1, Number(value) || 0));
+  activeStage = Math.round(stageProgress);
   const stage = stages[activeStage];
   timelineButtons.forEach((button, buttonIndex) => {
     const selected = buttonIndex === activeStage;
@@ -120,7 +133,14 @@ function setStage(index) {
   stageFields.index.textContent = String(activeStage + 1).padStart(2, "0");
   stageFields.viewerEra.textContent = stage.period;
   stageFields.viewerShape.textContent = stage.shape;
-  if (hallScene) hallScene.setStage(activeStage);
+  if (stageSlider) {
+    stageSlider.value = String(stageProgress);
+    stageSlider.style.setProperty("--progress", String(stageProgress / (stages.length - 1) * 100) + "%");
+    stageSlider.setAttribute("aria-valuetext", stage.short);
+  }
+  if (timelinePeriod) timelinePeriod.textContent = stage.period;
+  if (timelineYear) timelineYear.textContent = stage.year;
+  if (hallScene) hallScene.setStage(stageProgress);
   if (inspector.root) inspector.root.hidden = true;
   document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
 }
@@ -141,6 +161,25 @@ function setObservation(part) {
 }
 
 timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
+stageSlider?.addEventListener("input", (event) => setStage(Number(event.currentTarget.value)));
+stageSlider?.addEventListener("change", (event) => setStage(Math.round(Number(event.currentTarget.value))));
+stageSlider?.addEventListener("keydown", (event) => {
+  const direction = event.key === "ArrowRight" || event.key === "ArrowUp" ? 1
+    : event.key === "ArrowLeft" || event.key === "ArrowDown" ? -1 : 0;
+  if (direction) {
+    event.preventDefault();
+    event.stopPropagation();
+    setStage(Math.max(0, Math.min(stages.length - 1, activeStage + direction)));
+  } else if (event.key === "Home") {
+    event.preventDefault();
+    event.stopPropagation();
+    setStage(0);
+  } else if (event.key === "End") {
+    event.preventDefault();
+    event.stopPropagation();
+    setStage(stages.length - 1);
+  }
+});
 function clearObservation({ restoreFocus = false } = {}) {
   setStage(activeStage);
   if (restoreFocus) document.querySelector("#hallCanvas")?.focus({ preventScroll: true });
@@ -161,11 +200,26 @@ document.querySelectorAll(".view-button[data-view]").forEach((button) => {
   });
 });
 
+const toolsToggle = document.querySelector("#toolsToggle");
+const modelTools = document.querySelector("#modelTools");
+toolsToggle?.addEventListener("click", () => {
+  const expanded = toolsToggle.getAttribute("aria-expanded") !== "true";
+  toolsToggle.setAttribute("aria-expanded", String(expanded));
+  modelTools.hidden = !expanded;
+});
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && modelTools && !modelTools.hidden) {
+    modelTools.hidden = true;
+    toolsToggle?.setAttribute("aria-expanded", "false");
+    toolsToggle?.focus({ preventScroll: true });
+  }
+});
+
 document.querySelector("#explodeToggle").addEventListener("click", (event) => {
   if (!hallScene) return;
   const active = hallScene.toggleExploded();
   event.currentTarget.setAttribute("aria-pressed", String(active));
-  event.currentTarget.textContent = active ? "收拢结构" : "结构分解";
+  event.currentTarget.textContent = active ? "合拢结构" : "分层拆解";
 });
 
 document.querySelector("#frameToggle").addEventListener("click", (event) => {
@@ -185,9 +239,11 @@ document.querySelector("#cutawayToggle").addEventListener("click", (event) => {
 document.querySelector("#resetView").addEventListener("click", () => {
   if (!hallScene) return;
   hallScene.resetView();
-  document.querySelector("#explodeToggle").textContent = "结构分解";
+  document.querySelector("#explodeToggle").textContent = "分层拆解";
   document.querySelector("#frameToggle").textContent = "构架透视";
   document.querySelector("#cutawayToggle").textContent = "剖视";
+  modelTools.hidden = true;
+  toolsToggle?.setAttribute("aria-expanded", "false");
   clearObservation();
   document.querySelectorAll(".view-button[data-view]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.view === "outside");
@@ -274,3 +330,4 @@ async function bootModel() {
 }
 
 bootModel();
+
