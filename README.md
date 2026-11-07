@@ -4,13 +4,13 @@
 
 ## 运行
 
-项目采用原生 ES modules 与 import map，无需安装依赖或构建步骤。
+项目采用原生 ES modules 与 import map，无需安装依赖或构建步骤。Three.js r187、OrbitControls 与 GLTFExporter 已随源码放在 `vendor/three/`，本地运行不依赖 CDN。
 
 ```bash
 python -m http.server 8000
 ```
 
-打开 [http://localhost:8000](http://localhost:8000)。请使用支持 WebGL 2 的现代桌面或移动浏览器，并保持网络连接以加载 Three.js r187（jsDelivr CDN）。不要直接双击 `index.html`，因为浏览器通常会阻止 `file://` 下的 ES module 导入。
+打开 [http://localhost:8000](http://localhost:8000)。请使用支持 WebGL 2 的现代桌面或移动浏览器。不要直接双击 `index.html`，因为浏览器通常会阻止 `file://` 下的 ES module 导入。
 
 ## 交互
 
@@ -46,11 +46,11 @@ python -m http.server 8000
 
 ## 技术
 
-- Three.js r187（ES modules + import map）
+- Three.js r187（本地 ES modules + import map；MIT 许可证见 `vendor/three/LICENSE`）
 - OrbitControls：相机环绕、缩放、平移
 - GLTFExporter：二进制 glTF 导出
 - 原生 JavaScript / CSS；无构建步骤
-- `prefers-reduced-motion`、键盘焦点、触屏移动控制与 WebGL 启动失败提示
+- `prefers-reduced-motion`、键盘焦点、键盘/触屏移动控制与 WebGL 2 启动失败提示
 
 ## 研究边界
 
@@ -61,4 +61,4 @@ python -m http.server 8000
 
 第二轮建筑研究原型的完整代码、源照片和交接文档保存在分支 [`feat/zhenru-archive-final-handoff`](https://github.com/wongolivia336-a11y/zhenru-temple/tree/feat/zhenru-archive-final-handoff)。本版本在已有第二轮结构改造基础上补充了 WebGL 几何剖视（“剖视 / 恢复全景”）和更完整的史料/QA交接材料。参阅 [handoff/README.md](./handoff/README.md)、[handoff/EXECUTION_PROMPT.md](./handoff/EXECUTION_PROMPT.md)、[handoff/QA_CHECKLIST.md](./handoff/QA_CHECKLIST.md)。
 
-**注意**：当前环境已完成代码静态检查，但不能视为已完成真实浏览器 WebGL、触屏及 GLB round-trip 全面验收。请按 QA 清单在浏览器中复核。
+**浏览器验收记录**：本轮已在真实 Edge 浏览器中检查 WebGL 场景、四个历史阶段、六个热点、鼠标/键盘/触屏仿真、剖视/分解/构架透视、390/768/1440px 响应式布局及 GLB 二进制结构。完整记录与截图见 [qa/QA_REPORT.md](./qa/QA_REPORT.md)。当前环境没有 Blender，也没有真实手机/低端硬件；GLB 文件结构已在浏览器中解析，但 Blender 导入和硬件帧率仍待后续现场验收。

@@ -16,7 +16,7 @@ const stages = [
     question: "此刻值得看",
     detail: "模型以半透明外扩柱列与下层檐顶呈现“五间重檐说”的研究性叠加。外扩尺寸、构件关系和细部均待原始图档核对。",
     shape: "五间重檐说 · 轮廓推演",
-    source: 2,
+    source: 0,
     grade: "公开记载 + 研究文章推断"
   },
   {
@@ -36,7 +36,7 @@ const stages = [
     question: "此刻值得看",
     detail: "公开资料记载16根柱中有10根元代柏木柱、6个元代旧石柱础；模型不将这些数量信息擅自转换成具体构件位置。",
     shape: "现状 · 修缮后的单檐形制",
-    source: 2,
+    source: 0,
     grade: "现状记录"
   }
 ];
@@ -122,6 +122,7 @@ function setStage(index) {
   stageFields.viewerShape.textContent = stage.shape;
   if (hallScene) hallScene.setStage(activeStage);
   if (inspector.root) inspector.root.hidden = true;
+  document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
 }
 
 function setObservation(part) {
@@ -140,9 +141,17 @@ function setObservation(part) {
 }
 
 timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
-document.querySelector("#closeInspector")?.addEventListener("click", () => {
-  inspector.root.hidden = true;
-  document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
+function clearObservation({ restoreFocus = false } = {}) {
+  setStage(activeStage);
+  if (restoreFocus) document.querySelector("#hallCanvas")?.focus({ preventScroll: true });
+}
+document.querySelector("#closeInspector")?.addEventListener("click", () => clearObservation({ restoreFocus: true }));
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && inspector.root && !inspector.root.hidden) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    clearObservation({ restoreFocus: true });
+  }
 });
 
 document.querySelectorAll(".view-button[data-view]").forEach((button) => {
@@ -179,7 +188,7 @@ document.querySelector("#resetView").addEventListener("click", () => {
   document.querySelector("#explodeToggle").textContent = "结构分解";
   document.querySelector("#frameToggle").textContent = "构架透视";
   document.querySelector("#cutawayToggle").textContent = "剖视";
-  inspector.root.hidden = true;
+  clearObservation();
   document.querySelectorAll(".view-button[data-view]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.view === "outside");
   });
@@ -197,7 +206,7 @@ document.querySelector("#modelDownload").addEventListener("click", async (event)
     anchor.href = url;
     anchor.download = "zhenru-main-hall-study-stage-" + (activeStage + 1) + ".glb";
     anchor.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(() => URL.revokeObjectURL(url), 30000);
     button.textContent = "GLB 已下载";
     window.setTimeout(() => { button.textContent = "下载 GLB"; }, 1800);
   } catch (error) {
@@ -260,7 +269,7 @@ async function bootModel() {
     console.error("Three.js scene failed to start:", error);
     loading.classList.add("is-hidden");
     message.hidden = false;
-    message.textContent = "三维场景没有启动。请确认浏览器支持 WebGL，并通过本地服务器打开页面；首次加载还需访问 Three.js CDN。";
+    message.textContent = "三维场景没有启动。请确认浏览器支持 WebGL 2、图形加速已启用，并通过本地服务器打开页面。";
   }
 }
 

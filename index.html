@@ -6,12 +6,13 @@
     <meta name="theme-color" content="#eee8dc" />
     <meta name="description" content="进入真如寺大雄宝殿的交互式三维建筑档案，观察木构、屋面与历次修缮留下的时间层。" />
     <title>一殿三时｜真如寺大殿三维研究场</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
     <script type="importmap">
       {
         "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
         }
       }
     </script>
@@ -49,7 +50,7 @@
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
               <div class="viewer-ident"><span class="live-dot"></span><span>INTERACTIVE STUDY / 01</span><b>真如寺大殿</b></div>
-              <div class="viewer-scale">现状公开尺寸 <strong>13.4 × 13.0 m</strong><small>高度为视觉推演</small></div>
+              <div class="viewer-scale">现状公开尺寸 <strong>13.4 × 13.0 m</strong><small>高度未按测绘比例复原</small></div>
             </div>
             <div class="view-tools" role="group" aria-label="三维视角与模型控制">
               <button type="button" class="view-button is-selected" data-view="outside">外部</button>
@@ -70,11 +71,11 @@
               <button class="scene-pin" id="pinColumns" type="button" data-part="columns"><i></i><span>柱网</span></button>
               <button class="scene-pin" id="pinBase" type="button" data-part="base"><i></i><span>台基</span></button>
             </div>
-            <div class="walk-pad" id="walkPad" aria-label="漫游移动控制">
-              <button type="button" data-move="forward" aria-label="前进">↑</button>
-              <button type="button" data-move="left" aria-label="左移">←</button>
-              <button type="button" data-move="back" aria-label="后退">↓</button>
-              <button type="button" data-move="right" aria-label="右移">→</button>
+            <div class="walk-pad" id="walkPad" role="group" aria-label="漫游移动控制">
+              <button type="button" data-move="forward" aria-label="前进" aria-pressed="false">↑</button>
+              <button type="button" data-move="left" aria-label="左移" aria-pressed="false">←</button>
+              <button type="button" data-move="back" aria-label="后退" aria-pressed="false">↓</button>
+              <button type="button" data-move="right" aria-label="右移" aria-pressed="false">→</button>
             </div>
             <aside class="component-inspector" id="componentInspector" aria-live="polite" hidden>
               <div class="inspector-top"><span>构件档案 / PART NOTE</span><button type="button" id="closeInspector" aria-label="关闭构件说明">×</button></div>
@@ -84,7 +85,7 @@
             </aside>
             <div class="viewer-loading" id="viewerLoading" role="status">
               <span class="loading-glyph">如</span><span>正在构建三维木构场景…</span>
-              <small>首次加载需连接 Three.js CDN</small>
+            <small>Three.js r187 · 本地模块</small>
             </div>
             <div class="viewer-bottom">
               <div class="viewer-caption"><span class="caption-kicker" id="viewerEra">元 · 延祐七年</span><strong id="viewerShape">单檐歇山 · 形制示意</strong><span class="caption-divider"></span><span class="explore-hint" id="exploreHint">拖动旋转 · 滚轮缩放 · 右键平移</span></div>
@@ -95,7 +96,7 @@
                 <button class="time-step" type="button" data-stage="3" aria-pressed="false"><span class="time-dot"></span><strong>今日</strong><small>延续现状</small></button>
               </div>
             </div>
-            <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL。请使用支持 WebGL 的浏览器，并通过本地服务器打开页面。</div>
+            <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL 2。请使用支持 WebGL 2 的浏览器，并确认浏览器已启用图形加速。</div>
           </div>
           <div class="viewer-instruction"><span><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> 聚焦模型后旋转 · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 入殿移动</span><span>拖动旋转 · 滚轮缩放 · 右键平移</span><span class="model-badge">程序化几何 · 非照片贴图</span></div>
         </div>
@@ -198,6 +199,7 @@
           <a href="https://www.thepaper.cn/newsDetail_forward_26636609" target="_blank" rel="noreferrer"><span class="source-no">03</span><span><strong>真如寺：大都市，小元构 · 澎湃新闻</strong><small>建筑史脉络与修缮形制讨论；作为进一步阅读线索</small></span><span class="source-arrow">↗</span></a>
           <a href="https://www.shpt.gov.cn/zhengwu/wbcg-wljwhyc/2024/106/163758/b91c233608204309aad9254cfbfef98a.pdf" target="_blank" rel="noreferrer"><span class="source-no">04</span><span><strong>普陀区文物保护单位名录 · 上海普陀</strong><small>文物身份与地址信息</small></span><span class="source-arrow">↗</span></a>
           <a href="https://threejs.org/docs/pages/OrbitControls.html" target="_blank" rel="noreferrer"><span class="source-no">05</span><span><strong>Three.js · OrbitControls</strong><small>相机旋转、缩放与平移交互</small></span><span class="source-arrow">↗</span></a>
+          <a href="https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html" target="_blank" rel="noreferrer"><span class="source-no">06</span><span><strong>走进真如寺，探秘大殿的建筑密码 · 上海普陀</strong><small>斗栱、梁架与屋面参数的报道线索；非测绘图</small></span><span class="source-arrow">↗</span></a>
         </div>
         <p class="source-caveat">本原型为研究与表达练习，不代表寺方、文物主管部门或专业修缮单位的官方意见。公开网页信息需要与原始档案及专业人员核对。</p>
       </section>

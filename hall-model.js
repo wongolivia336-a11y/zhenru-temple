@@ -17,7 +17,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.02;
@@ -36,6 +36,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   controls.zoomSpeed = 0.82;
   controls.panSpeed = 0.74;
   controls.update();
+  const cancelCameraTween = () => { cameraTween = null; cameraTouched = true; };
+  controls.addEventListener("start", cancelCameraTween);
 
   scene.add(new THREE.HemisphereLight(0xf2eadb, 0x6b6659, 1.85));
   const keyLight = new THREE.DirectionalLight(0xffedcf, 3.0);
@@ -133,20 +135,29 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     base: new THREE.Vector3(6.45, 0.64, 7.1)
   };
   const moving = new Set();
+  const listenerController = new AbortController();
+  const listenerOptions = { signal: listenerController.signal };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const interactiveGroups = [baseGroup, frameGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
   let exploded = false;
   let frameMode = false;
   let cutaway = false;
   let currentStage = 0;
   let cameraTween = null;
+  let cameraTouched = false;
   let disposed = false;
   let readyCalled = false;
   let raf = 0;
   let lastTime = performance.now();
+
+  function responsiveHomePosition() {
+    const aspect = frame.clientWidth / Math.max(frame.clientHeight, 1);
+    const distanceScale = THREE.MathUtils.clamp(0.72 / aspect, 1, 1.32);
+    return TARGET_HOME.clone().add(CAMERA_HOME.clone().sub(TARGET_HOME).multiplyScalar(distanceScale));
+  }
 
   function setStage(stage) {
     currentStage = stage;
@@ -161,7 +172,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function moveCamera(position, target, nextView) {
     cameraTween = {
       startTime: performance.now(),
-      duration: reducedMotion ? 1 : 850,
+      duration: reducedMotionQuery.matches ? 1 : 850,
       fromPosition: camera.position.clone(),
       toPosition: position.clone(),
       fromTarget: controls.target.clone(),
@@ -187,12 +198,13 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
 
   function setView(view) {
+    if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.1, 3.1), new THREE.Vector3(0, 2.65, -1.5), "inside");
     } else if (view === "top") {
       moveCamera(new THREE.Vector3(0.2, 24, 0.4), new THREE.Vector3(0, 0, 0), "top");
     } else {
-      moveCamera(CAMERA_HOME, TARGET_HOME, "outside");
+      moveCamera(responsiveHomePosition(), TARGET_HOME, "outside");
     }
     document.querySelectorAll(".view-button[data-view]").forEach((button) => {
       button.classList.toggle("is-selected", button.dataset.view === view);
@@ -222,6 +234,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   function resetView() {
     moving.clear();
+    cameraTouched = false;
     setView("outside");
     toggleExploded(false);
     toggleFrame(false);
@@ -256,14 +269,14 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
 
   let downPoint = null;
-  canvas.addEventListener("pointerdown", (event) => { downPoint = { x: event.clientX, y: event.clientY }; });
+  canvas.addEventListener("pointerdown", (event) => { downPoint = { x: event.clientX, y: event.clientY }; }, listenerOptions);
   canvas.addEventListener("pointerup", (event) => {
     if (!downPoint) return;
     if (Math.hypot(event.clientX - downPoint.x, event.clientY - downPoint.y) < 5) selectAt(event);
     downPoint = null;
-  });
-  canvas.addEventListener("contextmenu", (event) => event.preventDefault());
-  canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }));
+  }, listenerOptions);
+  canvas.addEventListener("contextmenu", (event) => event.preventDefault(), listenerOptions);
+  canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }), listenerOptions);
 
   function rotateCameraBy(horizontal, vertical) {
     cameraTween = null;
@@ -284,6 +297,19 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const key = event.key.toLowerCase();
     const editing = event.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
     if (editing) return;
+    if (key === "escape") {
+      const inspector = document.getElementById("componentInspector");
+      if (inspector && !inspector.hidden) {
+        event.preventDefault();
+        inspector.hidden = true;
+        document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
+        canvas.focus({ preventScroll: true });
+      } else if (activeView === "inside") {
+        event.preventDefault();
+        setView("outside");
+      }
+      return;
+    }
     if (["w", "a", "s", "d"].includes(key) && activeView === "inside") {
       event.preventDefault();
       moving.add(key);
@@ -301,18 +327,49 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
   function onKeyUp(event) { moving.delete(event.key.toLowerCase()); }
   function onBlur() { moving.clear(); }
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", onKeyUp);
-  window.addEventListener("blur", onBlur);
+  window.addEventListener("keydown", onKeyDown, listenerOptions);
+  window.addEventListener("keyup", onKeyUp, listenerOptions);
+  window.addEventListener("blur", onBlur, listenerOptions);
 
   document.querySelectorAll(".walk-pad [data-move]").forEach((button) => {
     const directions = { forward: "w", back: "s", left: "a", right: "d" };
     const key = directions[button.dataset.move];
-    button.addEventListener("pointerdown", (event) => { event.preventDefault(); button.setPointerCapture(event.pointerId); setMove(key, true); });
-    button.addEventListener("pointerup", () => setMove(key, false));
-    button.addEventListener("pointercancel", () => setMove(key, false));
-    button.addEventListener("lostpointercapture", () => setMove(key, false));
+    const press = () => { setMove(key, true); button.setAttribute("aria-pressed", "true"); };
+    const release = () => { setMove(key, false); button.setAttribute("aria-pressed", "false"); };
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      button.focus({ preventScroll: true });
+      button.setPointerCapture(event.pointerId);
+      press();
+    }, listenerOptions);
+    button.addEventListener("pointerup", release, listenerOptions);
+    button.addEventListener("pointercancel", release, listenerOptions);
+    button.addEventListener("lostpointercapture", release, listenerOptions);
+    button.addEventListener("keydown", (event) => {
+      if (["Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+        event.preventDefault();
+        press();
+      }
+    }, listenerOptions);
+    button.addEventListener("keyup", (event) => {
+      if (["Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+        event.preventDefault();
+        release();
+      }
+    }, listenerOptions);
+    button.addEventListener("blur", release, listenerOptions);
   });
+
+  const onVisibilityChange = () => {
+    if (document.hidden) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    } else if (!disposed && !raf) {
+      lastTime = performance.now();
+      raf = requestAnimationFrame(animate);
+    }
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange, listenerOptions);
 
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(frame);
@@ -322,27 +379,100 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    if (activeView === "outside" && !cameraTouched && !cameraTween) {
+      camera.position.copy(responsiveHomePosition());
+      controls.target.copy(TARGET_HOME);
+      controls.update();
+    }
   }
   resize();
 
   function updatePins() {
     const rect = frame.getBoundingClientRect();
+    const bounds = { left: 16, right: rect.width - 16, top: 100, bottom: rect.height - 114 };
+    const obstacles = [...document.querySelectorAll(".hero-copy, .viewer-topline, .view-tools, .viewer-bottom, .component-inspector, .walk-pad")]
+      .filter((element) => getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
+      .map((element) => {
+        const box = element.getBoundingClientRect();
+        return { left: box.left - rect.left - 6, right: box.right - rect.left + 6, top: box.top - rect.top - 6, bottom: box.bottom - rect.top + 6 };
+      });
+    const candidates = [];
     for (const [part, element] of Object.entries(pins)) {
       const point = pinAnchors[part].clone().project(camera);
       const x = (point.x * 0.5 + 0.5) * rect.width;
       const y = (-point.y * 0.5 + 0.5) * rect.height;
-      const inBounds = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 92 && y < rect.height - 110;
-      element.classList.toggle("is-visible", inBounds && activeView !== "inside");
-      element.style.left = String(x) + "px";
-      element.style.top = String(y) + "px";
+      const visible = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 10 && y < rect.height - 10 && activeView !== "inside";
+      element.classList.toggle("is-visible", visible);
+      if (visible) candidates.push({ element, x, y, part });
+    }
+    candidates.sort((a, b) => a.y - b.y || a.x - b.x);
+    const placed = [];
+    const overlaps = (a, b, gap = 8) => !(a.right + gap <= b.left || a.left - gap >= b.right || a.bottom + gap <= b.top || a.top - gap >= b.bottom);
+    for (const item of candidates) {
+      const width = item.element.offsetWidth || 68;
+      const height = item.element.offsetHeight || 24;
+      const stepX = width + 16;
+      const stepY = height + 12;
+      const offsets = [[0, 0], [0, -stepY], [0, stepY], [stepX, 0], [-stepX, 0], [stepX, -stepY], [-stepX, -stepY], [stepX, stepY], [-stepX, stepY], [0, -stepY * 2], [0, stepY * 2], [stepX * 2, 0], [-stepX * 2, 0]];
+      let chosen = null;
+      for (const [dx, dy] of offsets) {
+        const cx = THREE.MathUtils.clamp(item.x + dx, bounds.left + width / 2, bounds.right - width / 2);
+        const cy = THREE.MathUtils.clamp(item.y + dy, bounds.top + height / 2, bounds.bottom - height / 2);
+        const box = { left: cx - width / 2, right: cx + width / 2, top: cy - height / 2, bottom: cy + height / 2 };
+        if (![...placed, ...obstacles].some((other) => overlaps(box, other))) { chosen = { x: cx, y: cy, box }; break; }
+      }
+      if (!chosen) {
+        const cx = THREE.MathUtils.clamp(item.x, bounds.left + width / 2, bounds.right - width / 2);
+        const cy = THREE.MathUtils.clamp(item.y, bounds.top + height / 2, bounds.bottom - height / 2);
+        chosen = { x: cx, y: cy, box: { left: cx - width / 2, right: cx + width / 2, top: cy - height / 2, bottom: cy + height / 2 } };
+      }
+      item.element.style.left = String(chosen.x) + "px";
+      item.element.style.top = String(chosen.y) + "px";
+      placed.push(chosen.box);
     }
   }
   Object.values(pins).forEach((element) => {
-    element.addEventListener("click", () => onPart(element.dataset.part));
+    element.addEventListener("click", () => onPart(element.dataset.part), listenerOptions);
   });
 
+  function getSceneState() {
+    return {
+      stage: currentStage,
+      view: activeView,
+      exploded,
+      frameMode,
+      cutaway,
+      qingRoofVisible: extraRoofGroup.visible,
+      qingExtensionVisible: qingExtensionGroup.visible,
+      mainRoofSurfaceVisible: mainRoofSkin.visible,
+      lowerRoofSurfaceVisible: extraRoofSkin.visible,
+      camera: camera.position.toArray(),
+      target: controls.target.toArray(),
+      mainRoofOffset: roofGroup.position.y,
+      lowerEaveOffset: extraRoofGroup.position.y
+    };
+  }
+  function getDiagnostics() {
+    let objects = 0;
+    let renderables = 0;
+    scene.traverse((node) => { objects += 1; if (node.isMesh || node.isLine || node.isPoints) renderables += 1; });
+    return {
+      revision: THREE.REVISION,
+      drawCalls: renderer.info.render.calls,
+      triangles: renderer.info.render.triangles,
+      geometries: renderer.info.memory.geometries,
+      textures: renderer.info.memory.textures,
+      objects,
+      renderables,
+      pixelRatio: renderer.getPixelRatio()
+    };
+  }
+  if (new URLSearchParams(window.location.search).get("qa") === "1") {
+    window.__zhenruQA = { getSceneState, getDiagnostics };
+  }
+
   function animate(now) {
-    if (disposed) return;
+    if (disposed || document.hidden) { raf = 0; return; }
     raf = requestAnimationFrame(animate);
     const delta = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
@@ -366,12 +496,19 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       if (moving.has("a")) velocity.sub(right);
       if (velocity.lengthSq()) {
         velocity.normalize().multiplyScalar(2.2 * delta);
-        const nextX = THREE.MathUtils.clamp(camera.position.x + velocity.x, -5.9, 5.9);
-        const nextZ = THREE.MathUtils.clamp(camera.position.z + velocity.z, -5.9, 5.9);
-        const blocked = POST_X.some((x) => POST_Z.some((z) => Math.hypot(nextX - x, nextZ - z) < 0.48));
-        if (!blocked) {
-          const dx = nextX - camera.position.x;
-          const dz = nextZ - camera.position.z;
+        const startX = camera.position.x;
+        const startZ = camera.position.z;
+        let nextX = THREE.MathUtils.clamp(startX + velocity.x, -5.9, 5.9);
+        let nextZ = THREE.MathUtils.clamp(startZ + velocity.z, -5.9, 5.9);
+        const blocked = (x, z) => POST_X.some((postX) => POST_Z.some((postZ) => Math.hypot(x - postX, z - postZ) < 0.5));
+        if (blocked(nextX, nextZ)) {
+          if (!blocked(nextX, startZ)) nextZ = startZ;
+          else if (!blocked(startX, nextZ)) nextX = startX;
+          else { nextX = startX; nextZ = startZ; }
+        }
+        if (nextX !== startX || nextZ !== startZ) {
+          const dx = nextX - startX;
+          const dz = nextZ - startZ;
           camera.position.x = nextX;
           camera.position.z = nextZ;
           controls.target.x += dx;
@@ -388,7 +525,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       onReady();
     }
   }
-  raf = requestAnimationFrame(animate);
+  raf = document.hidden ? 0 : requestAnimationFrame(animate);
 
   return {
     setStage,
@@ -402,10 +539,10 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       disposed = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
+      listenerController.abort();
+      controls.removeEventListener("start", cancelCameraTween);
       controls.dispose();
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("blur", onBlur);
+      if (window.__zhenruQA) delete window.__zhenruQA;
       const geometries = new Set();
       const materials = new Set();
       scene.traverse((node) => {
