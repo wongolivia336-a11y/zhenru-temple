@@ -11,6 +11,7 @@
 - `IMPLEMENTATION_NOTES.md`：架构、具体变更、历史证据边界、剩余技术工作。
 - `EXECUTION_PROMPT.md`：可直接复制给没有上下文的下一位 Creative Frontend / WebGL Agent 的执行提示词。
 - `QA_CHECKLIST.md`：当前验证、复核方法、手动浏览器检查表。
+- `BROWSER_AUDIT.md`：2026-11-07 临时浏览器预览的实际观察、未验证部分和限制。
 - `../README.md`：开源仓库运行、操作与阶段说明。
 - `../sources.md`：历史来源和推演范围。
 - `../assets/`：保留原始现场照片，仅作现场笔记。
