@@ -17,6 +17,7 @@
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#viewerFrame">跳转到三维模型</a>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="一殿三时，回到首页">
         <span class="brand-seal">真如</span>
@@ -43,7 +44,7 @@
         </div>
 
         <div class="viewer-shell">
-          <div class="viewer-frame" id="viewerFrame">
+          <div class="viewer-frame" id="viewerFrame" tabindex="-1">
             <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
@@ -54,6 +55,7 @@
               <button type="button" class="view-button is-selected" data-view="outside">外部</button>
               <button type="button" class="view-button" data-view="inside">入殿</button>
               <button type="button" class="view-button" data-view="top">俯瞰</button>
+              <button type="button" class="view-button tool-button" id="cutawayToggle" aria-pressed="false">剖视</button>
               <span class="tool-separator"></span>
               <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">结构分解</button>
               <button type="button" class="view-button tool-button" id="frameToggle" aria-pressed="false">构架透视</button>

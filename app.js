@@ -166,11 +166,20 @@ document.querySelector("#frameToggle").addEventListener("click", (event) => {
   event.currentTarget.textContent = active ? "恢复屋面" : "构架透视";
 });
 
+document.querySelector("#cutawayToggle").addEventListener("click", (event) => {
+  if (!hallScene) return;
+  const active = hallScene.toggleCutaway();
+  event.currentTarget.setAttribute("aria-pressed", String(active));
+  event.currentTarget.textContent = active ? "恢复全景" : "剖视";
+});
+
 document.querySelector("#resetView").addEventListener("click", () => {
   if (!hallScene) return;
   hallScene.resetView();
   document.querySelector("#explodeToggle").textContent = "结构分解";
   document.querySelector("#frameToggle").textContent = "构架透视";
+  document.querySelector("#cutawayToggle").textContent = "剖视";
+  inspector.root.hidden = true;
   document.querySelectorAll(".view-button[data-view]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.view === "outside");
   });

@@ -120,9 +120,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const mainRoofSkin = buildRoof(roofGroup, {
     width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
   });
-  const extraRoofSkin = buildRoof(extraRoofGroup, {
-    width: 19.05, depth: 18.55, baseY: 5.72, ridgeY: 7.55, ridgeHalf: 5.95, mats, style: "lower"
-  });
+  const extraRoofSkin = buildLowerEave(extraRoofGroup, mats);
   buildInteriorHint(hall, mats);
   buildQingExtension(qingExtensionGroup, mats);
 
@@ -142,6 +140,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   let activeView = "outside";
   let exploded = false;
   let frameMode = false;
+  let cutaway = false;
   let currentStage = 0;
   let cameraTween = null;
   let disposed = false;
@@ -154,7 +153,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     extraRoofGroup.visible = stage === 1;
     extraRoofGroup.position.y = stage === 1 && exploded ? 1.37 : 0;
     extraRoofGroup.scale.x = stage === 1 ? 1.15 : 1;
-    roofGroup.scale.x = stage === 1 ? 1.2 : 1;
+    roofGroup.scale.x = 1;
     qingExtensionGroup.visible = stage === 1;
     extraRoofSkin.visible = !frameMode;
   }
@@ -214,13 +213,22 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     return frameMode;
   }
 
+  function toggleCutaway(force) {
+    cutaway = typeof force === "boolean" ? force : !cutaway;
+    // Render actual WebGL section, not a screen-space screenshot.
+    renderer.clippingPlanes = cutaway ? [new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0)] : [];
+    return cutaway;
+  }
+
   function resetView() {
     moving.clear();
     setView("outside");
     toggleExploded(false);
     toggleFrame(false);
+    toggleCutaway(false);
     document.getElementById("explodeToggle").setAttribute("aria-pressed", "false");
     document.getElementById("frameToggle").setAttribute("aria-pressed", "false");
+    document.getElementById("cutawayToggle").setAttribute("aria-pressed", "false");
   }
 
   async function exportGLB() {
@@ -387,6 +395,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     setView,
     toggleExploded,
     toggleFrame,
+    toggleCutaway,
     resetView,
     exportGLB,
     destroy() {
@@ -809,6 +818,56 @@ function buildQingExtension(group, mats) {
       meshBox(group, [0.28, 0.24, 0.3], [x, 5.66, z], inferredTimber, "frame");
     }
   }
+}
+
+function buildLowerEave(parent, mats) {
+  // Qing-period additional lower eave: annular roof only.
+  // Its construction is conjectural, not a scan of the lost 19th-century configuration.
+  const skin = new THREE.Group();
+  skin.name = "Qing-addition-eave-skin";
+  skin.userData.part = "roof";
+  skin.userData.isRoofSkin = true;
+  parent.add(skin);
+  const outerX = 11.2;
+  const outerZ = 9.35;
+  const innerX = 6.55;
+  const innerZ = 6.42;
+  const topY = 6.12;
+  const outerY = 5.64;
+  const eaveMat = mats.roofSun;
+  for (const sign of [-1, 1]) {
+    const front = [
+      [-outerX, outerY + 0.17, sign * outerZ],
+      [outerX, outerY + 0.17, sign * outerZ],
+      [innerX, topY, sign * innerZ],
+      [-innerX, topY, sign * innerZ]
+    ];
+    polygonMesh(skin, front, eaveMat, "roof");
+    const side = [
+      [sign * outerX, outerY + 0.17, -outerZ],
+      [sign * outerX, outerY + 0.17, outerZ],
+      [sign * innerX, topY, innerZ],
+      [sign * innerX, topY, -innerZ]
+    ];
+    polygonMesh(skin, side, eaveMat, "roof");
+    const frontEave = [];
+    const sideEave = [];
+    for (let i = 0; i <= 24; i++) {
+      const u = -1 + 2 * i / 24;
+      frontEave.push([u * outerX, outerY + 0.17 + 0.1 * u * u, sign * outerZ]);
+      sideEave.push([sign * outerX, outerY + 0.17 + 0.1 * u * u, u * outerZ]);
+    }
+    addTube(skin, frontEave, 0.08, mats.woodDark, "roof");
+    addTube(skin, sideEave, 0.08, mats.woodDark, "roof");
+    for (let i = -12; i <= 12; i++) {
+      const u = i / 12;
+      addTube(skin, [[u * innerX, topY + 0.015, sign * innerZ], [u * outerX, outerY + 0.21 + 0.1 * u * u, sign * outerZ]],
+        0.022, mats.woodDark, "roof");
+      addTube(skin, [[sign * innerX, topY + 0.015, u * innerZ], [sign * outerX, outerY + 0.21 + 0.1 * u * u, u * outerZ]],
+        0.022, mats.woodDark, "roof");
+    }
+  }
+  return skin;
 }
 
 function buildInteriorHint(hall, mats) {
