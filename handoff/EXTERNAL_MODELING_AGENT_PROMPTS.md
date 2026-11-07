@@ -25,7 +25,7 @@
 
 - **核心建筑几何**：优先交给会用 Blender 的建筑/数字遗产建模者，或能写 Blender Python 参数化脚本的代码 Agent。AI 生成器不应根据单张照片猜整座殿的尺寸、背面和隐藏结构。
 - **单体草模与纹理测试**：可试 [Meshy Image-to-3D](https://docs.meshy.ai/en/api/image-to-3d)、[Tripo Image-to-3D](https://www.tripo3d.ai/features/image-to-3d-model)、[Hyper3D Rodin](https://hyper3d.ai/help/articles/what-features-does-hyper3d-have)。它们能从图像生成网格并导出常见三维格式；适合生成局部候选形体，再由人检查和重拓扑，不适合作为有测绘精度承诺的建筑复原。
-- **本地开源图像转模型**：可试 [Tencent Hunyuan3D-2](https://github.com/Tencent-Hunyuan/Hunyuan3D-2)，项目公开了图像转形体、纹理和多视图工作流，并支持输出网格。部署前核对硬件要求与当前模型许可条款：[官方 License](https://github.com/Tencent-Hunyuan/Hunyuan3D-2/blob/main/LICENSE)。
+- **本地可部署图像转模型**：可试 [Tencent Hunyuan3D-2](https://github.com/Tencent-Hunyuan/Hunyuan3D-2)，项目公开了图像转形体、纹理和多视图工作流，并支持输出网格。部署前核对硬件要求与当前模型许可条款：[官方 License](https://github.com/Tencent-Hunyuan/Hunyuan3D-2/blob/main/LICENSE)。
 - **现状摄影测量**：照片覆盖充分后，用 [Meshroom](https://github.com/alicevision/Meshroom) 或 [COLMAP](https://github.com/colmap/colmap) 建现状网格；用 [Nerfstudio Splatfacto](https://docs.nerf.studio/nerfology/methods/splat.html) 训练照片级漫游层，再由 [Spark](https://github.com/sparkjsdev/spark) 接入 Three.js。Splat 是现状视觉层，不能替代可测量、可拆解的木构模型。
 - **证据底线**：AI 输出属于候选资产。未经照片、尺寸或档案复核，不得标为“真如寺精确复原”。
 
@@ -214,6 +214,7 @@
 2. 与寺方联系，申请大殿现状测绘、历次修缮图纸/照片和室内拍摄许可；资料到位后再启动 Prompt 3、4、5。
 3. 最后让 Prompt 6 接收审核过的 GLB；先做模型验收，再合入 Web 时间轴。
 4. 单图 AI 生成适合探索屋瓦端头、灯具或非关键装饰的候选，不应承担“整殿复原”。若没有测量资料，最专业的交付就是列清不确定项并暂停该部分，而不是让模型猜完整。
+
 
 
 
