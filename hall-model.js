@@ -9,8 +9,8 @@ const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 
 export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#e9e2d5");
-  scene.fog = new THREE.Fog("#e9e2d5", 44, 88);
+  scene.background = new THREE.Color("#f0f3f0");
+  scene.fog = new THREE.Fog("#f0f3f0", 48, 96);
 
   const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 120);
   camera.position.copy(CAMERA_HOME);
@@ -39,8 +39,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const cancelCameraTween = () => { cameraTween = null; cameraTouched = true; };
   controls.addEventListener("start", cancelCameraTween);
 
-  scene.add(new THREE.HemisphereLight(0xf2eadb, 0x6b6659, 1.85));
-  const keyLight = new THREE.DirectionalLight(0xffedcf, 3.0);
+  scene.add(new THREE.HemisphereLight(0xf6f8f6, 0x737b76, 1.7));
+  const keyLight = new THREE.DirectionalLight(0xfff5e3, 2.6);
   keyLight.position.set(-13, 22, 15);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -51,30 +51,30 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   keyLight.shadow.bias = -0.00028;
   keyLight.shadow.normalBias = 0.035;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x9cae9d, 0.95);
+  const fillLight = new THREE.DirectionalLight(0xc5d0ca, 1.15);
   fillLight.position.set(12, 10, -15);
   scene.add(fillLight);
-  const warmInterior = new THREE.PointLight(0xd9a66c, 8, 16, 1.8);
+  const warmInterior = new THREE.PointLight(0xe0bd82, 4.2, 17, 1.8);
   warmInterior.position.set(0, 4.2, -0.8);
   scene.add(warmInterior);
 
   const mats = {
-    stone: new THREE.MeshStandardMaterial({ color: 0x938d7f, roughness: 0.94 }),
-    stoneLight: new THREE.MeshStandardMaterial({ color: 0xc9bea8, roughness: 0.9 }),
-    stoneDark: new THREE.MeshStandardMaterial({ color: 0x716d62, roughness: 0.96 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0x969a96, roughness: 0.94 }),
+    stoneLight: new THREE.MeshStandardMaterial({ color: 0xd0d3ce, roughness: 0.9 }),
+    stoneDark: new THREE.MeshStandardMaterial({ color: 0x707873, roughness: 0.96 }),
     wood: new THREE.MeshStandardMaterial({ color: 0x503724, roughness: 0.86 }),
     woodLight: new THREE.MeshStandardMaterial({ color: 0x80603d, roughness: 0.82 }),
     woodDark: new THREE.MeshStandardMaterial({ color: 0x30251d, roughness: 0.92 }),
     woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7548, roughness: 0.78 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xcbbfa8, roughness: 0.95 }),
-    wallShadow: new THREE.MeshStandardMaterial({ color: 0x9d9079, roughness: 0.96 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x494a42, roughness: 0.9, side: THREE.DoubleSide }),
-    roofSide: new THREE.MeshStandardMaterial({ color: 0x3b4039, roughness: 0.92, side: THREE.DoubleSide }),
-    roofSun: new THREE.MeshStandardMaterial({ color: 0x5a584c, roughness: 0.88, side: THREE.DoubleSide }),
-    roofTile: new THREE.LineBasicMaterial({ color: 0xaaa081, transparent: true, opacity: 0.86 }),
-    roofRib: new THREE.LineBasicMaterial({ color: 0x393e36, transparent: true, opacity: 0.9 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xc9cec9, roughness: 0.95 }),
+    wallShadow: new THREE.MeshStandardMaterial({ color: 0x858d87, roughness: 0.96 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x777e79, roughness: 0.91, side: THREE.DoubleSide }),
+    roofSide: new THREE.MeshStandardMaterial({ color: 0x656e69, roughness: 0.93, side: THREE.DoubleSide }),
+    roofSun: new THREE.MeshStandardMaterial({ color: 0x858a84, roughness: 0.89, side: THREE.DoubleSide }),
+    roofTile: new THREE.LineBasicMaterial({ color: 0xa3aaa5, transparent: true, opacity: 0.52 }),
+    roofRib: new THREE.LineBasicMaterial({ color: 0x4b5550, transparent: true, opacity: 0.66 }),
     brass: new THREE.MeshStandardMaterial({ color: 0xa98b59, roughness: 0.68, metalness: 0.12 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0xd5cebf, roughness: 1 }),
+    ground: new THREE.MeshStandardMaterial({ color: 0xf0f2ef, roughness: 1 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x35342e, roughness: 0.52, metalness: 0.02 })
   };
 
@@ -100,7 +100,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const columnGroup = new THREE.Group();
   columnGroup.name = "sixteen-column-grid";
   columnGroup.userData.part = "columns";
-  frameGroup.add(columnGroup);
+  hall.add(columnGroup);
   const roofGroup = new THREE.Group();
   roofGroup.name = "single-eave-roof";
   roofGroup.userData.part = "roof";
@@ -139,13 +139,16 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const listenerOptions = { signal: listenerController.signal };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const interactiveGroups = [baseGroup, frameGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
+  const interactiveGroups = [baseGroup, frameGroup, columnGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
   let exploded = false;
+  let explosionAmount = 0;
   let frameMode = false;
   let cutaway = false;
   let currentStage = 0;
+  let qingOpacity = 0;
+  const fadeMaterialCache = new WeakMap();
   let cameraTween = null;
   let cameraTouched = false;
   let disposed = false;
@@ -159,14 +162,56 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     return TARGET_HOME.clone().add(CAMERA_HOME.clone().sub(TARGET_HOME).multiplyScalar(distanceScale));
   }
 
+  function responsiveTopPosition() {
+    const aspect = frame.clientWidth / Math.max(frame.clientHeight, 1);
+    const halfSpan = 9.35;
+    const distance = halfSpan / (Math.tan(THREE.MathUtils.degToRad(52 / 2)) * Math.max(aspect, 0.55));
+    return new THREE.Vector3(0.2, Math.max(20, distance), 0.4);
+  }
+
+  function setGroupOpacity(root, opacity) {
+    root.traverse((node) => {
+      if (!node.isMesh && !node.isLine) return;
+      let materials = fadeMaterialCache.get(node);
+      if (!materials) {
+        const originals = Array.isArray(node.material) ? node.material : [node.material];
+        const copies = originals.map((material) => material.clone());
+        materials = {
+          original: node.material,
+          copies: Array.isArray(node.material) ? copies : copies[0],
+          opacity: originals.map((material) => material.opacity),
+          depthWrite: originals.map((material) => material.depthWrite)
+        };
+        fadeMaterialCache.set(node, materials);
+      }
+      if (opacity >= 0.995) {
+        node.material = materials.original;
+        return;
+      }
+      node.material = materials.copies;
+      const copies = Array.isArray(materials.copies) ? materials.copies : [materials.copies];
+      copies.forEach((material, index) => {
+        material.transparent = true;
+        material.opacity = materials.opacity[index] * opacity;
+        material.depthWrite = opacity > 0.92 ? materials.depthWrite[index] : false;
+      });
+    });
+  }
+
   function setStage(stage) {
-    currentStage = stage;
-    extraRoofGroup.visible = stage === 1;
-    extraRoofGroup.position.y = stage === 1 && exploded ? 1.37 : 0;
-    extraRoofGroup.scale.x = stage === 1 ? 1.15 : 1;
+    currentStage = THREE.MathUtils.clamp(Number(stage) || 0, 0, 3);
+    if (currentStage <= 1) qingOpacity = currentStage;
+    else if (currentStage <= 2) qingOpacity = 2 - currentStage;
+    else qingOpacity = 0;
+    qingOpacity = THREE.MathUtils.clamp(qingOpacity, 0, 1);
+    extraRoofGroup.visible = qingOpacity > 0.005;
+    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 0.78;
+    extraRoofGroup.scale.x = 1 + qingOpacity * 0.15;
     roofGroup.scale.x = 1;
-    qingExtensionGroup.visible = stage === 1;
-    extraRoofSkin.visible = !frameMode;
+    qingExtensionGroup.visible = qingOpacity > 0.005;
+    setGroupOpacity(extraRoofGroup, qingOpacity);
+    setGroupOpacity(qingExtensionGroup, qingOpacity);
+    extraRoofSkin.visible = !frameMode && qingOpacity > 0.005;
   }
 
   function moveCamera(position, target, nextView) {
@@ -179,6 +224,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       toTarget: target.clone()
     };
     activeView = nextView;
+    camera.fov = nextView === "top" ? 52 : 37;
+    camera.updateProjectionMatrix();
     if (nextView === "top") {
       camera.up.set(0, 0, -1);
       controls.maxPolarAngle = Math.PI;
@@ -193,16 +240,17 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     controls.update();
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
     document.getElementById("exploreHint").textContent = nextView === "inside"
-      ? "WASD / 触屏方向键移动 · 拖动转头 · 滚轮靠近"
-      : "拖动旋转 · 滚轮缩放 · 右键平移";
+      ? "WASD 移动 · 佛像轮廓为待核占位"
+      : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
   function setView(view) {
+    cameraTouched = false;
     if (view !== "inside") moving.clear();
     if (view === "inside") {
-      moveCamera(new THREE.Vector3(0, 2.1, 3.1), new THREE.Vector3(0, 2.65, -1.5), "inside");
+      moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
     } else if (view === "top") {
-      moveCamera(new THREE.Vector3(0.2, 24, 0.4), new THREE.Vector3(0, 0, 0), "top");
+      moveCamera(responsiveTopPosition(), new THREE.Vector3(0, 0.7, 0), "top");
     } else {
       moveCamera(responsiveHomePosition(), TARGET_HOME, "outside");
     }
@@ -213,8 +261,6 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   function toggleExploded(force) {
     exploded = typeof force === "boolean" ? force : !exploded;
-    roofGroup.position.y = exploded ? 1.75 : 0;
-    extraRoofGroup.position.y = currentStage === 1 && exploded ? 1.37 : 0;
     return exploded;
   }
 
@@ -248,7 +294,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const exportRoot = hall.clone(true);
     exportRoot.traverse((node) => {
       if (node.userData.isRoofSkin) node.visible = true;
-      if (node.name === "single-eave-roof" || node.name === "Qing-period-added-eave-study") node.position.y = 0;
+      if (["single-eave-roof", "Qing-period-added-eave-study", "timber-frame", "sixteen-column-grid", "Qing-period-five-bay-outline-study"].includes(node.name)) node.position.y = 0;
     });
     const exportScene = new THREE.Scene();
     exportScene.add(exportRoot);
@@ -383,6 +429,10 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       camera.position.copy(responsiveHomePosition());
       controls.target.copy(TARGET_HOME);
       controls.update();
+    } else if (activeView === "top" && !cameraTouched && !cameraTween) {
+      camera.position.copy(responsiveTopPosition());
+      controls.target.set(0, 0.7, 0);
+      controls.update();
     }
   }
   resize();
@@ -401,7 +451,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       const point = pinAnchors[part].clone().project(camera);
       const x = (point.x * 0.5 + 0.5) * rect.width;
       const y = (-point.y * 0.5 + 0.5) * rect.height;
-      const visible = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 10 && y < rect.height - 10 && activeView !== "inside";
+      const visible = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 10 && y < rect.height - 10 && activeView === "outside";
       element.classList.toggle("is-visible", visible);
       if (visible) candidates.push({ element, x, y, part });
     }
@@ -449,6 +499,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       camera: camera.position.toArray(),
       target: controls.target.toArray(),
       mainRoofOffset: roofGroup.position.y,
+      frameOffset: frameGroup.position.y,
+      columnOffset: columnGroup.position.y,
       lowerEaveOffset: extraRoofGroup.position.y
     };
   }
@@ -476,6 +528,12 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     raf = requestAnimationFrame(animate);
     const delta = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
+    explosionAmount = THREE.MathUtils.damp(explosionAmount, exploded ? 1 : 0, 7, delta);
+    frameGroup.position.y = explosionAmount * 0.42;
+    columnGroup.position.y = explosionAmount * 0.07;
+    roofGroup.position.y = explosionAmount * 1.28;
+    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 0.78;
+    qingExtensionGroup.position.y = explosionAmount * 0.27;
     if (cameraTween) {
       const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
       const eased = t * t * (3 - 2 * t);
@@ -500,7 +558,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
         const startZ = camera.position.z;
         let nextX = THREE.MathUtils.clamp(startX + velocity.x, -5.9, 5.9);
         let nextZ = THREE.MathUtils.clamp(startZ + velocity.z, -5.9, 5.9);
-        const blocked = (x, z) => POST_X.some((postX) => POST_Z.some((postZ) => Math.hypot(x - postX, z - postZ) < 0.5));
+        const blocked = (x, z) => POST_X.some((postX) => POST_Z.some((postZ) => Math.hypot(x - postX, z - postZ) < 0.5))
+          || (z < -3.05 && Math.abs(x) < 1.68);
         if (blocked(nextX, nextZ)) {
           if (!blocked(nextX, startZ)) nextZ = startZ;
           else if (!blocked(startX, nextZ)) nextX = startX;
@@ -564,7 +623,7 @@ function addCourtyardLines(scene) {
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
-  scene.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xaaa58c, transparent: true, opacity: 0.1 })));
+  scene.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0x98a19b, transparent: true, opacity: 0.15 })));
 }
 
 function meshBox(parent, dimensions, position, material, part) {
@@ -859,26 +918,59 @@ function buildRoof(parent, options) {
   surfacePatch(skin, (u, v) => sidePoint(u, v, -1), mats.roofSide, "roof", 22, 16);
   surfacePatch(skin, (u, v) => sidePoint(u, v, 1), roofMaterial, "roof", 22, 16);
 
-  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x555449 : 0x353a34, roughness: 0.94 });
-  const tileCourse = new THREE.MeshStandardMaterial({ color: 0xaaa087, roughness: 0.9 });
+  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x68716c : 0x626b66, roughness: 0.94 });
+  const tileCourse = new THREE.MeshStandardMaterial({ color: 0x9da49f, roughness: 0.92 });
   const drawRoofGrid = (pointFn, ribs, courses) => {
     for (let i = 0; i <= ribs; i += 1) {
       const u = -0.96 + 1.92 * i / ribs;
       const points = [];
       for (let j = 0; j <= 8; j += 1) points.push(raised(pointFn(u, j / 8)));
-      addTube(skin, points, 0.026, tileRib, "roof");
+      addTube(skin, points, 0.014, tileRib, "roof");
     }
     for (let j = 1; j <= courses; j += 1) {
       const v = j / (courses + 1);
       const points = [];
       for (let i = 0; i <= 20; i += 1) points.push(raised(pointFn(-1 + 2 * i / 20, v)));
-      addTube(skin, points, 0.012, tileCourse, "roof");
+      addTube(skin, points, 0.008, tileCourse, "roof");
     }
   };
-  drawRoofGrid((u, v) => frontPoint(u, v, 1), 18, 12);
-  drawRoofGrid((u, v) => frontPoint(u, v, -1), 18, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, -1), 16, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, 1), 16, 12);
+  drawRoofGrid((u, v) => frontPoint(u, v, 1), 24, 13);
+  drawRoofGrid((u, v) => frontPoint(u, v, -1), 24, 13);
+  drawRoofGrid((u, v) => sidePoint(u, v, -1), 22, 13);
+  drawRoofGrid((u, v) => sidePoint(u, v, 1), 22, 13);
+
+  // Repeated, restrained tile-end caps make the eaves readable at close range.
+  const eaveCapMaterial = new THREE.MeshStandardMaterial({ color: 0x858b86, roughness: 0.88 });
+  const eaveCapGeometry = new THREE.CylinderGeometry(0.115, 0.115, 0.075, 12, 1);
+  const eaveCaps = new THREE.InstancedMesh(eaveCapGeometry, eaveCapMaterial, 140);
+  eaveCaps.name = "repeated-eave-tile-caps";
+  eaveCaps.userData.part = "roof";
+  eaveCaps.castShadow = true;
+  const capTransform = new THREE.Object3D();
+  const capCount = 35;
+  let capIndex = 0;
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < capCount; i += 1) {
+      const u = -0.96 + 1.92 * i / (capCount - 1);
+      const point = frontPoint(u, 1, sign);
+      capTransform.position.set(point[0], point[1] - 0.035, point[2] + sign * 0.015);
+      capTransform.rotation.set(Math.PI / 2, 0, 0);
+      capTransform.updateMatrix();
+      eaveCaps.setMatrixAt(capIndex++, capTransform.matrix);
+    }
+  }
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < capCount; i += 1) {
+      const u = -0.96 + 1.92 * i / (capCount - 1);
+      const point = sidePoint(u, 1, sign);
+      capTransform.position.set(point[0] + sign * 0.015, point[1] - 0.035, point[2]);
+      capTransform.rotation.set(0, 0, Math.PI / 2);
+      capTransform.updateMatrix();
+      eaveCaps.setMatrixAt(capIndex++, capTransform.matrix);
+    }
+  }
+  eaveCaps.instanceMatrix.needsUpdate = true;
+  skin.add(eaveCaps);
 
   for (const sign of [-1, 1]) {
     const points = [];
@@ -1008,23 +1100,54 @@ function buildLowerEave(parent, mats) {
 }
 
 function buildInteriorHint(hall, mats) {
-  const warm = new THREE.MeshStandardMaterial({ color: 0x9b7340, emissive: 0x4a2b0d, emissiveIntensity: 0.5, roughness: 0.55 });
-  meshBox(hall, [3.5, 0.36, 1.35], [0, 1.15, -3.65], mats.woodDark, "frame");
-  meshBox(hall, [2.7, 0.14, 0.96], [0, 1.42, -3.55], mats.woodLight, "frame");
-  for (const x of [-1.17, 1.17]) {
-    meshBox(hall, [0.13, 0.72, 0.13], [x, 1.78, -3.55], mats.wood, "frame");
-    meshBox(hall, [0.13, 0.72, 0.13], [x, 1.78, -2.89], mats.wood, "frame");
+  const interior = new THREE.Group();
+  interior.name = "interior-altar-and-scale-study";
+  interior.userData.part = "frame";
+  hall.add(interior);
+
+  // The altar is a spatial study. Its dimensions and carving are not surveyed.
+  meshBox(interior, [4.25, 0.22, 1.25], [0, 1.1, -3.88], mats.woodDark, "frame");
+  meshBox(interior, [3.95, 0.12, 1.12], [0, 1.26, -3.88], mats.woodLight, "frame");
+  meshBox(interior, [3.5, 0.42, 0.98], [0, 1.54, -3.82], mats.wood, "frame");
+  meshBox(interior, [3.3, 0.1, 1.02], [0, 1.79, -3.82], mats.woodEdge, "frame");
+  for (const x of [-1.43, -0.72, 0, 0.72, 1.43]) {
+    meshBox(interior, [0.025, 0.32, 0.02], [x, 1.54, -3.315], mats.woodLight, "frame");
   }
-  meshBox(hall, [2.5, 0.12, 0.8], [0, 2.13, -3.22], mats.woodLight, "frame");
-  const lamp = new THREE.Mesh(new THREE.OctahedronGeometry(0.22, 1), warm);
-  lamp.position.set(0, 4.25, 0.6);
-  lamp.scale.set(0.72, 1.18, 0.72);
-  lamp.userData.part = "frame";
-  hall.add(lamp);
-  const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.65, 7), mats.brass);
-  chain.position.set(0, 4.76, 0.6);
-  hall.add(chain);
+  for (const x of [-1.76, 1.76]) {
+    meshBox(interior, [0.1, 0.5, 0.08], [x, 1.55, -3.8], mats.woodDark, "frame");
+  }
+
+  // Neutral silhouette only: replace after a permitted, multi-view altar survey.
+  const silhouetteMaterial = new THREE.MeshStandardMaterial({
+    color: 0x8b806b, roughness: 0.78, metalness: 0.02, transparent: true, opacity: 0.76
+  });
+  const figure = new THREE.Group();
+  figure.name = "unverified-statue-silhouette-placeholder";
+  figure.userData.part = "frame";
+  figure.userData.evidence = "spatial placeholder; iconography and dimensions unverified";
+  interior.add(figure);
+  const ellipsoid = (radius, scale, position) => {
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 14), silhouetteMaterial);
+    mesh.scale.set(...scale);
+    mesh.position.set(...position);
+    mesh.castShadow = true;
+    mesh.userData.part = "frame";
+    figure.add(mesh);
+  };
+  ellipsoid(1, [0.56, 0.27, 0.38], [0, 1.98, -3.78]);
+  ellipsoid(1, [0.4, 0.52, 0.32], [0, 2.34, -3.82]);
+  ellipsoid(1, [0.57, 0.24, 0.34], [0, 2.57, -3.82]);
+  ellipsoid(1, [0.19, 0.16, 0.2], [0, 2.82, -3.8]);
+  ellipsoid(1, [0.255, 0.31, 0.25], [0, 3.13, -3.8]);
+  ellipsoid(1, [0.09, 0.12, 0.09], [0, 3.53, -3.8]);
+  ellipsoid(1, [0.21, 0.13, 0.19], [-0.47, 2.35, -3.78]);
+  ellipsoid(1, [0.21, 0.13, 0.19], [0.47, 2.35, -3.78]);
+
+  // A plain backing plane records the altar's depth without inventing ornament.
+  meshBox(interior, [4.7, 3.25, 0.12], [0, 3.2, -4.72], mats.woodDark, "frame");
+  meshBox(interior, [4.36, 2.92, 0.035], [0, 3.2, -4.64], mats.woodLight, "frame");
 }
 
 function lerp3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
 function raised(point) { return [point[0], point[1] + 0.022, point[2]]; }
+
