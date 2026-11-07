@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#202a25" />
-    <meta name="description" content="进入真如寺大殿的交互式 Three.js 形制研究场景，观察元代、清代与1963—64年修缮的时间层。" />
+    <meta name="theme-color" content="#eee8dc" />
+    <meta name="description" content="进入真如寺大雄宝殿的交互式三维建筑档案，观察木构、屋面与历次修缮留下的时间层。" />
     <title>一殿三时｜真如寺大殿三维研究场</title>
     <link rel="stylesheet" href="./styles.css" />
     <script type="importmap">
@@ -28,7 +28,7 @@
         <a href="#evidence">证据与推演</a>
         <a href="#fieldnotes">现场笔记</a>
       </nav>
-      <span class="header-note"><i></i>研究原型 · 非测绘模型</span>
+      <span class="header-note"><i></i>数字建筑档案 · 研究模型</span>
     </header>
 
     <main id="top">
@@ -36,15 +36,15 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-mark">文物建筑 · 单体三维研究</span><span>上海 · 普陀</span></p>
           <h1>一殿<span class="hero-slash">、</span><br />三时</h1>
-          <p class="hero-deck">真如寺大殿的形制、拆修与再现</p>
-          <p class="hero-intro">进入一座木构殿堂，从檐口绕到梁架，再走进柱网之间。拖动、缩放或步行，观察它在不同时段的形制变化。</p>
+          <p class="hero-deck">一座木构殿堂的形制、修缮与再现</p>
+          <p class="hero-intro">从檐口到柱础，从外部轮廓到内部柱网。慢慢环绕、靠近，再进入殿内，观察一座建筑如何叠合出不同的时间。</p>
           <a class="text-link" href="#chronology">沿着屋檐，进入时间 <span aria-hidden="true">↘</span></a>
           <div class="hero-foot"><span>1320 — 至今</span><span class="hero-foot-rule"></span><span>一座殿 · 多重时间</span></div>
         </div>
 
         <div class="viewer-shell">
           <div class="viewer-frame" id="viewerFrame">
-            <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大殿的交互式三维形制示意模型。拖动旋转，滚轮缩放，进入后可用 WASD 移动。"></canvas>
+            <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
               <div class="viewer-ident"><span class="live-dot"></span><span>INTERACTIVE STUDY / 01</span><b>真如寺大殿</b></div>
@@ -63,6 +63,8 @@
             <div class="scene-pins" aria-label="建筑构件热点">
               <button class="scene-pin" id="pinRoof" type="button" data-part="roof"><i></i><span>屋面</span></button>
               <button class="scene-pin" id="pinFrame" type="button" data-part="frame"><i></i><span>梁架</span></button>
+              <button class="scene-pin" id="pinDougong" type="button" data-part="dougong"><i></i><span>斗栱</span></button>
+              <button class="scene-pin" id="pinDoor" type="button" data-part="door"><i></i><span>隔扇</span></button>
               <button class="scene-pin" id="pinColumns" type="button" data-part="columns"><i></i><span>柱网</span></button>
               <button class="scene-pin" id="pinBase" type="button" data-part="base"><i></i><span>台基</span></button>
             </div>
@@ -72,6 +74,12 @@
               <button type="button" data-move="back" aria-label="后退">↓</button>
               <button type="button" data-move="right" aria-label="右移">→</button>
             </div>
+            <aside class="component-inspector" id="componentInspector" aria-live="polite" hidden>
+              <div class="inspector-top"><span>构件档案 / PART NOTE</span><button type="button" id="closeInspector" aria-label="关闭构件说明">×</button></div>
+              <h3 id="inspectorTitle">屋面与檐口</h3>
+              <p id="inspectorText">选择一个构件，查看它的历史依据与模型边界。</p>
+              <div class="inspector-foot"><span id="inspectorGrade">形制有记载 · 几何待测绘</span><small id="inspectorSource">上海市文旅推广网</small></div>
+            </aside>
             <div class="viewer-loading" id="viewerLoading" role="status">
               <span class="loading-glyph">如</span><span>正在构建三维木构场景…</span>
               <small>首次加载需连接 Three.js CDN</small>
@@ -87,7 +95,7 @@
             </div>
             <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL。请使用支持 WebGL 的浏览器，并通过本地服务器打开页面。</div>
           </div>
-          <div class="viewer-instruction"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 入殿后移动</span><span>鼠标拖动 / 触屏手势控制视角</span><span class="model-badge">程序化 Three.js 网格 · 非照片贴图</span></div>
+          <div class="viewer-instruction"><span><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> 聚焦模型后旋转 · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 入殿移动</span><span>拖动旋转 · 滚轮缩放 · 右键平移</span><span class="model-badge">程序化几何 · 非照片贴图</span></div>
         </div>
       </section>
 
@@ -103,7 +111,7 @@
             <p class="eyebrow dark"><span class="eyebrow-mark">时间轴 · 形制切换</span><span>在同一座殿里观察变化</span></p>
             <h2>檐的增与减，<br /><em>改变了什么？</em></h2>
           </div>
-          <p class="section-aside">切换上方模型的年代，清代阶段会出现一层附加檐顶。旋转模型观察屋面与柱网；“结构分解”会将屋顶抬升，显出梁架关系。</p>
+          <p class="section-aside">切换上方模型的年代。清代阶段以半透明外扩柱列与下层檐顶表达研究文章提出的“五间重檐说”，与官方资料的表述存在差异，尺寸待证。旋转模型观察屋面与柱网；“结构分解”会将屋顶抬升，显出梁架关系。</p>
         </div>
         <article class="stage-story" aria-live="polite">
           <div class="story-number"><span id="stageIndex">01</span><i></i><span>04</span></div>
@@ -128,7 +136,7 @@
         <div class="section-wrap">
           <div class="section-heading anatomy-heading">
             <div><p class="eyebrow"><span class="eyebrow-mark">构件观察 · 点击模型热点</span><span>一座殿的三维索引</span></p><h2>从檐口，<br /><em>读到柱础</em></h2></div>
-            <p class="section-aside">热点关联的是公开线索和下一步待核问题。点击模型上的“屋面、梁架、柱网、台基”标记，切换对应说明。</p>
+            <p class="section-aside">热点关联的是公开线索和下一步待核问题。点击屋面、梁架、斗栱、隔扇、柱网或台基，查看构件档案、证据状态与待核问题。</p>
           </div>
           <div class="anatomy-grid">
             <article><span>01 / ROOF</span><h3>屋面与檐口</h3><p>公开记载给出单檐／双檐的阶段变化。当前的举架与瓦作细节只是形制表达。</p></article>
