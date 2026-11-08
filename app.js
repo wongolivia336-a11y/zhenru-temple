@@ -345,8 +345,9 @@ async function bootModel() {
     startupStage = "GLTFExporter";
     await import("three/addons/exporters/GLTFExporter.js");
 
-    startupStage = "hall-model.js";
+    startupStage = "hall-model.js module";
     const { createHallScene } = await import("./hall-model.js");
+    startupStage = "building Three.js scene";
     hallScene = createHallScene({
       canvas,
       frame: document.querySelector("#viewerFrame"),
@@ -354,6 +355,7 @@ async function bootModel() {
       onPart: setObservation,
       onReady: () => loading.classList.add("is-hidden")
     });
+    startupStage = "setting initial history stage";
     hallScene.setStage(activeStage);
   } catch (error) {
     console.error(`Three.js scene failed during ${startupStage}:`, error);
