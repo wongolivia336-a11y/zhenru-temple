@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
+import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -116,7 +117,15 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   buildStoneBase(baseGroup, mats);
   buildColumnsAndFrame(frameGroup, columnGroup, mats);
-  buildGableAndRafters(frameGroup, mats);
+  // Current front elevation shows the long ridge across the facade; rotate the old frame-study roof axis.
+  const roofFrameStudy = new THREE.Group();
+  roofFrameStudy.name = "roof-framing-axis-study";
+  roofFrameStudy.rotation.y = Math.PI * 0.5;
+  roofFrameStudy.userData.part = "frame";
+  frameGroup.add(roofFrameStudy);
+  buildGableAndRafters(roofFrameStudy, mats);
+  // Rotate main roof ridge from the schematic depth axis to the facade-parallel x axis.
+  roofGroup.rotation.y = Math.PI * 0.5;
   const mainRoofSkin = buildRoof(roofGroup, {
     width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
   });
@@ -664,25 +673,9 @@ function buildGableAndRafters(group, mats) {
 }
 
 function buildDougong(group, mats, xs, zs) {
-  for (const x of xs) for (const z of zs) {
-    meshBox(group, [0.58, 0.18, 0.58], [x, 6.05, z], mats.woodDark, "dougong");
-    meshBox(group, [0.92, 0.15, 0.34], [x, 6.22, z], mats.woodLight, "dougong");
-    meshBox(group, [0.34, 0.15, 0.92], [x, 6.38, z], mats.wood, "dougong");
-    meshBox(group, [0.72, 0.14, 0.28], [x, 6.53, z], mats.woodEdge, "dougong");
-    beamBetween(group, [x - 0.46, 6.24, z], [x + 0.46, 6.24, z], 0.12, mats.woodLight, "dougong", 0.3);
-    beamBetween(group, [x, 6.38, z - 0.46], [x, 6.38, z + 0.46], 0.12, mats.wood, "dougong", 0.3);
-    if (Math.abs(x) > 5 || Math.abs(z) > 5) {
-      const dx = Math.abs(x) > 5 ? Math.sign(x) : 0;
-      const dz = Math.abs(z) > 5 ? Math.sign(z) : 0;
-      if (dx) beamBetween(group, [x, 6.32, z], [x + dx * 0.72, 6.75, z], 0.1, mats.woodEdge, "dougong", 0.12);
-      if (dz) beamBetween(group, [x, 6.32, z], [x, 6.75, z + dz * 0.72], 0.1, mats.woodEdge, "dougong", 0.12);
-    }
-    meshBox(group, [0.14, 0.18, 0.14], [x, 6.69, z], mats.woodDark, "dougong");
-  }
-  const frieze = [];
-  for (const z of [-6.7, 6.7]) frieze.push(-6.8, 6.55, z, 6.8, 6.55, z);
-  for (const x of [-6.65, 6.65]) frieze.push(x, 6.55, -6.7, x, 6.55, 6.7);
-  addLineSegments(group, frieze, new THREE.LineBasicMaterial({ color: 0xb59866, transparent: true, opacity: 0.72 }), "frame");
+  // Layered bracket research geometry with carved gong ends, bearing dou and false ang.
+  // Not a measured reconstruction; outer/interior distribution remains provisional.
+  populateDougongStudy(group, xs, zs, mats);
 }
 
 function buildCeilingFrame(group, mats) {
@@ -722,26 +715,12 @@ function buildRoof(parent, options) {
   surfacePatch(skin, (u, v) => sidePoint(u, v, -1), mats.roofSide, "roof", 22, 16);
   surfacePatch(skin, (u, v) => sidePoint(u, v, 1), roofMaterial, "roof", 22, 16);
 
-  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x555449 : 0x353a34, roughness: 0.94 });
-  const tileCourse = new THREE.MeshStandardMaterial({ color: 0xaaa087, roughness: 0.9 });
-  const drawRoofGrid = (pointFn, ribs, courses) => {
-    for (let i = 0; i <= ribs; i += 1) {
-      const u = -0.96 + 1.92 * i / ribs;
-      const points = [];
-      for (let j = 0; j <= 8; j += 1) points.push(raised(pointFn(u, j / 8)));
-      addTube(skin, points, 0.026, tileRib, "roof");
-    }
-    for (let j = 1; j <= courses; j += 1) {
-      const v = j / (courses + 1);
-      const points = [];
-      for (let i = 0; i <= 20; i += 1) points.push(raised(pointFn(-1 + 2 * i / 20, v)));
-      addTube(skin, points, 0.012, tileCourse, "roof");
-    }
-  };
-  drawRoofGrid((u, v) => frontPoint(u, v, 1), 18, 12);
-  drawRoofGrid((u, v) => frontPoint(u, v, -1), 18, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, -1), 16, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, 1), 16, 12);
+  // Each roof face now has explicit thin 3D pan/cover tile shells rather than flat grid lines.
+  // Geometry is combined by face/material to avoid one draw call per tile.
+  addRoofTileStudy(skin, (u, v) => frontPoint(u, v, 1), mats, { bays: 16, courses: 14, label: "hip-east" });
+  addRoofTileStudy(skin, (u, v) => frontPoint(u, v, -1), mats, { bays: 16, courses: 14, label: "hip-west" });
+  addRoofTileStudy(skin, (u, v) => sidePoint(u, v, -1), mats, { bays: 24, courses: 16, label: "south-slope" });
+  addRoofTileStudy(skin, (u, v) => sidePoint(u, v, 1), mats, { bays: 24, courses: 16, label: "north-slope" });
 
   for (const sign of [-1, 1]) {
     const points = [];
