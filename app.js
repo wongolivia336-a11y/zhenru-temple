@@ -300,9 +300,32 @@ if ("IntersectionObserver" in window) {
 
 setStage(0);
 
+function prepareWebGL2Context(canvas) {
+  // Prefer a lightweight context first; Three.js reuses this canvas context.
+  const attempts = [
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "low-power", failIfMajorPerformanceCaveat: false },
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "default", failIfMajorPerformanceCaveat: false },
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false }
+  ];
+  let lastError = null;
+
+  for (const attributes of attempts) {
+    try {
+      const context = canvas.getContext("webgl2", attributes);
+      if (context) return context;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  const detail = lastError instanceof Error ? `: ${lastError.message}` : "";
+  throw new Error(`无法创建 WebGL 2 图形上下文${detail}`, { cause: lastError });
+}
+
 async function bootModel() {
   const loading = document.querySelector("#viewerLoading");
   const message = document.querySelector("#webglMessage");
+  const canvas = document.querySelector("#hallCanvas");
   const pinElements = {
     roof: document.querySelector("#pinRoof"),
     frame: document.querySelector("#pinFrame"),
@@ -311,21 +334,38 @@ async function bootModel() {
     columns: document.querySelector("#pinColumns"),
     base: document.querySelector("#pinBase")
   };
+  let startupStage = "WebGL 2 context";
   try {
+    prepareWebGL2Context(canvas);
+
+    startupStage = "Three.js core";
+    await import("three");
+    startupStage = "OrbitControls";
+    await import("three/addons/controls/OrbitControls.js");
+    startupStage = "GLTFExporter";
+    await import("three/addons/exporters/GLTFExporter.js");
+
+    startupStage = "hall-model.js module";
     const { createHallScene } = await import("./hall-model.js");
+    startupStage = "building Three.js scene";
     hallScene = createHallScene({
-      canvas: document.querySelector("#hallCanvas"),
+      canvas,
       frame: document.querySelector("#viewerFrame"),
       pins: pinElements,
       onPart: setObservation,
       onReady: () => loading.classList.add("is-hidden")
     });
+    startupStage = "setting initial history stage";
     hallScene.setStage(activeStage);
   } catch (error) {
-    console.error("Three.js scene failed to start:", error);
+    console.error(`Three.js scene failed during ${startupStage}:`, error);
     loading.classList.add("is-hidden");
     message.hidden = false;
-    message.textContent = "三维场景没有启动。请确认浏览器支持 WebGL 2、图形加速已启用，并通过本地服务器打开页面。";
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    const stack = error instanceof Error && error.stack ? error.stack.split("\n").slice(1, 3).join(" | ").slice(0, 220) : "";
+    message.dataset.startupStage = startupStage;
+    message.title = stack ? `${detail} | ${stack}` : detail;
+    message.textContent = `三维场景启动失败（${startupStage}）：${detail.slice(0, 160)}。可查看浏览器控制台定位模块。`;
   }
 }
 
