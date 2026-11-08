@@ -58,8 +58,14 @@ async function run() {
   assert.equal(observedTopology?.gableTriangles,2);
   assert.equal(observedTopology?.cornerWings,4);
   assert.equal(normal.infillBracketCount,16,"16 modeled front/rear infill bracket sets");
-  assert.equal(observedTopology?.eaveTileEnds,224);
-  assert.equal(observedTopology?.dripTiles,224);
+  // The 1440px comparison desk embeds a half-width viewer: geometry LOD is
+  // chosen from the real IFRAME viewport, not from the outer browser window.
+  const eaveTier=await page.evaluate(()=>{
+    const w=document.querySelector("#model").contentWindow;
+    return (w.innerWidth<=720 || (w.navigator.deviceMemory && w.navigator.deviceMemory<=4))?128:224;
+  });
+  assert.equal(observedTopology?.eaveTileEnds,eaveTier);
+  assert.equal(observedTopology?.dripTiles,eaveTier);
   assert.equal(observedTopology?.eaveBatchCount,2);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(150);
