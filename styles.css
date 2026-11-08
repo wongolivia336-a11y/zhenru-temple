@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 13488)
-Total output lines: 1061
-
 :root {
   --paper: #efeade;
   --paper-deep: #e4dccb;
@@ -260,7 +257,118 @@ h2 em { color: var(--clay); font-style: normal; }
   .viewer-shell { padding: 0 19px 23px; }
   .viewer-frame { height: min(690px,78svh); min-height: 495px; }
   .viewer-instruction { flex-wrap: wrap; }
-  .intro-band { grid-tem…1488 tokens truncated…-gold: #a98b59;
+  .intro-band { grid-template-columns: 1fr 3fr 40px; gap: 22px; }
+  .section-heading,.evidence-intro { gap: 30px; }
+  .stage-story { grid-template-columns: 55px 1fr; gap: 20px; }
+  .story-aside { grid-column: 2; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--rule); }
+  .story-aside p { max-width: 560px; }
+  .anatomy-grid { grid-template-columns: repeat(2,1fr); }
+  .anatomy-grid article { min-height: 175px; }
+  .anatomy-grid article:nth-child(3) { padding-left: 0; border-left: 0; border-top: 1px solid rgba(238,231,214,.19); }
+  .anatomy-grid article:nth-child(4) { border-top: 1px solid rgba(238,231,214,.19); }
+  .anatomy-grid article:nth-child(2) { border-left: 1px solid rgba(238,231,214,.19); }
+}
+@media (max-width: 560px) {
+  :root { --page: calc(100% - 38px); }
+  .site-header { height: 64px; padding-inline: 18px; }
+  html { scroll-padding-top: 64px; }
+  .brand { gap: 8px; }
+  .brand-seal { width: 34px; height: 34px; font-size: 11px; }
+  .brand-copy strong { font-size: 12px; }
+  .brand-copy small { font-size: 7px; }
+  .main-nav { gap: 13px; }
+  .main-nav a { font-size: 8px; }
+  .main-nav a:nth-child(2) { display: none; }
+  .hero-copy { min-height: 410px; padding: 48px 20px 25px; }
+  .eyebrow { gap: 10px; font-size: 8px; }
+  .hero h1 { font-size: clamp(77px,21vw,107px); }
+  .hero-deck { max-width: 310px; font-size: 14px; line-height: 1.7; }
+  .hero-intro { font-size: 11px; }
+  .viewer-shell { padding-inline: 10px; }
+  .viewer-frame { height: 77svh; min-height: 475px; max-height: 650px; }
+  .viewer-topline { top: 13px; left: 13px; right: 13px; }
+  .viewer-scale strong { font-size: 9px; }
+  .view-tools { top: 66px; right: 10px; gap: 4px; max-width: 250px; }
+  .view-button { min-height: 26px; padding-inline: 7px; font-size: 8px; }
+  .reset-button { width: 26px; }
+  .viewer-bottom { left: 10px; right: 10px; bottom: 10px; }
+  .viewer-caption { gap: 6px 8px; }
+  .viewer-caption strong { font-size: 10px; }
+  .explore-hint { width: 100%; padding-left: 2px; }
+  .timeline-strip { min-height: 61px; gap: 4px; padding: 8px 7px; }
+  .time-step { grid-template-columns: 7px 1fr; column-gap: 5px; }
+  .time-dot { width: 6px; height: 6px; }
+  .time-step strong { font-size: 7px; }
+  .time-step small { font-size: 7px; }
+  .viewer-instruction { padding-inline: 2px; font-size: 7px; }
+  .viewer-instruction > span:nth-child(2) { display: none; }
+  .intro-band { min-height: auto; padding: 28px 0 30px; grid-template-columns: 1fr 38px; gap: 15px; }
+  .section-index { grid-column: 1/-1; font-size: 8px; }
+  .intro-band p { grid-column: 1; font-size: 13px; }
+  .intro-seal { grid-column: 2; grid-row: 2; width: 36px; height: 44px; }
+  .chronology,.fieldnotes,.sources-section { padding-block: 73px; }
+  .section-heading,.evidence-intro { display: block; margin-bottom: 33px; }
+  .section-heading h2,.evidence-intro h2 { font-size: clamp(41px,11vw,59px); }
+  .section-aside,.evidence-intro > p { width: 100%; max-width: 465px; margin-top: 18px; font-size: 10px; }
+  .stage-story { grid-template-columns: 32px 1fr; gap: 14px; padding-block: 24px; }
+  .story-number { gap: 5px; font-size: 8px; }
+  .story-number i { width: 8px; }
+  .story-number span:last-child { display: none; }
+  .story-copy h3 { font-size: 28px; }
+  .story-copy > p { font-size: 10px; }
+  .story-aside { grid-column: 2; }
+  .model-disclaimer { padding: 13px; gap: 9px; }
+  .model-disclaimer p { font-size: 9px; }
+  .anatomy-section { padding: 73px 0 79px; }
+  .anatomy-grid article { min-height: 186px; padding-right: 11px; }
+  .anatomy-grid article + article { padding-left: 13px; }
+  .anatomy-grid article:nth-child(3) { padding-left: 0; }
+  .anatomy-grid h3 { margin-top: 20px; font-size: 15px; }
+  .anatomy-grid p { font-size: 9px; }
+  .evidence-section { padding: 75px 0 79px; }
+  .evidence-cards { margin-top: 38px; grid-template-columns: 1fr; }
+  .evidence-card { min-height: 210px; padding: 18px 20px; }
+  .evidence-card h3 { margin-top: 25px; }
+  .evidence-card p { max-width: 390px; }
+  .conservation-question { margin-top: 58px; padding: 0 15px; }
+  .conservation-question p { font-size: 21px; }
+  .photo-grid { grid-template-columns: 1fr; gap: 13px; }
+  .photo-card,.photo-card img { min-height: 95vw; max-height: 540px; }
+  .photo-card figcaption { left: 18px; bottom: 19px; }
+  .photo-card figcaption strong { font-size: 18px; }
+  .next-steps { padding: 66px 0 70px; }
+  .next-steps h2 { font-size: clamp(40px,11vw,59px); }
+  .steps-list { width: 100%; margin-top: 34px; }
+  .steps-list > div { grid-template-columns: 34px 1fr; gap: 8px; }
+  .steps-list p { font-size: 9px; }
+  .next-seal { top: 20px; right: -8px; width: 77px; height: 77px; font-size: 28px; }
+  .sources-heading { display: block; margin-bottom: 28px; }
+  .sources-heading h2 { font-size: 40px; }
+  .source-md-link { margin-top: 19px; }
+  .source-list > a { grid-template-columns: 31px 1fr 19px; gap: 7px; padding-block: 15px; }
+  .source-list strong { font-size: 9px; line-height: 1.65; }
+  .source-list small { font-size: 8px; line-height: 1.7; }
+  .site-footer { padding: 18px 19px; flex-wrap: wrap; }
+  .site-footer > span { order: 3; width: 100%; }
+  .site-footer > a:last-child { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   2026 / Digital building archive — paper, ink, timber, seal red
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --paper: #eee9de;
+  --paper-deep: #e4ddcf;
+  --ink: #292820;
+  --ink-soft: #68665c;
+  --moss: #666b5d;
+  --moss-deep: #252923;
+  --clay: #9a4f3d;
+  --gold: #a98b59;
   --rule: rgba(48, 44, 35, .18);
   --page: min(1280px, calc(100% - 96px));
 }
@@ -949,5 +1057,4 @@ body::before { opacity: .022; }
 @media (max-width: 560px) {
   .view-tools { top: 178px; left: 12px; right: 12px; max-width: none; justify-content: flex-start; align-items: flex-start; }
 }
-
 
