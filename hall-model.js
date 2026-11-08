@@ -4,6 +4,7 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
 import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
 import { createHipGableStudy } from "./reconstruction/hip-gable-topology.mjs";
+import { addEaveTerminations } from "./reconstruction/eave-details.js";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -275,12 +276,12 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       controls.minPolarAngle = 0.08;
     }
     controls.minDistance = nextView === "inside" ? 0.7 : 0.75;
-    controls.maxDistance = nextView === "inside" ? 8.5 : 42;
+    controls.maxDistance = nextView === "inside" ? 8.5 : nextView === "eave" ? 17 : 42;
     controls.update();
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
     document.getElementById("exploreHint").textContent = nextView === "inside"
       ? "WASD 移动 · 佛像轮廓为待核占位"
-      : "拖动环绕 · 滚轮缩放 · 右键平移";
+      : nextView === "eave" ? "檐下近观 · 拖动查看瓦当与补间斗栱" : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
   function setView(view) {
@@ -288,6 +289,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "eave") {
+      // Close-up based on the main front eave + real model bracket stations.
+      // No generic dolly zoom overlaid onto a photo plane.
+      moveCamera(new THREE.Vector3(5.6, 5.75, 11.7),
+        new THREE.Vector3(1.2, 6.45, 6.65), "eave");
     } else if (view === "top") {
       moveCamera(responsiveTopPosition(), new THREE.Vector3(0, 0.7, 0), "top");
     } else {
@@ -593,7 +599,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           frameScaleY: roofFrameStudy.scale.y,
           framingStudyVisible: roofFrameStudy.visible,
           ceilingRafterStudyVisible: ceilingRafterStudy.visible,
-          roofTopology: mainRoofSkin.parent.userData.roofTopology
+          roofTopology: mainRoofSkin.parent.userData.roofTopology,
+          infillBracketCount: frameGroup.userData.infillBracketCount
         };
       }
     };
@@ -1075,10 +1082,16 @@ function buildRoof(parent, options) {
     terminal.scale.set(0.67,1.06,0.62);
     skin.add(terminal);
   }
+  // Actually modeled eave end discs + shaped drip tiles along all 4 borders.
+  // Geometry is instanced into just two draw calls and scales with mobile tier.
+  const eaveDetail=addEaveTerminations(skin,roof,mats,{compact});
   root.userData.roofTopology = {
     mainRidges:1,descendingRidges:4,hipRidges:4,
     gableTriangles:2,cornerWings:4,
-    shoulderFraction:0.58,cornerLiftM:roof.cornerLift
+    shoulderFraction:0.58,cornerLiftM:roof.cornerLift,
+    eaveTileEnds:eaveDetail.tileEnds,
+    dripTiles:eaveDetail.dripTiles,
+    eaveBatchCount:3
   };
   return skin;
 }
