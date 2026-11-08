@@ -1091,7 +1091,7 @@ function buildRoof(parent, options) {
     shoulderFraction:0.58,cornerLiftM:roof.cornerLift,
     eaveTileEnds:eaveDetail.tileEnds,
     dripTiles:eaveDetail.dripTiles,
-    eaveBatchCount:2
+    eaveBatchCount:3
   };
   return skin;
 }

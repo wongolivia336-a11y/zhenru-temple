@@ -19,3 +19,6 @@ See `reconstruction/REFERENCE_ATLAS_V7.md`. Reusable open-source examples provid
 ## QA
 `node scripts/check-bracket-layout.mjs`, `node scripts/check-eave-layout.mjs`, `node scripts/check-model-fidelity.mjs`, `node scripts/browser-smoke.mjs` in a Playwright-capable environment.
 Three.js CI confirms generated geometry and controls, not historic surface fidelity or accurate unseen mortise-and-tenon dimensions. Need close-up visual review and field photo registration.
+
+## 近景视觉修订（小型瓦当和边缘浮雕）
+第一次浏览器近景显示瓦当呈大直径的铜币、滴水呈尖牙形，过度装饰。第二次修订将瓦当圆盘由半径0.095缩到0.067，单件厚度从0.08降为0.045，滴水最大宽从0.184降到0.136，尖端深度缩小，并添加极薄的环状边缘浮雕。3组 InstancedMesh 批量渲染，不新增长期纹理加载。仍是形态研究，不是原砖瓦模具扫描。

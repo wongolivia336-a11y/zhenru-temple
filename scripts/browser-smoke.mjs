@@ -66,7 +66,7 @@ async function run() {
   });
   assert.equal(observedTopology?.eaveTileEnds,eaveTier);
   assert.equal(observedTopology?.dripTiles,eaveTier);
-  assert.equal(observedTopology?.eaveBatchCount,2);
+  assert.equal(observedTopology?.eaveBatchCount,3);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
