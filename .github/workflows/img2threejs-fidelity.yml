@@ -7,6 +7,10 @@ on:
       - 'model-fidelity.js'
       - 'reconstruction/**'
       - 'scripts/check-roof-parameters.mjs'
+      - 'scripts/check-bracket-layout.mjs'
+      - 'scripts/check-eave-layout.mjs'
+      - 'reconstruction/eave-details.js'
+      - 'scripts/check-hip-gable-topology.mjs'
       - 'scripts/browser-smoke.mjs'
       - 'scripts/check-model-fidelity.mjs'
       - '.github/workflows/img2threejs-fidelity.yml'
@@ -27,6 +31,10 @@ jobs:
           node --check model-fidelity.js
           node scripts/check-model-fidelity.mjs
           node scripts/check-roof-parameters.mjs
+          node scripts/check-hip-gable-topology.mjs
+          node scripts/check-bracket-layout.mjs
+          node scripts/check-eave-layout.mjs
+          node --check reconstruction/eave-details.js
       - name: Fetch upstream img2threejs at pinned v2.0.1
         run: git clone --quiet --depth 1 --branch v2.0.1 https://github.com/img2threejs/img2threejs.git "$RUNNER_TEMP/img2threejs"
       - name: Install CJK fonts for legible screenshot review

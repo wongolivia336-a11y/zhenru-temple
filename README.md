@@ -78,3 +78,16 @@ python -m http.server 8000
 ## v5｜屋顶坡度有证据的参数化校准
 
 对照 [上海普陀区公开报道](https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html)所述约 26° 的屋面坡度，项目改用 `reconstruction/roof-parameters.mjs` 计算模型的屋脊抬升及内部研究屋架联动。浏览器访问 [参考照片对照实验台](./reconstruction/reference-review.html)，可选择本地图片，尝试18°–34° 研究坡度并刷新实际三维模型。数据没有原始测绘值及相机标定，任何试验数值均非真如寺正式测量结果。运行 `node scripts/check-roof-parameters.mjs` 检查参数一致性，后续阶段见 [v5 修订说明](./handoff/ROOF_PITCH_CALIBRATION_V5.md)。
+
+
+## v6：单檐歇山屋顶的结构拓扑改造
+
+不再把四坡庑殿式算法当成歇山顶。引入 `reconstruction/hip-gable-topology.mjs`，显式构建两个山花、两个端坡、四角翼面、四条垂脊和四条戗脊，保持实体瓦件及上一轮 26° 坡度校准。新增 `scripts/check-hip-gable-topology.mjs` 共边单元测试和实际 Chromium 验收；详细边界见 [v6 结构笔记](./handoff/HIP_GABLE_V6.md)。此模型依然不是实测文物数字复原。
+
+
+## V7｜照片约束构件细化：补间斗栱、瓦当与滴水
+
+按建筑考察资料记载的前后檐补间分布（每侧中间4朵、两次间各2朵），在原16组柱头斗栱之外新增16组独立可选的构件研究几何；并将四个檐口的瓦当、滴水改成批处理的实体三维构件（桌面每类224件、紧凑视口每类128件）。**节点形状和真实榫卯仍未测绘，不当作考证复原。** [研究图源与版权边界](./reconstruction/REFERENCE_ATLAS_V7.md) · [V7 技术交接](./handoff/COMPONENT_FIDELITY_V7.md)。
+
+
+**V7 檐下细看视角**：主模型工具条新增“檐下细看”，把真实 3D 相机移动到现状前檐附近，用于近景观察补间铺作、瓦当与滴水；此视角的真实浏览器截图将保存在 CI Artifacts（`eave-brackets-closeup.png`）。

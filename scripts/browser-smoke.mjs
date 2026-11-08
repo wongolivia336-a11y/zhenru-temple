@@ -51,6 +51,22 @@ async function run() {
   assert.equal(normal.framingStudyVisible,false,"Exterior rafters should not poke through roof");
   assert.equal(normal.ceilingRafterStudyVisible,false,"Interior rafter silhouettes should not pierce the exterior roof");
   assert.ok(Math.abs(normal.ridgeY-10.926693576380554)<0.0001);
+  const observedTopology=await page.evaluate(()=>document.querySelector("#model")?.contentWindow?.__zhenruQA?.getRoofCalibration?.()?.roofTopology);
+  assert.equal(observedTopology?.mainRidges,1);
+  assert.equal(observedTopology?.descendingRidges,4);
+  assert.equal(observedTopology?.hipRidges,4);
+  assert.equal(observedTopology?.gableTriangles,2);
+  assert.equal(observedTopology?.cornerWings,4);
+  assert.equal(normal.infillBracketCount,16,"16 modeled front/rear infill bracket sets");
+  // The 1440px comparison desk embeds a half-width viewer: geometry LOD is
+  // chosen from the real IFRAME viewport, not from the outer browser window.
+  const eaveTier=await page.evaluate(()=>{
+    const w=document.querySelector("#model").contentWindow;
+    return (w.innerWidth<=720 || (w.navigator.deviceMemory && w.navigator.deviceMemory<=4))?128:224;
+  });
+  assert.equal(observedTopology?.eaveTileEnds,eaveTier);
+  assert.equal(observedTopology?.dripTiles,eaveTier);
+  assert.equal(observedTopology?.eaveBatchCount,3);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
@@ -87,6 +103,14 @@ async function run() {
   assert.equal((await getRoof()).framingStudyVisible,false);
   assert.equal((await getRoof()).ceilingRafterStudyVisible,false);
   assert.equal(await viewer.locator("#cutawayToggle").getAttribute("aria-pressed"),"false");
+  // Explicit close-up control should expose the bracket/eave details rather than
+  // hiding added geometry at the building-wide camera distance.
+  await viewer.locator('[data-view="eave"]').click();
+  assert.equal((await getState()).view,"eave");
+  await sleep(1050);
+  await page.screenshot({path:"qa/runtime-screenshots/eave-brackets-closeup.png"});
+  await viewer.locator('[data-view="outside"]').click();
+  await sleep(900);
   await page.screenshot({path:"qa/runtime-screenshots/reset-desktop.png"});
   let overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   assert.ok(overflow<=1,"Desktop horizontal overflow "+overflow);

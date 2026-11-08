@@ -3,6 +3,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
 import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
+import { createHipGableStudy } from "./reconstruction/hip-gable-topology.mjs";
+import { addEaveTerminations } from "./reconstruction/eave-details.js";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -274,12 +276,12 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       controls.minPolarAngle = 0.08;
     }
     controls.minDistance = nextView === "inside" ? 0.7 : 0.75;
-    controls.maxDistance = nextView === "inside" ? 8.5 : 42;
+    controls.maxDistance = nextView === "inside" ? 8.5 : nextView === "eave" ? 17 : 42;
     controls.update();
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
     document.getElementById("exploreHint").textContent = nextView === "inside"
       ? "WASD 移动 · 佛像轮廓为待核占位"
-      : "拖动环绕 · 滚轮缩放 · 右键平移";
+      : nextView === "eave" ? "檐下近观 · 拖动查看瓦当与补间斗栱" : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
   function setView(view) {
@@ -287,6 +289,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "eave") {
+      // Close-up based on the main front eave + real model bracket stations.
+      // No generic dolly zoom overlaid onto a photo plane.
+      moveCamera(new THREE.Vector3(5.6, 5.75, 11.7),
+        new THREE.Vector3(1.2, 6.45, 6.65), "eave");
     } else if (view === "top") {
       moveCamera(responsiveTopPosition(), new THREE.Vector3(0, 0.7, 0), "top");
     } else {
@@ -591,7 +598,9 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           meshBottomY: box.min.y,
           frameScaleY: roofFrameStudy.scale.y,
           framingStudyVisible: roofFrameStudy.visible,
-          ceilingRafterStudyVisible: ceilingRafterStudy.visible
+          ceilingRafterStudyVisible: ceilingRafterStudy.visible,
+          roofTopology: mainRoofSkin.parent.userData.roofTopology,
+          infillBracketCount: frameGroup.userData.infillBracketCount
         };
       }
     };
@@ -955,61 +964,135 @@ function buildCeilingFrame(group, mats) {
 
 function buildRoof(parent, options) {
   const { width, depth, baseY, ridgeY, ridgeHalf, mats, style } = options;
-  const group = new THREE.Group();
-  group.userData.part = "roof";
-  parent.add(group);
+  const roof = createHipGableStudy({ width, depth, baseY, ridgeY, ridgeHalf });
+  const root = new THREE.Group();
+  root.userData.part = "roof";
+  root.userData.topology = "SINGLE_EAVE_HIP_GABLE_NINE_RIDGE_STUDY";
+  root.userData.evidence = "PUBLIC_STYLE + INFERRED_3D_SURFACES_NOT_SURVEY";
+  parent.add(root);
+
   const skin = new THREE.Group();
   skin.userData.part = "roof";
   skin.userData.isRoofSkin = true;
-  group.add(skin);
-  const halfW = width / 2;
-  const halfD = depth / 2;
-  const eaveRise = (u) => 0.34 * Math.pow(Math.abs(u), 2.25);
-  const frontPoint = (u, v, sign = 1) => [
-    u * halfW * v,
-    ridgeY + (baseY - ridgeY) * v + eaveRise(u) * v * v,
-    sign * (ridgeHalf + (halfD - ridgeHalf) * v)
-  ];
-  const sidePoint = (u, v, sign = 1) => [
-    sign * halfW * v,
-    ridgeY + (baseY - ridgeY) * v + eaveRise(u) * v * v,
-    u * (ridgeHalf + (halfD - ridgeHalf) * v)
-  ];
-  const roofMaterial = style === "lower" ? mats.roofSun : mats.roof;
-  surfacePatch(skin, (u, v) => frontPoint(u, v, 1), roofMaterial, "roof", 28, 16);
-  surfacePatch(skin, (u, v) => frontPoint(u, v, -1), mats.roofSide, "roof", 28, 16);
-  surfacePatch(skin, (u, v) => sidePoint(u, v, -1), mats.roofSide, "roof", 22, 16);
-  surfacePatch(skin, (u, v) => sidePoint(u, v, 1), roofMaterial, "roof", 22, 16);
-
-  // Separate overlapping pan + cover-tile shell meshes, batched per roof face/material.
-  // Tiered geometry lowers vertex cost on compact mobile devices.
+  skin.name = "one-main-four-vertical-four-hip-ridge-roof";
+  root.add(skin);
   const compact = window.innerWidth <= 720 || (navigator.deviceMemory && navigator.deviceMemory <= 4);
-  const hipBays = compact ? 10 : 16, hipCourses = compact ? 9 : 14;
-  const slopeBays = compact ? 16 : 24, slopeCourses = compact ? 10 : 16;
-  addRoofTileStudy(skin, (u,v) => frontPoint(u,v,1), mats, { bays:hipBays, courses:hipCourses, label:"hip-a" });
-  addRoofTileStudy(skin, (u,v) => frontPoint(u,v,-1), mats, { bays:hipBays, courses:hipCourses, label:"hip-b" });
-  addRoofTileStudy(skin, (u,v) => sidePoint(u,v,-1), mats, { bays:slopeBays, courses:slopeCourses, label:"slope-a" });
-  addRoofTileStudy(skin, (u,v) => sidePoint(u,v,1), mats, { bays:slopeBays, courses:slopeCourses, label:"slope-b" });
+  const mainBays = compact ? 18 : 26, mainCourses = compact ? 12 : 20;
+  const hipBays = compact ? 11 : 17, hipCourses = compact ? 9 : 15;
+  const wingBays = compact ? 3 : 5, wingCourses = compact ? 6 : 10;
+  const roofFace = mats.roof.clone();
+  const hipFace = mats.roofSide.clone();
+  roofFace.side = hipFace.side = THREE.DoubleSide;
+  // Two broad transverse main slopes, from longitudinal ridge to side eaves.
+  for (const signX of [-1,1]) {
+    const fn=(u,v)=>roof.main(signX,u,v);
+    const mesh=surfacePatch(skin,fn,roofFace,"roof",32,21);
+    mesh.name = `main tiled slope ${signX}`;
+    mesh.userData.evidence = "HIP_GABLE_TOPOLOGY_INFERRED";
+    addRoofTileStudy(skin,fn,mats,{bays:mainBays,courses:mainCourses,label:`main-slope-${signX}`});
+  }
+  // End hip slopes start below a separate dark triangular gable wall.
+  for (const signZ of [-1,1]) {
+    const fn=(u,v)=>roof.end(signZ,u,v);
+    const mesh=surfacePatch(skin,fn,hipFace,"roof",24,14);
+    mesh.name=`lower hip-end surface ${signZ}`;
+    mesh.userData.evidence="HIP_GABLE_TOPOLOGY_INFERRED";
+    addRoofTileStudy(skin,fn,mats,{bays:hipBays,courses:hipCourses,label:`end-hip-${signZ}`});
 
-  for (const sign of [-1, 1]) {
-    const points = [];
-    for (let i = 0; i <= 24; i += 1) points.push(raised(sidePoint(-1 + 2 * i / 24, 1, sign)));
-    addTube(group, points, 0.09, mats.woodDark, "roof");
+    const gableOutline = new THREE.Shape();
+    gableOutline.moveTo(-roof.shoulderX,roof.shoulderY);
+    for(let i=0;i<=28;i++) {
+      const x=-roof.shoulderX+2*roof.shoulderX*i/28;
+      gableOutline.lineTo(x,roof.gableTop(x));
+    }
+    gableOutline.lineTo(roof.shoulderX,roof.shoulderY);
+    gableOutline.closePath();
+    const wall = new THREE.Mesh(new THREE.ShapeGeometry(gableOutline),mats.woodDark.clone());
+    wall.material.side=THREE.DoubleSide;
+    wall.name=`gable timber triangle / study ${signZ}`;
+    wall.position.z=signZ*(roof.ridgeHalf+0.018);
+    wall.userData.part="roof";
+    wall.userData.evidence="PHOTO_OBSERVED_GABLE_INFERRED_PANEL_SPACING";
+    wall.receiveShadow=true;
+    skin.add(wall);
+
+    // Fine dark vertical boarding creates scale, not a claim about real joinery.
+    const boardLines=[];
+    for(let i=-6;i<=6;i++) {
+      const x=i*roof.shoulderX/7;
+      const top=roof.gableTop(x)-0.08;
+      if(top>roof.shoulderY+0.10) {
+        boardLines.push(x,roof.shoulderY+0.055,signZ*(roof.ridgeHalf+0.045),
+          x,top,signZ*(roof.ridgeHalf+0.045));
+      }
+    }
+    addLineSegments(skin,boardLines,new THREE.LineBasicMaterial({
+      color:0x8f816d,transparent:true,opacity:0.42
+    }),"roof");
+    const boji=[];
+    for(let i=0;i<=18;i++) {
+      const t=-1+2*i/18;
+      boji.push([roof.shoulderX*t,roof.shoulderY+0.045,signZ*roof.ridgeHalf]);
+    }
+    addTube(skin,boji,0.042,mats.woodDark,"roof");
   }
-  for (const sign of [-1, 1]) {
-    const points = [];
-    for (let i = 0; i <= 24; i += 1) points.push(raised(frontPoint(-1 + 2 * i / 24, 1, sign)));
-    addTube(group, points, 0.075, mats.woodEdge, "roof");
+  // Four interlocking triangular corner surfaces. Their edges share exact
+  // formulae with BOTH main slopes and hip-end trapezoids.
+  for(const signX of [-1,1]) for(const signZ of [-1,1]) {
+    const fn=(u,v)=>roof.wing(signX,signZ,u,v);
+    const mesh=surfacePatch(skin,fn,roofFace,"roof",12,12);
+    mesh.name=`upturned corner wing ${signX}/${signZ}`;
+    mesh.userData.evidence="PHOTO_OBSERVED_EAVE_LIFT_INFERRED_SPLINE";
+    addRoofTileStudy(skin,fn,mats,{bays:wingBays,courses:wingCourses,label:`wing-${signX}-${signZ}`});
   }
-  addTube(group, [[0, ridgeY + 0.08, -ridgeHalf], [0, ridgeY + 0.08, ridgeHalf]], 0.13, mats.woodEdge, "roof");
-  cylinderBetween(group, [0, ridgeY + 0.1, -ridgeHalf], [0, ridgeY + 0.1, ridgeHalf], style === "lower" ? 0.11 : 0.15, mats.woodEdge, "roof", 12);
-  for (const sign of [-1, 1]) {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.17, 12, 8), mats.brass);
-    cap.position.set(0, ridgeY + 0.16, sign * ridgeHalf);
-    cap.scale.set(0.78, 0.62, 0.78);
-    cap.userData.part = "roof";
-    group.add(cap);
+  // 1 main ridge, four descending gable ridges, four diagonal hip ridges.
+  addTube(skin,[[0,ridgeY+0.075,-roof.ridgeHalf],[0,ridgeY+0.075,roof.ridgeHalf]],
+    0.132,mats.woodDark,"roof");
+  for(const signX of [-1,1]) for(const signZ of [-1,1]) {
+    const verticalRidge=[];
+    for(let i=0;i<=18;i++) {
+      const p=roof.gableRim(signX,signZ,i/18);
+      verticalRidge.push([p[0],p[1]+0.095,p[2]+signZ*0.035]);
+    }
+    const ridgeA=addTube(skin,verticalRidge,0.075,mats.woodDark,"roof");
+    ridgeA.name=`descending ridge ${signX}/${signZ}`;
+    const hipRidge=[];
+    for(let i=0;i<=18;i++) {
+      const p=roof.hipLine(signX,signZ,i/18);
+      hipRidge.push([p[0],p[1]+0.090,p[2]]);
+    }
+    const ridgeB=addTube(skin,hipRidge,0.079,mats.woodDark,"roof");
+    ridgeB.name=`diagonal hip ridge ${signX}/${signZ}`;
   }
+  // Exposed eave soffit edges follow the geometric surfaces continuously.
+  for (const sx of [-1,1]) {
+    const eave=[];
+    for(let i=0;i<=36;i++) eave.push(roof.mainEave(sx,roof.halfD*(-1+2*i/36)));
+    addTube(skin,eave,0.075,mats.woodDark,"roof");
+  }
+  for (const sz of [-1,1]) {
+    const eave=[];
+    for(let i=0;i<=26;i++) eave.push(roof.endEave(sz,-1+2*i/26));
+    addTube(skin,eave,0.068,mats.woodEdge,"roof");
+    // The ornamental ridge terminal is intentionally abstract and small.
+    const terminal=new THREE.Mesh(new THREE.SphereGeometry(0.16,12,8),mats.stoneDark);
+    terminal.position.set(0,ridgeY+0.16,sz*roof.ridgeHalf);
+    terminal.userData.part="roof";
+    terminal.userData.evidence="STUDY_FINIAL_NOT_SCANNED";
+    terminal.scale.set(0.67,1.06,0.62);
+    skin.add(terminal);
+  }
+  // Actually modeled eave end discs + shaped drip tiles along all 4 borders.
+  // Geometry is instanced into just two draw calls and scales with mobile tier.
+  const eaveDetail=addEaveTerminations(skin,roof,mats,{compact});
+  root.userData.roofTopology = {
+    mainRidges:1,descendingRidges:4,hipRidges:4,
+    gableTriangles:2,cornerWings:4,
+    shoulderFraction:0.58,cornerLiftM:roof.cornerLift,
+    eaveTileEnds:eaveDetail.tileEnds,
+    dripTiles:eaveDetail.dripTiles,
+    eaveBatchCount:3
+  };
   return skin;
 }
 

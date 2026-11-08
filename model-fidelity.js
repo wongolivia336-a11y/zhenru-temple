@@ -5,6 +5,7 @@
  * These meshes can be individually selected, cut away, exploded and exported.
  */
 import * as THREE from 'three';
+import { getFacadeInfillPositions, ZHENRU_INFILL_EVIDENCE } from './reconstruction/bracket-layout.mjs';
 
 const WOOD_STUDY = 'PHOTO_OBSERVATION_AND_GEOMETRIC_INFERENCE';
 const TILE_STUDY = 'PHOTO_OBSERVATION_AND_GEOMETRIC_INFERENCE';
@@ -102,6 +103,40 @@ function capital(parent, x, z, materials, corner = false, interior = false) {
   return local;
 }
 
+/**
+ * Infill (补间铺作) set differs from post-headed and corner sets.
+ * Beam-to-dou-to-gong-to-false-ang hierarchy follows visible photographed
+ * relationships, not reconstructed hidden tenons or asserted structural forces.
+ */
+function infillBracket(parent,x,z,m,frontSign) {
+  const g=new THREE.Group();
+  g.position.set(x,0,z);
+  g.name=`补间铺作 / infill bracket [${x.toFixed(2)},${z.toFixed(2)}]`;
+  g.userData={part:"dougong",kind:"infill",evidence:"PAPER_2024_COUNT_AND_PHOTO__DIMENSIONS_INFERRED"};
+  parent.add(g);
+  const a=mesh=>{g.add(mesh);return mesh;};
+  a(block(0.43,0.115,0.42,0,6.00,0,m.woodDark,"栌斗 / sill dou"));
+  a(block(0.30,0.085,0.31,0,6.105,0,m.wood,"斗口 / raised neck"));
+  a(block(0.56,0.080,0.50,0,6.170,0,m.woodEdge,"承托斗 / top lip"));
+  const lower=a(woodPrism(1.03,0.190,0.20,m.wood,"泥道栱 / lower scalloped gong"));
+  lower.position.y=6.21;
+  for(const sign of [-1,1]) {
+    a(block(0.23,0.095,0.25,sign*0.35,6.427,0,m.woodDark,"散斗 / side bearing"));
+  }
+  const cross=a(woodPrism(0.91,0.16,0.19,m.woodLight,"华栱 / perpendicular projection","z"));
+  cross.position.y=6.39;
+  const angled=a(angPrism(m.woodLight,"z"));
+  angled.position.set(0,6.42,frontSign*0.05);
+  angled.rotation.y=frontSign*Math.PI/2;
+  angled.scale.set(0.88,0.84,0.89);
+  const upper=a(woodPrism(1.33,0.16,0.19,m.wood,"令栱 / upper spread"));
+  upper.position.y=6.57;
+  const inner=a(block(0.19,0.63,0.16,0,6.57,-frontSign*0.34,m.woodDark,"挑斡 / inclined inside support"));
+  inner.rotation.x=-frontSign*0.47;
+  a(block(1.53,0.15,0.23,0,6.84,0,m.woodDark,"撩檐枋 / perimeter bearing"));
+  return g;
+}
+
 /** Replace schematic rectangular block-stacks with named study components.
  * xs,zs are the existing 16-column grid: no historical claim that all supports
  * retained an identical bracket configuration. Interior units are simplified.
@@ -112,7 +147,16 @@ export function populateDougongStudy(parent, xs, zs, materials) {
     const edgeZ = iz === 0 || iz === zs.length - 1;
     capital(parent, x, z, materials, edgeX && edgeZ, !edgeX && !edgeZ);
   }));
+  // The source documents four infill sets in the central bay and two in each
+  // side bay on both front/rear eaves, in addition to column-headed sets.
+  const infillXs=getFacadeInfillPositions(xs);
+  for (const z of [zs[0],zs[zs.length-1]]) {
+    const frontSign=z<0?-1:1;
+    infillXs.forEach(station=>infillBracket(parent,station.x,z,materials,frontSign));
+  }
   parent.userData.part = 'dougong';
+  parent.userData.infillBracketCount = infillXs.length*2;
+  parent.userData.evidence = ZHENRU_INFILL_EVIDENCE;
   parent.userData.provenance = 'Four-puzuo single-ang account is one interpretation; government summary differs.';
   return parent;
 }
