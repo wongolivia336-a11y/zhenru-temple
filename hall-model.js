@@ -119,7 +119,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   hall.add(qingExtensionGroup);
 
   buildStoneBase(baseGroup, mats);
-  buildColumnsAndFrame(frameGroup, columnGroup, mats);
+  const ceilingRafterStudy = buildColumnsAndFrame(frameGroup, columnGroup, mats);
   // Contemporary facade reference: main roof ridge is parallel to the hall frontage.
   // Frame axis study shares its rotation; the actual 16-column grid remains unrotated.
   const pitchParam = new URLSearchParams(window.location.search).get("roofPitch");
@@ -261,6 +261,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       toTarget: target.clone()
     };
     activeView = nextView;
+    ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
     camera.fov = nextView === "top" ? 52 : nextView === "outside" ? responsiveHomeFov() : 37;
     camera.updateProjectionMatrix();
     if (nextView === "top") {
@@ -299,12 +300,14 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function toggleExploded(force) {
     exploded = typeof force === "boolean" ? force : !exploded;
     roofFrameStudy.visible = exploded || frameMode;
+    ceilingRafterStudy.visible = exploded || frameMode || activeView === "inside";
     return exploded;
   }
 
   function toggleFrame(force) {
     frameMode = typeof force === "boolean" ? force : !frameMode;
     roofFrameStudy.visible = frameMode || exploded;
+    ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
     mainRoofSkin.visible = !frameMode;
     extraRoofSkin.visible = !frameMode;
     return frameMode;
@@ -332,7 +335,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   async function exportGLB() {
     const exportRoot = hall.clone(true);
     exportRoot.traverse((node) => {
-      if (node.userData.isRoofSkin || node.name === "roof-framing-axis-study") node.visible = true;
+      if (node.userData.isRoofSkin || ["roof-framing-axis-study","upper-interior-rafter-study"].includes(node.name)) node.visible = true;
       if (["single-eave-roof", "Qing-period-added-eave-study", "timber-frame", "sixteen-column-grid", "Qing-period-five-bay-outline-study"].includes(node.name)) node.position.y = 0;
     });
     const exportScene = new THREE.Scene();
@@ -587,7 +590,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           meshTopY: box.max.y,
           meshBottomY: box.min.y,
           frameScaleY: roofFrameStudy.scale.y,
-          framingStudyVisible: roofFrameStudy.visible
+          framingStudyVisible: roofFrameStudy.visible,
+          ceilingRafterStudyVisible: ceilingRafterStudy.visible
         };
       }
     };
@@ -845,7 +849,13 @@ function buildColumnsAndFrame(group, columns, mats) {
   buildFrontPanels(group, mats);
   buildSidePanels(group, mats);
   buildDougong(group, mats, xs, zs);
-  buildCeilingFrame(group, mats);
+  const ceilingStudy = new THREE.Group();
+  ceilingStudy.name = "upper-interior-rafter-study";
+  ceilingStudy.userData.part = "frame";
+  ceilingStudy.visible = false;
+  group.add(ceilingStudy);
+  buildCeilingFrame(ceilingStudy, mats);
+  return ceilingStudy;
 }
 
 function buildFrontPanels(group, mats) {

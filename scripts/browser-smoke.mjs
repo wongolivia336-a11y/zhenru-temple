@@ -48,7 +48,8 @@ async function run() {
     return d?.width>100&&d?.height>100?d:null;
   },"reference JPEG decoded");
   const normal=await ensure(26);
-  assert.equal(normal.framingStudyVisible,false,"Unexplained rafters should not poke through normal roof");
+  assert.equal(normal.framingStudyVisible,false,"Exterior rafters should not poke through roof");
+  assert.equal(normal.ceilingRafterStudyVisible,false,"Interior rafter silhouettes should not pierce the exterior roof");
   assert.ok(Math.abs(normal.ridgeY-10.926693576380554)<0.0001);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
   const low=await apply(18);
@@ -68,6 +69,7 @@ async function run() {
   await viewer.locator("#explodeToggle").click();
   assert.equal((await getState()).exploded,true);
   assert.equal((await getRoof()).framingStudyVisible,true);
+  assert.equal((await getRoof()).ceilingRafterStudyVisible,true);
   await viewer.locator("#frameToggle").click();
   assert.equal((await getState()).frameMode,true);
   await viewer.locator("#resetView").click();
@@ -75,6 +77,7 @@ async function run() {
   assert.equal((await getState()).exploded,false);
   assert.equal((await getState()).frameMode,false);
   assert.equal((await getRoof()).framingStudyVisible,false);
+  assert.equal((await getRoof()).ceilingRafterStudyVisible,false);
   assert.equal(await viewer.locator("#cutawayToggle").getAttribute("aria-pressed"),"false");
   await page.screenshot({path:"qa/runtime-screenshots/reset-desktop.png"});
   let overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
