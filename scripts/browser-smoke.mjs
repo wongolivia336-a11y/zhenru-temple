@@ -31,7 +31,10 @@ async function run() {
     return data;
   }
   async function apply(pitch){
-    await page.locator("#pitchRange").fill(String(pitch));
+    await page.locator("#pitchRange").evaluate((input, next) => {
+      input.value = String(next);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }, pitch);
     await page.locator("#applyPitch").click();
     assert.ok((await page.locator("#model").getAttribute("src")).includes("roofPitch="+pitch));
     return ensure(pitch);
