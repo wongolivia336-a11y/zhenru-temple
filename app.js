@@ -334,8 +334,18 @@ async function bootModel() {
     columns: document.querySelector("#pinColumns"),
     base: document.querySelector("#pinBase")
   };
+  let startupStage = "WebGL 2 context";
   try {
     prepareWebGL2Context(canvas);
+
+    startupStage = "Three.js core";
+    await import("three");
+    startupStage = "OrbitControls";
+    await import("three/addons/controls/OrbitControls.js");
+    startupStage = "GLTFExporter";
+    await import("three/addons/exporters/GLTFExporter.js");
+
+    startupStage = "hall-model.js";
     const { createHallScene } = await import("./hall-model.js");
     hallScene = createHallScene({
       canvas,
@@ -346,12 +356,14 @@ async function bootModel() {
     });
     hallScene.setStage(activeStage);
   } catch (error) {
-    console.error("Three.js scene failed to start:", error);
+    console.error(`Three.js scene failed during ${startupStage}:`, error);
     loading.classList.add("is-hidden");
     message.hidden = false;
     const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-    message.title = detail;
-    message.textContent = `三维场景启动失败：${detail.slice(0, 180)}。请检查 WebGL 2 支持、图形加速和模块加载。`;
+    const stack = error instanceof Error && error.stack ? error.stack.split("\n").slice(1, 3).join(" | ").slice(0, 220) : "";
+    message.dataset.startupStage = startupStage;
+    message.title = stack ? `${detail} | ${stack}` : detail;
+    message.textContent = `三维场景启动失败（${startupStage}）：${detail.slice(0, 160)}。可查看浏览器控制台定位模块。`;
   }
 }
 
