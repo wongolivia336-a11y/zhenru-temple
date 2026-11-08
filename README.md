@@ -62,3 +62,8 @@ python -m http.server 8000
 第二轮建筑研究原型的完整代码、源照片和交接文档保存在分支 [`feat/zhenru-archive-final-handoff`](https://github.com/wongolivia336-a11y/zhenru-temple/tree/feat/zhenru-archive-final-handoff)。本版本在已有第二轮结构改造基础上补充了 WebGL 几何剖视（“剖视 / 恢复全景”）和更完整的史料/QA交接材料。参阅 [handoff/README.md](./handoff/README.md)、[handoff/EXECUTION_PROMPT.md](./handoff/EXECUTION_PROMPT.md)、[handoff/QA_CHECKLIST.md](./handoff/QA_CHECKLIST.md)。
 
 **注意**：当前环境已完成代码静态检查，但不能视为已完成真实浏览器 WebGL、触屏及 GLB round-trip 全面验收。请按 QA 清单在浏览器中复核。
+
+
+## 第三轮 / 精细化构件研究（功能分支）
+
+新分支 `feat/zhenru-hifi-roof-brackets-v3` 引入 `model-fidelity.js`：曲线造型斗栱与有厚度的搭接筒板瓦几何，修正主屋脊/正立面方向，并沿用现有时间轴、热点、剖视和导出。参见 `studies/README.md` 和 `handoff/HIFI_V3_CHANGELOG.md`。这仍是研究性几何，尚未取得原始测绘尺寸。请不要把模型精度视为文物复原精度。
