@@ -207,6 +207,13 @@ toolsToggle?.addEventListener("click", () => {
   toolsToggle.setAttribute("aria-expanded", String(expanded));
   modelTools.hidden = !expanded;
 });
+// Close the structure popover when interacting with the model or other UI.
+document.addEventListener("pointerdown", (event) => {
+  if (modelTools && !modelTools.hidden && !event.target.closest(".view-tools")) {
+    modelTools.hidden = true;
+    toolsToggle?.setAttribute("aria-expanded", "false");
+  }
+});
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && modelTools && !modelTools.hidden) {
     modelTools.hidden = true;
@@ -244,6 +251,10 @@ document.querySelector("#resetView").addEventListener("click", () => {
   document.querySelector("#cutawayToggle").textContent = "剖视";
   modelTools.hidden = true;
   toolsToggle?.setAttribute("aria-expanded", "false");
+  // Reset both visual state and accessibility semantics.
+  for (const id of ["explodeToggle", "frameToggle", "cutawayToggle"]) {
+    document.getElementById(id)?.setAttribute("aria-pressed", "false");
+  }
   clearObservation();
   document.querySelectorAll(".view-button[data-view]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.view === "outside");

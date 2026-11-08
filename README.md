@@ -70,3 +70,6 @@ python -m http.server 8000
 ## img2threejs 图像对照精细化实验（研究分支 v4）
 
 新增 [交互式参考对照页](./reconstruction/reference-review.html)、[几何/证据质量约束](./reconstruction/quality-contract.json)、[项目静态门禁脚本](./scripts/check-model-fidelity.mjs)、[Skill 安装及验收说明](./handoff/IMG2THREEJS_FIDELITY.md)。安装说明与官方仓库固定版本见文档。形态建模已有变更，不代表实测复原或视觉比对已通过。
+
+
+**参考比对页体验修订（2026-11-08）：** 三维面板现在使用 `index.html?viewerOnly=1` 的单场景画布，剖视/拆解菜单使用更明确的入口文字，并在重置时同步刷新 `aria-pressed`；测试边界见 `handoff/IMG2THREEJS_FIDELITY.md`。

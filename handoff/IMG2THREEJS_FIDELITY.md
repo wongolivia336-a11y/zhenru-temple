@@ -34,3 +34,10 @@ npx --yes img2threejs@latest doctor
 ## 目前尚未完成
 未安装 chat sandbox 技能、未执行完整 spec/generation 回路；GitHub CI 需运行后才可确认 Stage 1 是否通过。
 未有现场测绘、准确斗栱类型认证、相机标定、实机 FPS、Blender 全量 round-trip、完整浏览器回归。所有新几何仍是可编辑的研究性推断；如果对照片不吻合必须调整轮廓，而不是增加随机噪点。
+
+
+## 浏览器走查（提交 8a95da0）
+远程真实浏览器确认：主页面能绘制真实 Three.js 建筑（包含新瓦面/斗栱）、六个热点及四个历史阶段；`reconstruction/reference-review.html` 左侧原图和右侧 WebGL 场景均加载。未发现可见的 JavaScript 启动故障。
+初次浏览器测试未展开“结构工具”而误认为没有剖视/拆解；源代码与事件监听证实 `cutawayToggle`、`explodeToggle`、`frameToggle` 均在可展开面板内。新补丁增强菜单文本可发现性、菜单关闭行为，并修复 Reset 后 `aria-pressed` 可能残留的问题。
+本轮也将嵌入式查看模式改成 `?viewerOnly=1`，避免右边 iframe 同时缩放全站 UI；需要在更新后的预览里进一步观察窄屏布局、面板触发与四阶段真实动画。
+浏览器检查没有提供经校准的照片叠图或真实手机 GPU 数据，因此视觉门禁仍是 PENDING。
