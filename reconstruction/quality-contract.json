@@ -1,6 +1,6 @@
 {
   "name": "ZHENRU Main Hall image-guided geometry quality contract",
-  "version": "v5",
+  "version": "v6",
   "date": "2026-11-08",
   "scope": "Existing Main Hall only; no adjacent pagodas/pavilions",
   "sourceImages": [
@@ -28,7 +28,7 @@
       "id": "hipped-gable",
       "criterion": "hip and gable surfaces coherent in silhouette",
       "evidence": "photographic+inferred",
-      "state": "pending"
+      "state": "Implemented explicit gable faces, end hips and corner seam continuity; visual review pending"
     },
     {
       "id": "eave-sweep",
@@ -65,6 +65,12 @@
       "criterion": "Roof rise geometry computes a 26 degree study profile by default and preserves previous ~18 degree option",
       "evidence": "government-report + inferred span",
       "state": "parameterized and test-covered; photo comparison pending"
+    },
+    {
+      "id": "nine-ridge-system",
+      "criterion": "one major ridge, four gable-descending ridges and four diagonal hip ridges; two dark gable panels with four connected wing patches",
+      "evidence": "official roof typology + inferred Zhenru dimensions",
+      "state": "geometry/continuity unit-tested; historical ornamental style pending"
     }
   ],
   "review": [

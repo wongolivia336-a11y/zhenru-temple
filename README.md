@@ -78,3 +78,8 @@ python -m http.server 8000
 ## v5｜屋顶坡度有证据的参数化校准
 
 对照 [上海普陀区公开报道](https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html)所述约 26° 的屋面坡度，项目改用 `reconstruction/roof-parameters.mjs` 计算模型的屋脊抬升及内部研究屋架联动。浏览器访问 [参考照片对照实验台](./reconstruction/reference-review.html)，可选择本地图片，尝试18°–34° 研究坡度并刷新实际三维模型。数据没有原始测绘值及相机标定，任何试验数值均非真如寺正式测量结果。运行 `node scripts/check-roof-parameters.mjs` 检查参数一致性，后续阶段见 [v5 修订说明](./handoff/ROOF_PITCH_CALIBRATION_V5.md)。
+
+
+## v6：单檐歇山屋顶的结构拓扑改造
+
+不再把四坡庑殿式算法当成歇山顶。引入 `reconstruction/hip-gable-topology.mjs`，显式构建两个山花、两个端坡、四角翼面、四条垂脊和四条戗脊，保持实体瓦件及上一轮 26° 坡度校准。新增 `scripts/check-hip-gable-topology.mjs` 共边单元测试和实际 Chromium 验收；详细边界见 [v6 结构笔记](./handoff/HIP_GABLE_V6.md)。此模型依然不是实测文物数字复原。

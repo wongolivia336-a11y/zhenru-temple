@@ -51,6 +51,12 @@ async function run() {
   assert.equal(normal.framingStudyVisible,false,"Exterior rafters should not poke through roof");
   assert.equal(normal.ceilingRafterStudyVisible,false,"Interior rafter silhouettes should not pierce the exterior roof");
   assert.ok(Math.abs(normal.ridgeY-10.926693576380554)<0.0001);
+  const observedTopology=await page.evaluate(()=>document.querySelector("#model")?.contentWindow?.__zhenruQA?.getRoofCalibration?.()?.roofTopology);
+  assert.equal(observedTopology?.mainRidges,1);
+  assert.equal(observedTopology?.descendingRidges,4);
+  assert.equal(observedTopology?.hipRidges,4);
+  assert.equal(observedTopology?.gableTriangles,2);
+  assert.equal(observedTopology?.cornerWings,4);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
