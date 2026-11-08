@@ -73,3 +73,8 @@ python -m http.server 8000
 
 
 **参考比对页体验修订（2026-11-08）：** 三维面板现在使用 `index.html?viewerOnly=1` 的单场景画布，剖视/拆解菜单使用更明确的入口文字，并在重置时同步刷新 `aria-pressed`；测试边界见 `handoff/IMG2THREEJS_FIDELITY.md`。
+
+
+## v5｜屋顶坡度有证据的参数化校准
+
+对照 [上海普陀区公开报道](https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html)所述约 26° 的屋面坡度，项目改用 `reconstruction/roof-parameters.mjs` 计算模型的屋脊抬升及内部研究屋架联动。浏览器访问 [参考照片对照实验台](./reconstruction/reference-review.html)，可选择本地图片，尝试18°–34° 研究坡度并刷新实际三维模型。数据没有原始测绘值及相机标定，任何试验数值均非真如寺正式测量结果。运行 `node scripts/check-roof-parameters.mjs` 检查参数一致性，后续阶段见 [v5 修订说明](./handoff/ROOF_PITCH_CALIBRATION_V5.md)。

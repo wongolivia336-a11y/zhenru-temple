@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
+import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -118,18 +119,32 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   hall.add(qingExtensionGroup);
 
   buildStoneBase(baseGroup, mats);
-  buildColumnsAndFrame(frameGroup, columnGroup, mats);
+  const ceilingRafterStudy = buildColumnsAndFrame(frameGroup, columnGroup, mats);
   // Contemporary facade reference: main roof ridge is parallel to the hall frontage.
   // Frame axis study shares its rotation; the actual 16-column grid remains unrotated.
+  const pitchParam = new URLSearchParams(window.location.search).get("roofPitch");
+  const roofStudy = makeRoofStudy(parseRoofPitch(pitchParam));
   const roofFrameStudy = new THREE.Group();
   roofFrameStudy.name = "roof-framing-axis-study";
   roofFrameStudy.userData.part = "frame";
   roofFrameStudy.rotation.y = Math.PI / 2;
+  // Keep the frame eave datum fixed when the ridge height changes.
+  roofFrameStudy.scale.y = roofStudy.frameScaleY;
+  roofFrameStudy.position.y = roofStudy.frameOffsetY;
+  roofFrameStudy.userData.evidence = "INFERRED_GEOMETRY_SCALED_TO_PUBLIC_PITCH";
   frameGroup.add(roofFrameStudy);
   buildGableAndRafters(roofFrameStudy, mats);
+  // The illustrative frame's top rafters can intersect the roof skin.
+  // Show them only when the user explicitly inspects structure (frame/explode).
+  roofFrameStudy.visible = false;
   roofGroup.rotation.y = Math.PI / 2;
+  roofGroup.userData.studyPitchDeg = roofStudy.pitchDeg;
+  roofGroup.userData.studyRidgeElevation = roofStudy.ridgeY;
+  roofGroup.userData.reference = "Putuo District 2025 public description (26 degree roof slope); NOT a measured roof section";
   const mainRoofSkin = buildRoof(roofGroup, {
-    width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
+    width: roofStudy.width, depth: roofStudy.depth,
+    baseY: roofStudy.baseY, ridgeY: roofStudy.ridgeY,
+    ridgeHalf: roofStudy.ridgeHalf, mats, style: "main"
   });
   const extraRoofSkin = buildLowerEave(extraRoofGroup, mats);
   buildInteriorHint(hall, mats);
@@ -246,6 +261,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       toTarget: target.clone()
     };
     activeView = nextView;
+    ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
     camera.fov = nextView === "top" ? 52 : nextView === "outside" ? responsiveHomeFov() : 37;
     camera.updateProjectionMatrix();
     if (nextView === "top") {
@@ -283,11 +299,15 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   function toggleExploded(force) {
     exploded = typeof force === "boolean" ? force : !exploded;
+    roofFrameStudy.visible = exploded || frameMode;
+    ceilingRafterStudy.visible = exploded || frameMode || activeView === "inside";
     return exploded;
   }
 
   function toggleFrame(force) {
     frameMode = typeof force === "boolean" ? force : !frameMode;
+    roofFrameStudy.visible = frameMode || exploded;
+    ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
     mainRoofSkin.visible = !frameMode;
     extraRoofSkin.visible = !frameMode;
     return frameMode;
@@ -315,7 +335,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   async function exportGLB() {
     const exportRoot = hall.clone(true);
     exportRoot.traverse((node) => {
-      if (node.userData.isRoofSkin) node.visible = true;
+      if (node.userData.isRoofSkin || ["roof-framing-axis-study","upper-interior-rafter-study"].includes(node.name)) node.visible = true;
       if (["single-eave-roof", "Qing-period-added-eave-study", "timber-frame", "sixteen-column-grid", "Qing-period-five-bay-outline-study"].includes(node.name)) node.position.y = 0;
     });
     const exportScene = new THREE.Scene();
@@ -559,7 +579,22 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     };
   }
   if (new URLSearchParams(window.location.search).get("qa") === "1") {
-    window.__zhenruQA = { getSceneState, getDiagnostics };
+    window.__zhenruQA = {
+      getSceneState, getDiagnostics,
+      getRoofCalibration() {
+        roofGroup.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(mainRoofSkin);
+        return {
+          pitchDeg: roofStudy.pitchDeg,
+          ridgeY: roofStudy.ridgeY,
+          meshTopY: box.max.y,
+          meshBottomY: box.min.y,
+          frameScaleY: roofFrameStudy.scale.y,
+          framingStudyVisible: roofFrameStudy.visible,
+          ceilingRafterStudyVisible: ceilingRafterStudy.visible
+        };
+      }
+    };
   }
 
   function animate(now) {
@@ -814,7 +849,13 @@ function buildColumnsAndFrame(group, columns, mats) {
   buildFrontPanels(group, mats);
   buildSidePanels(group, mats);
   buildDougong(group, mats, xs, zs);
-  buildCeilingFrame(group, mats);
+  const ceilingStudy = new THREE.Group();
+  ceilingStudy.name = "upper-interior-rafter-study";
+  ceilingStudy.userData.part = "frame";
+  ceilingStudy.visible = false;
+  group.add(ceilingStudy);
+  buildCeilingFrame(ceilingStudy, mats);
+  return ceilingStudy;
 }
 
 function buildFrontPanels(group, mats) {
