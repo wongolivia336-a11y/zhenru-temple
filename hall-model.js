@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 13046)
-Total output lines: 1185
-
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
@@ -540,7 +537,115 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function getDiagnostics() {
     let objects = 0;
     let renderables = 0;
-    scene.traverse((node) => { objec…1046 tokens truncated…es(scene) {
+    scene.traverse((node) => { objects += 1; if (node.isMesh || node.isLine || node.isPoints) renderables += 1; });
+    return {
+      revision: THREE.REVISION,
+      drawCalls: renderer.info.render.calls,
+      triangles: renderer.info.render.triangles,
+      geometries: renderer.info.memory.geometries,
+      textures: renderer.info.memory.textures,
+      objects,
+      renderables,
+      pixelRatio: renderer.getPixelRatio()
+    };
+  }
+  if (new URLSearchParams(window.location.search).get("qa") === "1") {
+    window.__zhenruQA = { getSceneState, getDiagnostics };
+  }
+
+  function animate(now) {
+    if (disposed || document.hidden) { raf = 0; return; }
+    raf = requestAnimationFrame(animate);
+    const delta = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+    explosionAmount = THREE.MathUtils.damp(explosionAmount, exploded ? 1 : 0, 7, delta);
+    frameGroup.position.y = explosionAmount * 0.42;
+    columnGroup.position.y = explosionAmount * 0.07;
+    roofGroup.position.y = explosionAmount * 1.28;
+    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 0.78;
+    qingExtensionGroup.position.y = explosionAmount * 0.27;
+    if (cameraTween) {
+      const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
+      const eased = t * t * (3 - 2 * t);
+      camera.position.lerpVectors(cameraTween.fromPosition, cameraTween.toPosition, eased);
+      controls.target.lerpVectors(cameraTween.fromTarget, cameraTween.toTarget, eased);
+      if (t >= 1) cameraTween = null;
+    }
+    if (moving.size && activeView === "inside") {
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+      const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
+      const velocity = new THREE.Vector3();
+      if (moving.has("w")) velocity.add(forward);
+      if (moving.has("s")) velocity.sub(forward);
+      if (moving.has("d")) velocity.add(right);
+      if (moving.has("a")) velocity.sub(right);
+      if (velocity.lengthSq()) {
+        velocity.normalize().multiplyScalar(2.2 * delta);
+        const startX = camera.position.x;
+        const startZ = camera.position.z;
+        let nextX = THREE.MathUtils.clamp(startX + velocity.x, -5.9, 5.9);
+        let nextZ = THREE.MathUtils.clamp(startZ + velocity.z, -5.9, 5.9);
+        const blocked = (x, z) => POST_X.some((postX) => POST_Z.some((postZ) => Math.hypot(x - postX, z - postZ) < 0.5))
+          || (z < -3.05 && Math.abs(x) < 1.68);
+        if (blocked(nextX, nextZ)) {
+          if (!blocked(nextX, startZ)) nextZ = startZ;
+          else if (!blocked(startX, nextZ)) nextX = startX;
+          else { nextX = startX; nextZ = startZ; }
+        }
+        if (nextX !== startX || nextZ !== startZ) {
+          const dx = nextX - startX;
+          const dz = nextZ - startZ;
+          camera.position.x = nextX;
+          camera.position.z = nextZ;
+          controls.target.x += dx;
+          controls.target.z += dz;
+        }
+        camera.position.y = 2.1;
+      }
+    }
+    controls.update();
+    updatePins();
+    renderer.render(scene, camera);
+    if (!readyCalled && now > 600) {
+      readyCalled = true;
+      onReady();
+    }
+  }
+  raf = document.hidden ? 0 : requestAnimationFrame(animate);
+
+  return {
+    setStage,
+    setView,
+    toggleExploded,
+    toggleFrame,
+    toggleCutaway,
+    resetView,
+    exportGLB,
+    destroy() {
+      disposed = true;
+      cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
+      listenerController.abort();
+      controls.removeEventListener("start", cancelCameraTween);
+      controls.dispose();
+      if (window.__zhenruQA) delete window.__zhenruQA;
+      const geometries = new Set();
+      const materials = new Set();
+      scene.traverse((node) => {
+        if (node.geometry) geometries.add(node.geometry);
+        if (node.material) (Array.isArray(node.material) ? node.material : [node.material]).forEach((material) => materials.add(material));
+      });
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.forEach((material) => material.dispose());
+      renderer.dispose();
+    }
+  };
+}
+
+function addCourtyardLines(scene) {
   const points = [];
   for (let i = -12; i <= 12; i += 1.2) {
     points.push(-16, 0.005, i, 16, 0.005, i);
@@ -1075,6 +1180,5 @@ function buildInteriorHint(hall, mats) {
 
 function lerp3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
 function raised(point) { return [point[0], point[1] + 0.022, point[2]]; }
-
 
 
