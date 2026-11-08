@@ -57,6 +57,10 @@ async function run() {
   assert.equal(observedTopology?.hipRidges,4);
   assert.equal(observedTopology?.gableTriangles,2);
   assert.equal(observedTopology?.cornerWings,4);
+  assert.equal(normal.infillBracketCount,16,"16 modeled front/rear infill bracket sets");
+  assert.equal(observedTopology?.eaveTileEnds,224);
+  assert.equal(observedTopology?.dripTiles,224);
+  assert.equal(observedTopology?.eaveBatchCount,2);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});

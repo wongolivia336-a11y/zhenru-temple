@@ -1,6 +1,6 @@
 {
   "name": "ZHENRU Main Hall image-guided geometry quality contract",
-  "version": "v6",
+  "version": "v7",
   "date": "2026-11-08",
   "scope": "Existing Main Hall only; no adjacent pagodas/pavilions",
   "sourceImages": [
@@ -71,6 +71,18 @@
       "criterion": "one major ridge, four gable-descending ridges and four diagonal hip ridges; two dark gable panels with four connected wing patches",
       "evidence": "official roof typology + inferred Zhenru dimensions",
       "state": "geometry/continuity unit-tested; historical ornamental style pending"
+    },
+    {
+      "id": "front-and-rear-infill-brackets",
+      "criterion": "two infill sets on each minor bay and four in central bay, front/rear eave",
+      "evidence": "The Paper / published architectural field review (2024)",
+      "state": "implemented 16 schematic 3D infill brackets in addition to 16 post heads; exact joinery/dimensions unmeasured"
+    },
+    {
+      "id": "eave-tile-ends-and-drips",
+      "criterion": "three-dimensional tile ends and hanging drip tiles on four eave runs; separately batched/inspectable",
+      "evidence": "Putuo 2025 + public photo silhouette; geometry inferred",
+      "state": "implemented instanced; profile details await measured reference"
     }
   ],
   "review": [

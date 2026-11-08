@@ -4,6 +4,7 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
 import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
 import { createHipGableStudy } from "./reconstruction/hip-gable-topology.mjs";
+import { addEaveTerminations } from "./reconstruction/eave-details.js";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -593,7 +594,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           frameScaleY: roofFrameStudy.scale.y,
           framingStudyVisible: roofFrameStudy.visible,
           ceilingRafterStudyVisible: ceilingRafterStudy.visible,
-          roofTopology: mainRoofSkin.parent.userData.roofTopology
+          roofTopology: mainRoofSkin.parent.userData.roofTopology,
+          infillBracketCount: frameGroup.userData.infillBracketCount
         };
       }
     };
@@ -1075,10 +1077,16 @@ function buildRoof(parent, options) {
     terminal.scale.set(0.67,1.06,0.62);
     skin.add(terminal);
   }
+  // Actually modeled eave end discs + shaped drip tiles along all 4 borders.
+  // Geometry is instanced into just two draw calls and scales with mobile tier.
+  const eaveDetail=addEaveTerminations(skin,roof,mats,{compact});
   root.userData.roofTopology = {
     mainRidges:1,descendingRidges:4,hipRidges:4,
     gableTriangles:2,cornerWings:4,
-    shoulderFraction:0.58,cornerLiftM:roof.cornerLift
+    shoulderFraction:0.58,cornerLiftM:roof.cornerLift,
+    eaveTileEnds:eaveDetail.tileEnds,
+    dripTiles:eaveDetail.dripTiles,
+    eaveBatchCount:2
   };
   return skin;
 }

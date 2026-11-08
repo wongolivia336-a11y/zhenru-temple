@@ -16,6 +16,8 @@ const check=[
    hall.includes("for(const signX of [-1,1]) for(const signZ of [-1,1])") &&
    (hall.match(/addRoofTileStudy\(skin,fn,mats/g)||[]).length===3],
 ["shaped brackets connected",hall.includes("populateDougongStudy(group, xs, zs")&&model.includes("ExtrudeGeometry")],
+["published 2+4+2 infill layout",model.includes("getFacadeInfillPositions(xs)")&&model.includes("parent.userData.infillBracketCount")],
+["instanced eave termination meshes",hall.includes("addEaveTerminations(skin,roof,mats,{compact})")&&file("reconstruction/eave-details.js").includes("THREE.InstancedMesh")],
 ["mobile tile complexity tier",hall.includes("const compact = window.innerWidth <= 720")],
 ["research inference labeled",model.includes("GEOMETRIC_STUDY_NOT_SURVEY")],
 ["review signoff not invented",spec.review.every(x=>x.status==="PENDING")]
