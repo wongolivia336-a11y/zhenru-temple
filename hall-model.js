@@ -134,6 +134,9 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   roofFrameStudy.userData.evidence = "INFERRED_GEOMETRY_SCALED_TO_PUBLIC_PITCH";
   frameGroup.add(roofFrameStudy);
   buildGableAndRafters(roofFrameStudy, mats);
+  // The illustrative frame's top rafters can intersect the roof skin.
+  // Show them only when the user explicitly inspects structure (frame/explode).
+  roofFrameStudy.visible = false;
   roofGroup.rotation.y = Math.PI / 2;
   roofGroup.userData.studyPitchDeg = roofStudy.pitchDeg;
   roofGroup.userData.studyRidgeElevation = roofStudy.ridgeY;
@@ -295,11 +298,13 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   function toggleExploded(force) {
     exploded = typeof force === "boolean" ? force : !exploded;
+    roofFrameStudy.visible = exploded || frameMode;
     return exploded;
   }
 
   function toggleFrame(force) {
     frameMode = typeof force === "boolean" ? force : !frameMode;
+    roofFrameStudy.visible = frameMode || exploded;
     mainRoofSkin.visible = !frameMode;
     extraRoofSkin.visible = !frameMode;
     return frameMode;
@@ -327,7 +332,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   async function exportGLB() {
     const exportRoot = hall.clone(true);
     exportRoot.traverse((node) => {
-      if (node.userData.isRoofSkin) node.visible = true;
+      if (node.userData.isRoofSkin || node.name === "roof-framing-axis-study") node.visible = true;
       if (["single-eave-roof", "Qing-period-added-eave-study", "timber-frame", "sixteen-column-grid", "Qing-period-five-bay-outline-study"].includes(node.name)) node.position.y = 0;
     });
     const exportScene = new THREE.Scene();
@@ -581,7 +586,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           ridgeY: roofStudy.ridgeY,
           meshTopY: box.max.y,
           meshBottomY: box.min.y,
-          frameScaleY: roofFrameStudy.scale.y
+          frameScaleY: roofFrameStudy.scale.y,
+          framingStudyVisible: roofFrameStudy.visible
         };
       }
     };

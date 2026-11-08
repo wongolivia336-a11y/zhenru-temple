@@ -39,7 +39,16 @@ async function run() {
     assert.ok((await page.locator("#model").getAttribute("src")).includes("roofPitch="+pitch));
     return ensure(pitch);
   }
+  // Ensure the reference is actually decoded, not merely a nonempty img element.
+  const photoDimensions=await until(async()=>{
+    const d=await page.locator("#photo").evaluate(async img=>{
+      try { await img.decode(); return {width:img.naturalWidth,height:img.naturalHeight}; }
+      catch { return null; }
+    });
+    return d?.width>100&&d?.height>100?d:null;
+  },"reference JPEG decoded");
   const normal=await ensure(26);
+  assert.equal(normal.framingStudyVisible,false,"Unexplained rafters should not poke through normal roof");
   assert.ok(Math.abs(normal.ridgeY-10.926693576380554)<0.0001);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
   const low=await apply(18);
@@ -58,9 +67,14 @@ async function run() {
   assert.equal((await getState()).cutaway,true);
   await viewer.locator("#explodeToggle").click();
   assert.equal((await getState()).exploded,true);
+  assert.equal((await getRoof()).framingStudyVisible,true);
+  await viewer.locator("#frameToggle").click();
+  assert.equal((await getState()).frameMode,true);
   await viewer.locator("#resetView").click();
   assert.equal((await getState()).cutaway,false);
   assert.equal((await getState()).exploded,false);
+  assert.equal((await getState()).frameMode,false);
+  assert.equal((await getRoof()).framingStudyVisible,false);
   assert.equal(await viewer.locator("#cutawayToggle").getAttribute("aria-pressed"),"false");
   await page.screenshot({path:"qa/runtime-screenshots/reset-desktop.png"});
   let overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
@@ -70,7 +84,7 @@ async function run() {
   overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   assert.ok(overflow<=1,"Mobile horizontal overflow "+overflow);
   assert.deepEqual(errors,[]);
-  const report={pass:true,base26:normal,pitch18:low,pitch34:high,reset26:reset,
+  const report={pass:true,referencePhotoDimensions:photoDimensions,base26:normal,pitch18:low,pitch34:high,reset26:reset,
    note:"WebGL geometry and control verification in headless Chromium; NOT calibrated historical accuracy."};
   fs.writeFileSync("qa/runtime-screenshots/browser-report.json",JSON.stringify(report,null,2));
   console.log("PASS actual WebGL roof bounds",low.meshTopY,normal.meshTopY,high.meshTopY);
