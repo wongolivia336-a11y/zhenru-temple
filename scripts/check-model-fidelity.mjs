@@ -10,7 +10,11 @@ const check=[
 ["facade-parallel ridge",hall.includes("roofGroup.rotation.y = Math.PI / 2")],
 ["published pitch linked to roof frame",hall.includes("makeRoofStudy(parseRoofPitch(pitchParam))") && hall.includes("roofFrameStudy.scale.y = roofStudy.frameScaleY")],
 ["camera comparison loads local pitch parameter",file("reconstruction/reference-review.html").includes("roofPitch=")],
-["four batches of solid roof tiles",(hall.match(/addRoofTileStudy\(skin/g)||[]).length===4],
+["eight faces retain batched volumetric tiles",hall.includes("createHipGableStudy") &&
+   hall.includes("for (const signX of [-1,1])") &&
+   hall.includes("for (const signZ of [-1,1])") &&
+   hall.includes("for(const signX of [-1,1]) for(const signZ of [-1,1])") &&
+   (hall.match(/addRoofTileStudy\(skin,fn,mats/g)||[]).length===3],
 ["shaped brackets connected",hall.includes("populateDougongStudy(group, xs, zs")&&model.includes("ExtrudeGeometry")],
 ["mobile tile complexity tier",hall.includes("const compact = window.innerWidth <= 720")],
 ["research inference labeled",model.includes("GEOMETRIC_STUDY_NOT_SURVEY")],
