@@ -103,6 +103,14 @@ async function run() {
   assert.equal((await getRoof()).framingStudyVisible,false);
   assert.equal((await getRoof()).ceilingRafterStudyVisible,false);
   assert.equal(await viewer.locator("#cutawayToggle").getAttribute("aria-pressed"),"false");
+  // Explicit close-up control should expose the bracket/eave details rather than
+  // hiding added geometry at the building-wide camera distance.
+  await viewer.locator('[data-view="eave"]').click();
+  assert.equal((await getState()).view,"eave");
+  await sleep(1050);
+  await page.screenshot({path:"qa/runtime-screenshots/eave-brackets-closeup.png"});
+  await viewer.locator('[data-view="outside"]').click();
+  await sleep(900);
   await page.screenshot({path:"qa/runtime-screenshots/reset-desktop.png"});
   let overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   assert.ok(overflow<=1,"Desktop horizontal overflow "+overflow);

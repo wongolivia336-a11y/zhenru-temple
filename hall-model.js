@@ -276,12 +276,12 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       controls.minPolarAngle = 0.08;
     }
     controls.minDistance = nextView === "inside" ? 0.7 : 0.75;
-    controls.maxDistance = nextView === "inside" ? 8.5 : 42;
+    controls.maxDistance = nextView === "inside" ? 8.5 : nextView === "eave" ? 17 : 42;
     controls.update();
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
     document.getElementById("exploreHint").textContent = nextView === "inside"
       ? "WASD 移动 · 佛像轮廓为待核占位"
-      : "拖动环绕 · 滚轮缩放 · 右键平移";
+      : nextView === "eave" ? "檐下近观 · 拖动查看瓦当与补间斗栱" : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
   function setView(view) {
@@ -289,6 +289,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "eave") {
+      // Close-up based on the main front eave + real model bracket stations.
+      // No generic dolly zoom overlaid onto a photo plane.
+      moveCamera(new THREE.Vector3(5.6, 5.75, 11.7),
+        new THREE.Vector3(1.2, 6.45, 6.65), "eave");
     } else if (view === "top") {
       moveCamera(responsiveTopPosition(), new THREE.Vector3(0, 0.7, 0), "top");
     } else {
