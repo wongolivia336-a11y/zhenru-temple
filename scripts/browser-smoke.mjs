@@ -51,10 +51,18 @@ async function run() {
   assert.equal(normal.framingStudyVisible,false,"Exterior rafters should not poke through roof");
   assert.equal(normal.ceilingRafterStudyVisible,false,"Interior rafter silhouettes should not pierce the exterior roof");
   assert.ok(Math.abs(normal.ridgeY-10.926693576380554)<0.0001);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-26.png"});
   const low=await apply(18);
+  // Keep all comparison captures at the same page scroll position and camera preset.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-18.png"});
   const high=await apply(34);
+  // Keep all comparison captures at the same page scroll position and camera preset.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
   await page.screenshot({path:"qa/runtime-screenshots/pitch-34.png"});
   assert.ok(high.meshTopY>low.meshTopY+2.0,"Actual roof geometry did not change by at least 2m");
   assert.ok(high.ridgeY>low.ridgeY+2.9,"Pitch did not update roof ridge");
