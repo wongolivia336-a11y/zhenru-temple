@@ -7,6 +7,7 @@ on:
       - 'model-fidelity.js'
       - 'reconstruction/**'
       - 'scripts/check-roof-parameters.mjs'
+      - 'scripts/browser-smoke.mjs'
       - 'scripts/check-model-fidelity.mjs'
       - '.github/workflows/img2threejs-fidelity.yml'
 jobs:
@@ -28,6 +29,19 @@ jobs:
           node scripts/check-roof-parameters.mjs
       - name: Fetch upstream img2threejs at pinned v2.0.1
         run: git clone --quiet --depth 1 --branch v2.0.1 https://github.com/img2threejs/img2threejs.git "$RUNNER_TEMP/img2threejs"
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Real geometry and interaction smoke
+        run: node scripts/browser-smoke.mjs
+      - name: Preserve Chromium screenshots and geometry evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zhenru-roof-pitch-browser-qa
+          path: qa/runtime-screenshots/
+          if-no-files-found: ignore
       - name: Run upstream Stage 1 reference image probes
         run: |
           python "$RUNNER_TEMP/img2threejs/forge/stage1_intake/probe_image.py" assets/hall-eaves.jpg

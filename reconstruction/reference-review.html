@@ -41,6 +41,8 @@ import {makeRoofStudy,parseRoofPitch} from "./roof-parameters.mjs";
 const $=s=>document.querySelector(s);
 let view="eaves", localPhoto=null, chosenPitch=26, appliedPitch=26;
 const refs={eaves:["../assets/hall-eaves.jpg","外檐 · 项目照片"],interior:["../assets/temple-interior.jpg","殿内 · 项目照片"]};
+const qaQuery = new URLSearchParams(location.search).get("qa") === "1" ? "&qa=1" : "";
+if (qaQuery) $("#model").src += qaQuery;
 function showRef(next){
   view=next;const src=refs[next];if(localPhoto){URL.revokeObjectURL(localPhoto);localPhoto=null;}
   $("#photo").src=src[0];$("#sourceName").textContent=src[1];
@@ -61,7 +63,7 @@ function updateReadout(){
 }
 function applyPitch(){
   appliedPitch=chosenPitch;
-  $("#model").src="../index.html?viewerOnly=1&roofPitch="+encodeURIComponent(String(appliedPitch));
+  $("#model").src="../index.html?viewerOnly=1&roofPitch="+encodeURIComponent(String(appliedPitch))+qaQuery;
   $("#modelStatus").textContent=appliedPitch.toFixed(1)+"° 坡度研究";
 }
 $("#pitchRange").addEventListener("input",updateReadout);

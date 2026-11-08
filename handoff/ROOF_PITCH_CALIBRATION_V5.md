@@ -33,3 +33,6 @@
 `node scripts/check-roof-parameters.mjs`：名义坡角、三角函数关系、屋架基准点、不合法URL入参、18–34范围。
 `node scripts/check-model-fidelity.mjs`：源码与参数链接及既有结构 gate。
 仍待：用户照片与当前网页截图同机位比较、真实浏览器动态坡度切换、手机帧率/温升、实测结构精度。
+
+## 自动化实际 WebGL 几何测试
+`scripts/browser-smoke.mjs` 在 GitHub Actions 的 Chromium/SwiftShader 中加载本地 HTTP 站点，18° / 26° / 34° 分别触发真实 3D 场景重新载入，从 `window.__zhenruQA.getRoofCalibration()` 读取屋顶世界包围盒，验证不是仅修改数值标签。还检查剖视、分层拆解、重置、390px 溢出及保存截图。此检查不证明摄影测量精确度或实机 GPU 性能。运行状态需要查看该分支最新 Actions。

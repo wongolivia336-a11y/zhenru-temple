@@ -571,7 +571,20 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     };
   }
   if (new URLSearchParams(window.location.search).get("qa") === "1") {
-    window.__zhenruQA = { getSceneState, getDiagnostics };
+    window.__zhenruQA = {
+      getSceneState, getDiagnostics,
+      getRoofCalibration() {
+        roofGroup.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(mainRoofSkin);
+        return {
+          pitchDeg: roofStudy.pitchDeg,
+          ridgeY: roofStudy.ridgeY,
+          meshTopY: box.max.y,
+          meshBottomY: box.min.y,
+          frameScaleY: roofFrameStudy.scale.y
+        };
+      }
+    };
   }
 
   function animate(now) {
