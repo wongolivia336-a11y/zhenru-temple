@@ -300,9 +300,32 @@ if ("IntersectionObserver" in window) {
 
 setStage(0);
 
+function prepareWebGL2Context(canvas) {
+  // Prefer a lightweight context first; Three.js reuses this canvas context.
+  const attempts = [
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "low-power", failIfMajorPerformanceCaveat: false },
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "default", failIfMajorPerformanceCaveat: false },
+    { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: "high-performance", failIfMajorPerformanceCaveat: false }
+  ];
+  let lastError = null;
+
+  for (const attributes of attempts) {
+    try {
+      const context = canvas.getContext("webgl2", attributes);
+      if (context) return context;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  const detail = lastError instanceof Error ? `: ${lastError.message}` : "";
+  throw new Error(`无法创建 WebGL 2 图形上下文${detail}`, { cause: lastError });
+}
+
 async function bootModel() {
   const loading = document.querySelector("#viewerLoading");
   const message = document.querySelector("#webglMessage");
+  const canvas = document.querySelector("#hallCanvas");
   const pinElements = {
     roof: document.querySelector("#pinRoof"),
     frame: document.querySelector("#pinFrame"),
@@ -312,9 +335,10 @@ async function bootModel() {
     base: document.querySelector("#pinBase")
   };
   try {
+    prepareWebGL2Context(canvas);
     const { createHallScene } = await import("./hall-model.js");
     hallScene = createHallScene({
-      canvas: document.querySelector("#hallCanvas"),
+      canvas,
       frame: document.querySelector("#viewerFrame"),
       pins: pinElements,
       onPart: setObservation,
@@ -325,7 +349,9 @@ async function bootModel() {
     console.error("Three.js scene failed to start:", error);
     loading.classList.add("is-hidden");
     message.hidden = false;
-    message.textContent = "三维场景没有启动。请确认浏览器支持 WebGL 2、图形加速已启用，并通过本地服务器打开页面。";
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    message.title = detail;
+    message.textContent = `三维场景启动失败：${detail.slice(0, 180)}。请检查 WebGL 2 支持、图形加速和模块加载。`;
   }
 }
 
