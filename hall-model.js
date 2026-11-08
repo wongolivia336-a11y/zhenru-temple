@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 12937)
-Total output lines: 1170
+Warning: truncated output (original token count: 13046)
+Total output lines: 1185
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -444,14 +444,28 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     else camera.fov = 37;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
-    if (activeView === "outside" && !cameraTouched && !cameraTween) {
-      camera.position.copy(responsiveHomePosition());
-      controls.target.copy(TARGET_HOME);
-      controls.update();
-    } else if (activeView === "top" && !cameraTouched && !cameraTween) {
-      camera.position.copy(responsiveTopPosition());
-      controls.target.set(0, 0.7, 0);
-      controls.update();
+    if (activeView === "outside" && !cameraTouched) {
+      const homePosition = responsiveHomePosition();
+      const homeTarget = TARGET_HOME.clone();
+      if (cameraTween) {
+        cameraTween.toPosition = homePosition;
+        cameraTween.toTarget = homeTarget;
+      } else {
+        camera.position.copy(homePosition);
+        controls.target.copy(homeTarget);
+        controls.update();
+      }
+    } else if (activeView === "top" && !cameraTouched) {
+      const topPosition = responsiveTopPosition();
+      const topTarget = new THREE.Vector3(0, 0.7, 0);
+      if (cameraTween) {
+        cameraTween.toPosition = topPosition;
+        cameraTween.toTarget = topTarget;
+      } else {
+        camera.position.copy(topPosition);
+        controls.target.copy(topTarget);
+        controls.update();
+      }
     }
   }
   resize();
@@ -526,19 +540,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function getDiagnostics() {
     let objects = 0;
     let renderables = 0;
-    scene.traverse((node) => { objects += 1; if (node.isMesh || node.isLine || node.isPoints) renderables += 1; });
-    return {
-      revision: THREE.REVISION,
-      drawCalls: renderer.info.render.calls,
-      triangles: renderer.info.render.triangles,
-      geometries: renderer.info.memory.geometries,
-      textures: renderer.info.memory.textures,
-      objects,
-      renderables,
-      pixelRatio: renderer.getPixelRatio()
-    };
-  }
-  if (new URLSearchParams(win…937 tokens truncated…ines(scene) {
+    scene.traverse((node) => { objec…1046 tokens truncated…es(scene) {
   const points = [];
   for (let i = -12; i <= 12; i += 1.2) {
     points.push(-16, 0.005, i, 16, 0.005, i);
@@ -1073,5 +1075,6 @@ function buildInteriorHint(hall, mats) {
 
 function lerp3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
 function raised(point) { return [point[0], point[1] + 0.022, point[2]]; }
+
 
 
