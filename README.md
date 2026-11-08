@@ -65,3 +65,8 @@ python -m http.server 8000
 
 **浏览器验收记录**：本轮已在真实 Edge 浏览器中检查 WebGL 场景、四个历史阶段、六个热点、鼠标/键盘/触屏仿真、剖视/分解/构架透视、390/768/1440px 响应式布局及 GLB 二进制结构。完整记录与截图见 [qa/QA_REPORT.md](./qa/QA_REPORT.md)。当前环境没有 Blender，也没有真实手机/低端硬件；GLB 文件结构已在浏览器中解析，但 Blender 导入和硬件帧率仍待后续现场验收。
 
+
+
+## img2threejs 图像对照精细化实验（研究分支 v4）
+
+新增 [交互式参考对照页](./reconstruction/reference-review.html)、[几何/证据质量约束](./reconstruction/quality-contract.json)、[项目静态门禁脚本](./scripts/check-model-fidelity.mjs)、[Skill 安装及验收说明](./handoff/IMG2THREEJS_FIDELITY.md)。安装说明与官方仓库固定版本见文档。形态建模已有变更，不代表实测复原或视觉比对已通过。

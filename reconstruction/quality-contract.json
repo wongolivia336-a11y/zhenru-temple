@@ -1,0 +1,87 @@
+{
+  "name": "ZHENRU Main Hall image-guided geometry quality contract",
+  "version": "v4",
+  "date": "2026-11-08",
+  "scope": "Existing Main Hall only; no adjacent pagodas/pavilions",
+  "sourceImages": [
+    {
+      "path": "assets/hall-eaves.jpg",
+      "view": "exterior oblique",
+      "source": "project-original photography",
+      "limit": "not calibrated or dimensioned"
+    },
+    {
+      "path": "assets/temple-interior.jpg",
+      "view": "interior",
+      "source": "project-original photography",
+      "limit": "occlusions and unobserved joinery"
+    }
+  ],
+  "identityDetails": [
+    {
+      "id": "roof-ridge-direction",
+      "criterion": "ridge parallel to current facade",
+      "evidence": "photo-observed",
+      "state": "implemented; no visual signoff"
+    },
+    {
+      "id": "hipped-gable",
+      "criterion": "hip and gable surfaces coherent in silhouette",
+      "evidence": "photographic+inferred",
+      "state": "pending"
+    },
+    {
+      "id": "eave-sweep",
+      "criterion": "curved eave/wing profile compared against measured landmarks",
+      "evidence": "photo-observed",
+      "state": "pending"
+    },
+    {
+      "id": "roof-tile-profile",
+      "criterion": "individually thick overlapping pan/cover tiles",
+      "evidence": "geometric-study",
+      "state": "implemented; review pending"
+    },
+    {
+      "id": "bracket-layering",
+      "criterion": "individual dou/gong/ang with named evidence",
+      "evidence": "geometric-study",
+      "state": "implemented; historic type pending"
+    },
+    {
+      "id": "16-column-grid",
+      "criterion": "4x4 nonuniform depth grid and labeled source",
+      "evidence": "published",
+      "state": "implemented"
+    },
+    {
+      "id": "Qing-study",
+      "criterion": "separate conjectural lower eave, never asserted as measured",
+      "evidence": "inferred",
+      "state": "implemented"
+    }
+  ],
+  "review": [
+    {
+      "id": "front",
+      "status": "PENDING",
+      "note": "user front elevation photo in conversation; not automatically uploaded to repository"
+    },
+    {
+      "id": "oblique",
+      "status": "PENDING",
+      "reference": "assets/hall-eaves.jpg"
+    },
+    {
+      "id": "under-eave",
+      "status": "PENDING",
+      "reference": "assets/temple-interior.jpg"
+    }
+  ],
+  "upstreamSkill": {
+    "url": "https://github.com/img2threejs/img2threejs",
+    "release": "v2.0.1",
+    "license": "Apache-2.0",
+    "chatSandboxInstallation": "FAILED: npm/github DNS timeout; GitHub Actions Linux worker will fetch pinned source for intake"
+  }
+}

@@ -1,0 +1,32 @@
+name: img2threejs reference intake and structure gates
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'hall-model.js'
+      - 'model-fidelity.js'
+      - 'reconstruction/**'
+      - 'scripts/check-model-fidelity.mjs'
+      - '.github/workflows/img2threejs-fidelity.yml'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: JavaScript syntax and geometry contracts
+        run: |
+          node --check hall-model.js
+          node --check model-fidelity.js
+          node scripts/check-model-fidelity.mjs
+      - name: Fetch upstream img2threejs at pinned v2.0.1
+        run: git clone --quiet --depth 1 --branch v2.0.1 https://github.com/img2threejs/img2threejs.git "$RUNNER_TEMP/img2threejs"
+      - name: Run upstream Stage 1 reference image probes
+        run: |
+          python "$RUNNER_TEMP/img2threejs/forge/stage1_intake/probe_image.py" assets/hall-eaves.jpg
+          python "$RUNNER_TEMP/img2threejs/forge/stage1_intake/probe_image.py" assets/temple-interior.jpg
