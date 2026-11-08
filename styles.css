@@ -1058,3 +1058,68 @@ body::before { opacity: .022; }
   .view-tools { top: 178px; left: 12px; right: 12px; max-width: none; justify-content: flex-start; align-items: flex-start; }
 }
 
+
+
+/* V4 / Reference correspondence viewport — reduces nested UI in the comparison lab. */
+html.viewer-only, html.viewer-only body {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+html.viewer-only .skip-link,
+html.viewer-only .site-header,
+html.viewer-only .hero-copy,
+html.viewer-only .viewer-instruction,
+html.viewer-only .intro-band,
+html.viewer-only .chronology,
+html.viewer-only .anatomy-section,
+html.viewer-only .evidence-section,
+html.viewer-only .fieldnotes-section,
+html.viewer-only .sources-section,
+html.viewer-only .next-section,
+html.viewer-only .site-footer {
+  display: none !important;
+}
+html.viewer-only main,
+html.viewer-only .hero,
+html.viewer-only .viewer-shell {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+}
+html.viewer-only .hero {
+  max-width: none;
+  grid-template-columns: none;
+}
+html.viewer-only .viewer-frame {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  border: 0;
+  box-shadow: none;
+}
+html.viewer-only .viewer-topline { top: 12px; left: 13px; right: 13px; }
+html.viewer-only .view-tools { top: 60px; right: 12px; left: auto; max-width: 450px; }
+html.viewer-only .model-tools { right: 0; left: auto; }
+html.viewer-only .viewer-bottom { left: 12px; right: 12px; bottom: 10px; }
+html.viewer-only .viewer-caption { margin-bottom: 5px; }
+html.viewer-only .viewer-vignette { opacity: 0.6; }
+@media (max-width: 650px) {
+  html.viewer-only .viewer-topline { top: 8px; }
+  html.viewer-only .viewer-scale { display: none; }
+  html.viewer-only .view-tools { top: 44px; right: 8px; left: 8px; justify-content: flex-start; max-width: none; }
+  html.viewer-only .view-button { min-height: 27px; }
+  html.viewer-only .viewer-bottom { left: 8px; right: 8px; bottom: 7px; }
+  html.viewer-only .timeline-strip { padding: 7px 8px; }
+  html.viewer-only .model-tools { left: 0; right: auto; }
+}
+/* Expose the most discoverable structural action, without adding a second toolbar row. */
+#toolsToggle { border-color: rgba(169, 187, 173, .75); letter-spacing: .025em; }
+#toolsToggle:hover, #toolsToggle[aria-expanded="true"] { background: #334f42; color: #fff; }

@@ -7,6 +7,12 @@
     <meta name="description" content="进入真如寺大雄宝殿的交互式三维建筑档案，观察木构、屋面与历次修缮留下的时间层。" />
     <title>一殿三时｜真如寺大殿三维研究场</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Reference-review iframe: show the real 3D canvas, not a nested copy of the entire website.
+      if (new URLSearchParams(location.search).get("viewerOnly") === "1") {
+        document.documentElement.classList.add("viewer-only");
+      }
+    </script>
     <link rel="stylesheet" href="./styles.css" />
     <script type="importmap">
       {
@@ -56,7 +62,7 @@
               <button type="button" class="view-button is-selected" data-view="outside">外部</button>
               <button type="button" class="view-button" data-view="inside">入殿</button>
               <button type="button" class="view-button" data-view="top">俯瞰</button>
-              <button type="button" class="view-button" id="toolsToggle" aria-expanded="false" aria-controls="modelTools">结构工具</button>
+              <button type="button" class="view-button" id="toolsToggle" aria-expanded="false" aria-controls="modelTools" aria-label="展开结构工具：剖视、分层拆解、构架透视、下载模型" title="剖视 / 分层拆解 / 构架透视">结构 · 剖视 ▾</button>
               <button type="button" class="view-button reset-button" id="resetView">重置</button>
               <div class="model-tools" id="modelTools" role="group" aria-label="结构观察工具" hidden>
                 <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">分层拆解</button>
