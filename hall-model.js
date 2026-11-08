@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
+import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -121,15 +122,26 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   buildColumnsAndFrame(frameGroup, columnGroup, mats);
   // Contemporary facade reference: main roof ridge is parallel to the hall frontage.
   // Frame axis study shares its rotation; the actual 16-column grid remains unrotated.
+  const pitchParam = new URLSearchParams(window.location.search).get("roofPitch");
+  const roofStudy = makeRoofStudy(parseRoofPitch(pitchParam));
   const roofFrameStudy = new THREE.Group();
   roofFrameStudy.name = "roof-framing-axis-study";
   roofFrameStudy.userData.part = "frame";
   roofFrameStudy.rotation.y = Math.PI / 2;
+  // Keep the frame eave datum fixed when the ridge height changes.
+  roofFrameStudy.scale.y = roofStudy.frameScaleY;
+  roofFrameStudy.position.y = roofStudy.frameOffsetY;
+  roofFrameStudy.userData.evidence = "INFERRED_GEOMETRY_SCALED_TO_PUBLIC_PITCH";
   frameGroup.add(roofFrameStudy);
   buildGableAndRafters(roofFrameStudy, mats);
   roofGroup.rotation.y = Math.PI / 2;
+  roofGroup.userData.studyPitchDeg = roofStudy.pitchDeg;
+  roofGroup.userData.studyRidgeElevation = roofStudy.ridgeY;
+  roofGroup.userData.reference = "Putuo District 2025 public description (26 degree roof slope); NOT a measured roof section";
   const mainRoofSkin = buildRoof(roofGroup, {
-    width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
+    width: roofStudy.width, depth: roofStudy.depth,
+    baseY: roofStudy.baseY, ridgeY: roofStudy.ridgeY,
+    ridgeHalf: roofStudy.ridgeHalf, mats, style: "main"
   });
   const extraRoofSkin = buildLowerEave(extraRoofGroup, mats);
   buildInteriorHint(hall, mats);

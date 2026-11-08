@@ -1,6 +1,6 @@
 {
   "name": "ZHENRU Main Hall image-guided geometry quality contract",
-  "version": "v4",
+  "version": "v5",
   "date": "2026-11-08",
   "scope": "Existing Main Hall only; no adjacent pagodas/pavilions",
   "sourceImages": [
@@ -59,6 +59,12 @@
       "criterion": "separate conjectural lower eave, never asserted as measured",
       "evidence": "inferred",
       "state": "implemented"
+    },
+    {
+      "id": "reported-26-degree-pitch",
+      "criterion": "Roof rise geometry computes a 26 degree study profile by default and preserves previous ~18 degree option",
+      "evidence": "government-report + inferred span",
+      "state": "parameterized and test-covered; photo comparison pending"
     }
   ],
   "review": [
@@ -83,5 +89,14 @@
     "release": "v2.0.1",
     "license": "Apache-2.0",
     "chatSandboxInstallation": "FAILED: npm/github DNS timeout; GitHub Actions Linux worker will fetch pinned source for intake"
+  },
+  "publicRoofReference": {
+    "reportedPitchDeg": 26,
+    "source": "https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html",
+    "sourceType": "Shanghai Putuo Government 2025 feature article",
+    "interpretation": "Mean ridge-to-eave roof section for parameter study; original roof eave span is not surveyed",
+    "roofRidgeYCalculatedAt26": 10.926693576380554,
+    "reportedTotalHeightM": 14,
+    "restriction": "Do not claim model total building height is measured as 14m"
   }
 }

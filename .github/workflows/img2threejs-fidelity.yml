@@ -6,6 +6,7 @@ on:
       - 'hall-model.js'
       - 'model-fidelity.js'
       - 'reconstruction/**'
+      - 'scripts/check-roof-parameters.mjs'
       - 'scripts/check-model-fidelity.mjs'
       - '.github/workflows/img2threejs-fidelity.yml'
 jobs:
@@ -24,6 +25,7 @@ jobs:
           node --check hall-model.js
           node --check model-fidelity.js
           node scripts/check-model-fidelity.mjs
+          node scripts/check-roof-parameters.mjs
       - name: Fetch upstream img2threejs at pinned v2.0.1
         run: git clone --quiet --depth 1 --branch v2.0.1 https://github.com/img2threejs/img2threejs.git "$RUNNER_TEMP/img2threejs"
       - name: Run upstream Stage 1 reference image probes

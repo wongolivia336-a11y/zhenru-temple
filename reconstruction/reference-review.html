@@ -1,7 +1,78 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>真如寺｜参考摄影 × 三维校准台</title>
-<style>*{box-sizing:border-box}body{margin:0;background:#eef2ee;color:#27352e;font:15px/1.6 system-ui,-apple-system,"Microsoft YaHei",sans-serif}header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 28px;background:#fff;border-bottom:1px solid #cdd9cf}h1{font-size:clamp(20px,3vw,29px);font-weight:500;margin:0}p{color:#65756a;margin:5px 0 0;font-size:13px}a{color:#315f4a}main{padding:20px;max-width:1500px;margin:auto}.tools{display:flex;gap:8px;margin-bottom:14px}button{border:1px solid #c0cbc2;border-radius:22px;background:#fff;color:#365243;padding:8px 14px;cursor:pointer;font:inherit}button[aria-pressed=true]{background:#29513d;color:white}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #50906a;outline-offset:2px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{overflow:hidden;border:1px solid #cfd9d2;border-radius:13px;background:white}.panel-head{padding:12px 14px;border-bottom:1px solid #dce5de;font-size:12px;letter-spacing:.07em}.visual{height:min(60vw,570px);min-height:280px;background:#d8dfda}.visual img{height:100%;width:100%;object-fit:contain}.visual iframe{height:100%;width:100%;border:0;display:block}.hint{padding:12px;font-size:12px;color:#718075}.review{background:#fff;padding:18px;border:1px solid #cfd9d2;border-radius:13px;margin-top:14px}.review label{display:inline-flex;gap:7px;align-items:center;margin:10px 18px 10px 0;font-size:13px}.review textarea{display:block;width:100%;min-height:80px;padding:12px;border:1px solid #ced8d0;border-radius:10px;font:inherit}.actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:12px}@media(max-width:800px){header{padding:16px;display:block}.grid{grid-template-columns:1fr}.visual{height:400px}main{padding:12px}}</style></head><body><header><div><h1>参考摄影 × 实时三维</h1><p>img2threejs 式人工质量门禁 · 先检查轮廓，再批准材质和微细部。</p></div><a href="../index.html">返回建筑档案 →</a></header><main><div class="tools"><button data-view="eaves" aria-pressed="true">檐口 / 外观</button><button data-view="interior" aria-pressed="false">殿内 / 木构</button></div><div class="grid"><section class="panel"><div class="panel-head">01 / 参考照片 <span id="caption">外檐</span></div><div class="visual"><img id="photo" src="../assets/hall-eaves.jpg" alt="真如寺实地参考照片"></div><div class="hint">单张照片有相机透视与遮挡，不能自动推导结构尺寸。</div></section><section class="panel"><div class="panel-head">02 / 可交互 Three.js 模型</div><div class="visual"><iframe title="真如寺三维建筑互动场景" src="../index.html?viewerOnly=1"></iframe></div><div class="hint">拖动右侧模型至相近角度；人工比对轮廓、出檐、瓦件、斗栱。</div></section></div><section class="review"><strong>本轮人工审核</strong><div id="checks"><label><input type="checkbox" value="silhouette">整体轮廓</label><label><input type="checkbox" value="roof">屋顶与起翘</label><label><input type="checkbox" value="tile">瓦作节奏</label><label><input type="checkbox" value="bracket">斗栱节点</label><label><input type="checkbox" value="evidence">证据分级</label></div><textarea id="notes" placeholder="记录具体不匹配的部位和改进建议（需人工观察后填写）" aria-label="评审意见"></textarea><div class="actions"><p>导出的 JSON 仍标记 PENDING，须由审核者补充截图并签字后才算通过。</p><button id="download">导出评审 JSON</button></div></section></main><script>
-let view="eaves";
-const data={eaves:["../assets/hall-eaves.jpg","外檐"],interior:["../assets/temple-interior.jpg","殿内"]};
-document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;document.querySelector("#photo").src=data[view][0];document.querySelector("#caption").textContent=data[view][1];document.querySelectorAll("[data-view]").forEach(c=>c.setAttribute("aria-pressed",String(c===b)))}));
-document.querySelector("#download").addEventListener("click",()=>{const gates=Object.fromEntries([...document.querySelectorAll("#checks input")].map(x=>[x.value,x.checked]));const result={view,reviewDate:new Date().toISOString(),gates,notes:document.querySelector("#notes").value,status:"PENDING_HUMAN_REVIEW",renderScreenshot:null};const url=URL.createObjectURL(new Blob([JSON.stringify(result,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="zhenru-"+view+"-review.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>真如寺 | 照片与屋顶坡度研究</title>
+<style>
+:root{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#eef2ef;color:#24392f}
+*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:22px clamp(16px,4vw,45px);background:#fbfcfa;border-bottom:1px solid #d3ded6}
+.kicker{font:11px/1.8 ui-monospace,monospace;letter-spacing:.11em;color:#769287}h1{font-weight:500;font-size:clamp(23px,3.7vw,36px);letter-spacing:-.03em;margin:4px 0}p{margin:0;color:#718177;font-size:13px;line-height:1.6}
+a{color:#315d46}main{max-width:1600px;margin:auto;padding:clamp(12px,2.4vw,30px)}
+.tools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap}button,.upload-btn{font:inherit;border:1px solid #b7c9bd;border-radius:22px;background:#fff;color:#355c44;padding:9px 14px;cursor:pointer;transition:background .16s,transform .16s}
+button:hover,.upload-btn:hover{background:#e3ece6;transform:translateY(-1px)}button[aria-pressed=true]{background:#2c5540;color:#fff;border-color:#2c5540}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.upload-btn:focus-within{outline:3px solid #77a78a;outline-offset:2px}
+.upload-btn input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.panel{min-width:0;overflow:hidden;border:1px solid #d0ddd3;border-radius:14px;background:#fff}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 15px;border-bottom:1px solid #e2eae4;font-size:12px;letter-spacing:.04em}
+.visual{height:clamp(320px,40vw,610px);background:#dde4df;overflow:hidden}.visual img,.visual iframe{display:block;width:100%;height:100%;border:0}.visual img{object-fit:contain}
+.foot{padding:12px 14px;color:#667a6e;font-size:12px;line-height:1.6}
+.calibration,.review{margin-top:15px;padding:20px;border:1px solid #d0ddd3;background:#fff;border-radius:14px}
+.calibration{display:grid;grid-template-columns:1fr minmax(210px,350px);gap:25px;align-items:center}
+.calibration h2,.review h2{font-size:15px;letter-spacing:.01em;font-weight:600;margin:0 0 6px}
+.measure{font:38px/1.2 ui-monospace,monospace;color:#294b3a;letter-spacing:-.04em}
+.measure small{font-size:13px;letter-spacing:0;color:#759080;margin-left:7px}input[type=range]{width:100%;accent-color:#325b43;cursor:pointer}
+.slider-ends{display:flex;justify-content:space-between;font:11px ui-monospace,monospace;color:#84948b}
+.calibration .muted{margin-top:8px;color:#7a897d;font-size:12px}
+.review label{display:inline-flex;align-items:center;gap:7px;margin:10px 16px 12px 0;font-size:13px;line-height:1.4}
+.review textarea{width:100%;height:78px;resize:vertical;font:inherit;font-size:13px;padding:12px;border:1px solid #c6d4c9;border-radius:9px;background:#fcfdfc}
+.review-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.hint{max-width:670px}.active-data{font:12px ui-monospace,monospace;color:#2d5942}
+@media(max-width:820px){header{display:block}.grid{grid-template-columns:1fr}.visual{height:380px}.calibration{grid-template-columns:1fr}.review-actions{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){button,.upload-btn{transition:none}}
+</style></head><body>
+<header><div><div class="kicker">ZHENRU / GEOMETRY CALIBRATION / 05</div><h1>照片中的屋顶，和模型中的屋顶</h1><p>按同视角观察轮廓与斜率。改变参数会重新生成三维研究模型，旧视角需重新对齐。</p></div><a href="../index.html">返回建筑档案 ↗</a></header>
+<main><div class="tools"><div class="tabs" role="group" aria-label="参考照片视角"><button data-view="eaves" aria-pressed="true">外檐照片</button><button data-view="interior" aria-pressed="false">室内木构</button></div><label class="upload-btn">导入你的照片 <input id="photoUpload" aria-label="导入本地照片" type="file" accept="image/*"></label></div>
+<div class="grid"><section class="panel"><div class="panel-head"><strong>01 / Reference</strong><span id="sourceName">外檐 · 项目照片</span></div><div class="visual"><img id="photo" src="../assets/hall-eaves.jpg" alt="真如寺大雄宝殿实地照片"></div><div class="foot">可用自己的照片替换。图片只在你的浏览器中预览，不上传到服务器。注意排除后期佛塔和相邻殿宇。</div></section>
+<section class="panel"><div class="panel-head"><strong>02 / Interactive geometry</strong><span id="modelStatus">26° 坡度研究</span></div><div class="visual"><iframe id="model" title="可互动旋转的真如寺大殿三维模型" src="../index.html?viewerOnly=1&amp;roofPitch=26"></iframe></div><div class="foot">右侧保留外部环绕、入殿、俯瞰、剖视、拆解。通过照片对照选择形制，不把透视误差当作测绘误差。</div></section></div>
+<section class="calibration" aria-label="屋顶坡度试验"><div><h2>屋面坡度 / Pitch study</h2><div class="measure"><span id="angleValue">26.0°</span><small>公开报道参考值 26°</small></div><p>当前算法采用屋脊至中央檐口的平均坡角，屋面覆盖宽度为研究模型原有的 17.25 m；它不等于有原始断面图的实测坡度。</p><p class="muted" id="riseValue">参数化计算中…</p></div><div><label for="pitchRange" class="kicker">调节试验坡度（18°–34°）</label><input type="range" min="18" max="34" value="26" step=".5" id="pitchRange"><div class="slider-ends"><span>18° 原模型近似</span><span>26° 资料参考</span><span>34°</span></div><div style="margin-top:15px;display:flex;gap:9px;flex-wrap:wrap"><button id="applyPitch">将参数应用到模型</button><button id="resetPitch">恢复26°</button></div></div></section>
+<section class="review"><h2>记录这一轮的对照观察</h2><div id="checks"><label><input type="checkbox" value="ridge">屋脊方向</label><label><input type="checkbox" value="outline">屋面轮廓与山面</label><label><input type="checkbox" value="eave">出檐及起翘</label><label><input type="checkbox" value="tiles">瓦件排布</label><label><input type="checkbox" value="bracket">斗栱关系</label></div><textarea id="notes" placeholder="记录可具体修正的差异，例如‘正立面屋脊长度过长’；不可将本页勾选当作实测证据。"></textarea><div class="review-actions"><p class="hint">资料与照片尚未相机标定，审核记录默认 PENDING；导出后可附同视角截图交给下一位建模 Agent。</p><button id="export">导出本轮记录 JSON</button></div></section></main>
+<script type="module">
+import {makeRoofStudy,parseRoofPitch} from "./roof-parameters.mjs";
+const $=s=>document.querySelector(s);
+let view="eaves", localPhoto=null, chosenPitch=26, appliedPitch=26;
+const refs={eaves:["../assets/hall-eaves.jpg","外檐 · 项目照片"],interior:["../assets/temple-interior.jpg","殿内 · 项目照片"]};
+function showRef(next){
+  view=next;const src=refs[next];if(localPhoto){URL.revokeObjectURL(localPhoto);localPhoto=null;}
+  $("#photo").src=src[0];$("#sourceName").textContent=src[1];
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===next)));
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showRef(b.dataset.view)));
+$("#photoUpload").addEventListener("change",e=>{
+  const file=e.currentTarget.files?.[0];
+  if(!file||!file.type.startsWith("image/"))return;
+  if(localPhoto)URL.revokeObjectURL(localPhoto);
+  localPhoto=URL.createObjectURL(file);$("#photo").src=localPhoto;$("#sourceName").textContent=file.name;
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed","false"));
+});
+function updateReadout(){
+  chosenPitch=parseRoofPitch($("#pitchRange").value);const study=makeRoofStudy(chosenPitch);
+  $("#angleValue").textContent=chosenPitch.toFixed(1)+"°";
+  $("#riseValue").textContent="计算屋脊高度 "+study.ridgeY.toFixed(2)+" m（模型局部坐标；整体高度仍未实测）";
+}
+function applyPitch(){
+  appliedPitch=chosenPitch;
+  $("#model").src="../index.html?viewerOnly=1&roofPitch="+encodeURIComponent(String(appliedPitch));
+  $("#modelStatus").textContent=appliedPitch.toFixed(1)+"° 坡度研究";
+}
+$("#pitchRange").addEventListener("input",updateReadout);
+$("#applyPitch").addEventListener("click",applyPitch);
+$("#resetPitch").addEventListener("click",()=>{$("#pitchRange").value="26";updateReadout();applyPitch();});
+$("#export").addEventListener("click",()=>{
+ const check=Object.fromEntries([...document.querySelectorAll("#checks input")].map(x=>[x.value,x.checked]));
+ const result={project:"Zhenru Main Hall",date:new Date().toISOString(),reviewView:view,reference:localPhoto?"local user photo (not uploaded)":refs[view][1],selectedPitchDeg:chosenPitch,appliedModelPitchDeg:appliedPitch,computedRidgeY:makeRoofStudy(appliedPitch).ridgeY,checks:check,notes:$("#notes").value,status:"PENDING_HUMAN_REVIEW",visualEvidence:"NOT_ATTACHED",publishedPitchSource:"https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html"};
+ const blob=new Blob([JSON.stringify(result,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="zhenru-roof-pitch-review-"+appliedPitch+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+window.addEventListener("pagehide",()=>{if(localPhoto)URL.revokeObjectURL(localPhoto);});
+updateReadout();
 </script></body></html>
