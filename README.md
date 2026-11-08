@@ -4,13 +4,13 @@
 
 ## 运行
 
-项目采用原生 ES modules 与 import map，无需安装依赖或构建步骤。
+项目采用原生 ES modules 与 import map，无需安装依赖或构建步骤。Three.js r187、OrbitControls 与 GLTFExporter 已随源码放在 `vendor/three/`，本地运行不依赖 CDN。
 
 ```bash
 python -m http.server 8000
 ```
 
-打开 [http://localhost:8000](http://localhost:8000)。请使用支持 WebGL 2 的现代桌面或移动浏览器，并保持网络连接以加载 Three.js r187（jsDelivr CDN）。不要直接双击 `index.html`，因为浏览器通常会阻止 `file://` 下的 ES module 导入。
+打开 [http://localhost:8000](http://localhost:8000)。请使用支持 WebGL 2 的现代桌面或移动浏览器。不要直接双击 `index.html`，因为浏览器通常会阻止 `file://` 下的 ES module 导入。
 
 ## 交互
 
@@ -18,9 +18,9 @@ python -m http.server 8000
 - **键盘观察**：先聚焦三维模型，使用方向键旋转，`+` / `-` 缩放，`Home` 重置。
 - **入殿漫游**：点击“入殿”，用 `W A S D` 或屏幕方向键移动；移动会避开柱位。
 - **视角**：外部、入殿、俯瞰。
-- **结构**：“结构分解”抬升屋面；“构架透视”隐藏屋面表层，观察屋架关系。
+- **结构**：“分层拆解”分别抬升屋面、梁架与柱网；“构架透视”隐藏屋面表层，剖视使用 WebGL 裁切。
 - **构件档案**：点击屋面、梁架、斗栱、隔扇、柱网和台基热点，查看构件说明、证据状态与待核问题。
-- **历史阶段**：切换元延祐七年（1320）、光绪年间改作双檐、1963—64年落架大修与现状。清代阶段以半透明外扩柱列与较宽的下层檐顶表达研究文章提出的“五间重檐说”；它不是清代测绘图的精确复原，且与官方旅游资料关于主体结构未变的表述存在差异。
+- **历史阶段**：拖动时间轴浏览元代题记（1320）、清代双檐说、1963—64年落架大修与现状。清代外扩柱列与下层檐顶呈现研究文章提出的“五间重檐说”；它不是测绘复原，且与官方旅游资料关于主体结构未变的表述存在差异。
 - **导出**：下载当前可见阶段的 GLB，可在 Blender 等支持 glTF 的软件中继续检查和编辑。
 
 ## 模型范围与结构
@@ -32,7 +32,7 @@ python -m http.server 8000
 - 柱头铺作／斗栱的形态研究构件；
 - 前后及两侧格栅隔扇；
 - 分片曲面屋面、檐口起翘表达、瓦垄与脊线；
-- 可进入的室内空间与简化陈设提示。
+- 可进入的室内空间、供桌和佛像轮廓占位。佛像只用于说明空间尺度，形态、尺寸与位置尚未现场核实。
 
 重复构件尽量复用几何与材质；屋面瓦垄采用低多边形管状几何表达。模型面阔、进深和中央开间参考公开资料；进深三间按研究文章所述约5.3、5.1、2.6米不等距组织。清代外扩柱列是研究性叠加，具体尺寸与构件关系仍需测绘资料校准。
 
@@ -44,14 +44,24 @@ python -m http.server 8000
 
 来源入口与逐项建模边界见 [sources.md](./sources.md)。原始图纸、修缮档案、构件编号或现场测绘到位后，应优先校订几何与证据记录，而不是继续增加装饰细节。
 
+开源摄影测量与高斯泼溅方案见 [重建工具路线](./handoff/RECONSTRUCTION_PIPELINE.md)；获准入场后的三脚架候选点和拍摄清单见 [现场采集站位草案](./handoff/PHOTO_CAPTURE_PLAN.md)。
+
 ## 技术
 
-- Three.js r187（ES modules + import map）
+- Three.js r187（本地 ES modules + import map；MIT 许可证见 `vendor/three/LICENSE`）
 - OrbitControls：相机环绕、缩放、平移
 - GLTFExporter：二进制 glTF 导出
 - 原生 JavaScript / CSS；无构建步骤
-- `prefers-reduced-motion`、键盘焦点、触屏移动控制与 WebGL 启动失败提示
+- `prefers-reduced-motion`、键盘焦点、键盘/触屏移动控制与 WebGL 2 启动失败提示
 
 ## 研究边界
 
 本项目是教育与交互表达用途的程序化研究模型，不是实测模型、考古复原、文物修缮方案或寺方官方数字资产。它不应用于测绘、施工、结构安全判断或文物保护决策。公开网页信息仍应与原始档案及专业人员交叉核验。照片公开或转交第三方前，请确认图片授权。
+
+
+## 交付与继续开发
+
+第二轮建筑研究原型的完整代码、源照片和交接文档保存在分支 [`feat/zhenru-archive-final-handoff`](https://github.com/wongolivia336-a11y/zhenru-temple/tree/feat/zhenru-archive-final-handoff)。本版本在已有第二轮结构改造基础上补充了 WebGL 几何剖视（“剖视 / 恢复全景”）和更完整的史料/QA交接材料。参阅 [handoff/README.md](./handoff/README.md)、[handoff/EXECUTION_PROMPT.md](./handoff/EXECUTION_PROMPT.md)、[handoff/QA_CHECKLIST.md](./handoff/QA_CHECKLIST.md)。
+
+**浏览器验收记录**：本轮已在真实 Edge 浏览器中检查 WebGL 场景、四个历史阶段、六个热点、鼠标/键盘/触屏仿真、剖视/分解/构架透视、390/768/1440px 响应式布局及 GLB 二进制结构。完整记录与截图见 [qa/QA_REPORT.md](./qa/QA_REPORT.md)。当前环境没有 Blender，也没有真实手机/低端硬件；GLB 文件结构已在浏览器中解析，但 Blender 导入和硬件帧率仍待后续现场验收。
+

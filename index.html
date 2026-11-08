@@ -6,17 +6,19 @@
     <meta name="theme-color" content="#eee8dc" />
     <meta name="description" content="进入真如寺大雄宝殿的交互式三维建筑档案，观察木构、屋面与历次修缮留下的时间层。" />
     <title>一殿三时｜真如寺大殿三维研究场</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
     <script type="importmap">
       {
         "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
         }
       }
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#viewerFrame">跳转到三维模型</a>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="一殿三时，回到首页">
         <span class="brand-seal">真如</span>
@@ -43,22 +45,25 @@
         </div>
 
         <div class="viewer-shell">
-          <div class="viewer-frame" id="viewerFrame">
+          <div class="viewer-frame" id="viewerFrame" tabindex="-1">
             <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
               <div class="viewer-ident"><span class="live-dot"></span><span>INTERACTIVE STUDY / 01</span><b>真如寺大殿</b></div>
-              <div class="viewer-scale">现状公开尺寸 <strong>13.4 × 13.0 m</strong><small>高度为视觉推演</small></div>
+              <div class="viewer-scale">现状公开尺寸 <strong>13.4 × 13.0 m</strong><small>高度未按测绘比例复原</small></div>
             </div>
             <div class="view-tools" role="group" aria-label="三维视角与模型控制">
               <button type="button" class="view-button is-selected" data-view="outside">外部</button>
               <button type="button" class="view-button" data-view="inside">入殿</button>
               <button type="button" class="view-button" data-view="top">俯瞰</button>
-              <span class="tool-separator"></span>
-              <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">结构分解</button>
-              <button type="button" class="view-button tool-button" id="frameToggle" aria-pressed="false">构架透视</button>
-              <button type="button" class="view-button tool-button" id="modelDownload">下载 GLB</button>
-              <button type="button" class="view-button reset-button" id="resetView" aria-label="重置视角">↺</button>
+              <button type="button" class="view-button" id="toolsToggle" aria-expanded="false" aria-controls="modelTools">结构工具</button>
+              <button type="button" class="view-button reset-button" id="resetView">重置</button>
+              <div class="model-tools" id="modelTools" role="group" aria-label="结构观察工具" hidden>
+                <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">分层拆解</button>
+                <button type="button" class="view-button tool-button" id="frameToggle" aria-pressed="false">构架透视</button>
+                <button type="button" class="view-button tool-button" id="cutawayToggle" aria-pressed="false">剖视</button>
+                <button type="button" class="view-button tool-button" id="modelDownload">下载 GLB</button>
+              </div>
             </div>
             <div class="scene-pins" aria-label="建筑构件热点">
               <button class="scene-pin" id="pinRoof" type="button" data-part="roof"><i></i><span>屋面</span></button>
@@ -68,11 +73,11 @@
               <button class="scene-pin" id="pinColumns" type="button" data-part="columns"><i></i><span>柱网</span></button>
               <button class="scene-pin" id="pinBase" type="button" data-part="base"><i></i><span>台基</span></button>
             </div>
-            <div class="walk-pad" id="walkPad" aria-label="漫游移动控制">
-              <button type="button" data-move="forward" aria-label="前进">↑</button>
-              <button type="button" data-move="left" aria-label="左移">←</button>
-              <button type="button" data-move="back" aria-label="后退">↓</button>
-              <button type="button" data-move="right" aria-label="右移">→</button>
+            <div class="walk-pad" id="walkPad" role="group" aria-label="漫游移动控制">
+              <button type="button" data-move="forward" aria-label="前进" aria-pressed="false">↑</button>
+              <button type="button" data-move="left" aria-label="左移" aria-pressed="false">←</button>
+              <button type="button" data-move="back" aria-label="后退" aria-pressed="false">↓</button>
+              <button type="button" data-move="right" aria-label="右移" aria-pressed="false">→</button>
             </div>
             <aside class="component-inspector" id="componentInspector" aria-live="polite" hidden>
               <div class="inspector-top"><span>构件档案 / PART NOTE</span><button type="button" id="closeInspector" aria-label="关闭构件说明">×</button></div>
@@ -82,18 +87,25 @@
             </aside>
             <div class="viewer-loading" id="viewerLoading" role="status">
               <span class="loading-glyph">如</span><span>正在构建三维木构场景…</span>
-              <small>首次加载需连接 Three.js CDN</small>
+            <small>Three.js r187 · 本地模块</small>
             </div>
             <div class="viewer-bottom">
               <div class="viewer-caption"><span class="caption-kicker" id="viewerEra">元 · 延祐七年</span><strong id="viewerShape">单檐歇山 · 形制示意</strong><span class="caption-divider"></span><span class="explore-hint" id="exploreHint">拖动旋转 · 滚轮缩放 · 右键平移</span></div>
-              <div class="timeline-strip" role="group" aria-label="选择大殿历史阶段">
-                <button class="time-step is-active" type="button" data-stage="0" aria-pressed="true"><span class="time-dot"></span><strong>1320</strong><small>元 · 移建</small></button>
-                <button class="time-step" type="button" data-stage="1" aria-pressed="false"><span class="time-dot"></span><strong>1894—97</strong><small>清 · 改建</small></button>
-                <button class="time-step" type="button" data-stage="2" aria-pressed="false"><span class="time-dot"></span><strong>1963—64</strong><small>落架大修</small></button>
-                <button class="time-step" type="button" data-stage="3" aria-pressed="false"><span class="time-dot"></span><strong>今日</strong><small>延续现状</small></button>
+              <div class="timeline-strip" aria-label="大殿形制时间轴">
+                <div class="timeline-readout"><span id="timelinePeriod">元 · 延祐七年</span><span id="timelineYear">1320</span></div>
+                <label class="timeline-range-label" for="stageSlider">
+                  <span class="sr-only">拖动查看大殿历史阶段</span>
+                  <input id="stageSlider" type="range" min="0" max="3" step="0.01" value="0" aria-valuetext="1320，元代题记节点" />
+                </label>
+                <div class="timeline-ticks" role="group" aria-label="时间节点">
+                  <button class="time-step is-active" type="button" data-stage="0" aria-pressed="true"><strong>1320</strong><small>元 · 题记</small></button>
+                  <button class="time-step" type="button" data-stage="1" aria-pressed="false"><strong>1894—97</strong><small>清 · 双檐</small></button>
+                  <button class="time-step" type="button" data-stage="2" aria-pressed="false"><strong>1963—64</strong><small>落架大修</small></button>
+                  <button class="time-step" type="button" data-stage="3" aria-pressed="false"><strong>现状</strong><small>单檐延续</small></button>
+                </div>
               </div>
             </div>
-            <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL。请使用支持 WebGL 的浏览器，并通过本地服务器打开页面。</div>
+            <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL 2。请使用支持 WebGL 2 的浏览器，并确认浏览器已启用图形加速。</div>
           </div>
           <div class="viewer-instruction"><span><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> 聚焦模型后旋转 · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 入殿移动</span><span>拖动旋转 · 滚轮缩放 · 右键平移</span><span class="model-badge">程序化几何 · 非照片贴图</span></div>
         </div>
@@ -111,32 +123,31 @@
             <p class="eyebrow dark"><span class="eyebrow-mark">时间轴 · 形制切换</span><span>在同一座殿里观察变化</span></p>
             <h2>檐的增与减，<br /><em>改变了什么？</em></h2>
           </div>
-          <p class="section-aside">切换上方模型的年代。清代阶段以半透明外扩柱列与下层檐顶表达研究文章提出的“五间重檐说”，与官方资料的表述存在差异，尺寸待证。旋转模型观察屋面与柱网；“结构分解”会将屋顶抬升，显出梁架关系。</p>
+          <p class="section-aside">拖动时间轴查看形制变化。进入殿内观察空间；拆解模式按屋面、木构、柱网与台基分层展开。</p>
         </div>
         <article class="stage-story" aria-live="polite">
           <div class="story-number"><span id="stageIndex">01</span><i></i><span>04</span></div>
           <div class="story-copy">
             <div class="story-meta"><span id="stagePeriod">元 · 延祐七年</span><span class="source-grade" id="sourceGrade">史料节点</span></div>
-            <h3 id="stageTitle">移建现址，<br />木上留年</h3>
-            <p id="stageDescription">现址大殿梁间留有“大元延祐七年”题记。它为建筑年代提供重要线索，也让木构本身成为一份可阅读的档案。</p>
-            <div class="story-detail"><span id="stageQuestion">此刻值得看</span><p id="stageDetail">屋顶以单檐歇山形制示意。现存木构中有元代构件，但不把整座殿堂都标成“元代原物”。</p></div>
+            <h3 id="stageTitle">移建现址，木上留年</h3>
+            <p id="stageDescription">梁间题记为大殿提供了重要年代线索。</p>
+            <div class="story-detail"><span id="stageQuestion">看模型时</span><p id="stageDetail">1320 是纪年节点；当前形制不能直接等同于元代原貌。</p></div>
             <button class="source-link" id="stageSource" type="button">查看本节点资料 <span aria-hidden="true">↗</span></button>
           </div>
           <div class="story-aside">
-            <span class="aside-index">MODEL NOTE / 01</span>
-            <p>模型里的每一根柱子、每一道瓦线都是程序生成的三维几何。</p>
-            <p>公开记载中的元代柱和柱础数量已进入叙事，但其具体位置尚无可靠图档支持，因此没有在模型中擅自标注。</p>
-            <a href="#evidence">阅读证据边界 <span aria-hidden="true">↓</span></a>
+            <span class="aside-index">模型状态</span>
+            <p>研究模型 · 非实测复原</p>
+            <a href="#evidence">查看证据 <span aria-hidden="true">↓</span></a>
           </div>
         </article>
-        <div class="model-disclaimer"><span class="disclaimer-mark">注</span><p><strong>模型边界：</strong>此为程序化三维研究模型，不是实测模型或考古复原。公开资料提供面阔、进深、开间、历次修缮与部分旧构件信息；屋顶坡度、檐口曲线、斗栱尺寸、门窗、色彩和高度均为视觉推演，必须用测绘图、修缮档案和寺方资料校订。</p></div>
+        <div class="model-disclaimer"><span class="disclaimer-mark">注</span><p><strong>模型状态：</strong>程序几何 · 非实测复原。清代双檐为研究推定；屋面细部、佛像与构件节点待现场和档案校准。</p></div>
       </section>
 
       <section class="anatomy-section">
         <div class="section-wrap">
           <div class="section-heading anatomy-heading">
             <div><p class="eyebrow"><span class="eyebrow-mark">构件观察 · 点击模型热点</span><span>一座殿的三维索引</span></p><h2>从檐口，<br /><em>读到柱础</em></h2></div>
-            <p class="section-aside">热点关联的是公开线索和下一步待核问题。点击屋面、梁架、斗栱、隔扇、柱网或台基，查看构件档案、证据状态与待核问题。</p>
+            <p class="section-aside">点选屋面、梁架、斗栱、隔扇、柱网或台基，查看来源与模型状态。</p>
           </div>
           <div class="anatomy-grid">
             <article><span>01 / ROOF</span><h3>屋面与檐口</h3><p>公开记载给出单檐／双檐的阶段变化。当前的举架与瓦作细节只是形制表达。</p></article>
@@ -196,6 +207,7 @@
           <a href="https://www.thepaper.cn/newsDetail_forward_26636609" target="_blank" rel="noreferrer"><span class="source-no">03</span><span><strong>真如寺：大都市，小元构 · 澎湃新闻</strong><small>建筑史脉络与修缮形制讨论；作为进一步阅读线索</small></span><span class="source-arrow">↗</span></a>
           <a href="https://www.shpt.gov.cn/zhengwu/wbcg-wljwhyc/2024/106/163758/b91c233608204309aad9254cfbfef98a.pdf" target="_blank" rel="noreferrer"><span class="source-no">04</span><span><strong>普陀区文物保护单位名录 · 上海普陀</strong><small>文物身份与地址信息</small></span><span class="source-arrow">↗</span></a>
           <a href="https://threejs.org/docs/pages/OrbitControls.html" target="_blank" rel="noreferrer"><span class="source-no">05</span><span><strong>Three.js · OrbitControls</strong><small>相机旋转、缩放与平移交互</small></span><span class="source-arrow">↗</span></a>
+          <a href="https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html" target="_blank" rel="noreferrer"><span class="source-no">06</span><span><strong>走进真如寺，探秘大殿的建筑密码 · 上海普陀</strong><small>斗栱、梁架与屋面参数的报道线索；非测绘图</small></span><span class="source-arrow">↗</span></a>
         </div>
         <p class="source-caveat">本原型为研究与表达练习，不代表寺方、文物主管部门或专业修缮单位的官方意见。公开网页信息需要与原始档案及专业人员核对。</p>
       </section>
@@ -205,3 +217,4 @@
     <script type="module" src="./app.js"></script>
   </body>
 </html>
+

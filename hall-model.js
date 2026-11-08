@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 13046)
+Total output lines: 1185
+
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
@@ -9,15 +12,15 @@ const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 
 export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#e9e2d5");
-  scene.fog = new THREE.Fog("#e9e2d5", 44, 88);
+  scene.background = new THREE.Color("#f0f3f0");
+  scene.fog = new THREE.Fog("#f0f3f0", 48, 96);
 
   const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 120);
   camera.position.copy(CAMERA_HOME);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.02;
@@ -36,9 +39,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   controls.zoomSpeed = 0.82;
   controls.panSpeed = 0.74;
   controls.update();
+  const cancelCameraTween = () => { cameraTween = null; cameraTouched = true; };
+  controls.addEventListener("start", cancelCameraTween);
 
-  scene.add(new THREE.HemisphereLight(0xf2eadb, 0x6b6659, 1.85));
-  const keyLight = new THREE.DirectionalLight(0xffedcf, 3.0);
+  scene.add(new THREE.HemisphereLight(0xf6f8f6, 0x737b76, 1.7));
+  const keyLight = new THREE.DirectionalLight(0xfff5e3, 2.6);
   keyLight.position.set(-13, 22, 15);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -49,30 +54,30 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   keyLight.shadow.bias = -0.00028;
   keyLight.shadow.normalBias = 0.035;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x9cae9d, 0.95);
+  const fillLight = new THREE.DirectionalLight(0xc5d0ca, 1.15);
   fillLight.position.set(12, 10, -15);
   scene.add(fillLight);
-  const warmInterior = new THREE.PointLight(0xd9a66c, 8, 16, 1.8);
+  const warmInterior = new THREE.PointLight(0xe0bd82, 4.2, 17, 1.8);
   warmInterior.position.set(0, 4.2, -0.8);
   scene.add(warmInterior);
 
   const mats = {
-    stone: new THREE.MeshStandardMaterial({ color: 0x938d7f, roughness: 0.94 }),
-    stoneLight: new THREE.MeshStandardMaterial({ color: 0xc9bea8, roughness: 0.9 }),
-    stoneDark: new THREE.MeshStandardMaterial({ color: 0x716d62, roughness: 0.96 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0x969a96, roughness: 0.94 }),
+    stoneLight: new THREE.MeshStandardMaterial({ color: 0xd0d3ce, roughness: 0.9 }),
+    stoneDark: new THREE.MeshStandardMaterial({ color: 0x707873, roughness: 0.96 }),
     wood: new THREE.MeshStandardMaterial({ color: 0x503724, roughness: 0.86 }),
     woodLight: new THREE.MeshStandardMaterial({ color: 0x80603d, roughness: 0.82 }),
     woodDark: new THREE.MeshStandardMaterial({ color: 0x30251d, roughness: 0.92 }),
     woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7548, roughness: 0.78 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xcbbfa8, roughness: 0.95 }),
-    wallShadow: new THREE.MeshStandardMaterial({ color: 0x9d9079, roughness: 0.96 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x494a42, roughness: 0.9, side: THREE.DoubleSide }),
-    roofSide: new THREE.MeshStandardMaterial({ color: 0x3b4039, roughness: 0.92, side: THREE.DoubleSide }),
-    roofSun: new THREE.MeshStandardMaterial({ color: 0x5a584c, roughness: 0.88, side: THREE.DoubleSide }),
-    roofTile: new THREE.LineBasicMaterial({ color: 0xaaa081, transparent: true, opacity: 0.86 }),
-    roofRib: new THREE.LineBasicMaterial({ color: 0x393e36, transparent: true, opacity: 0.9 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xc9cec9, roughness: 0.95 }),
+    wallShadow: new THREE.MeshStandardMaterial({ color: 0x858d87, roughness: 0.96 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x777e79, roughness: 0.91, side: THREE.DoubleSide }),
+    roofSide: new THREE.MeshStandardMaterial({ color: 0x656e69, roughness: 0.93, side: THREE.DoubleSide }),
+    roofSun: new THREE.MeshStandardMaterial({ color: 0x858a84, roughness: 0.89, side: THREE.DoubleSide }),
+    roofTile: new THREE.LineBasicMaterial({ color: 0xa3aaa5, transparent: true, opacity: 0.52 }),
+    roofRib: new THREE.LineBasicMaterial({ color: 0x4b5550, transparent: true, opacity: 0.66 }),
     brass: new THREE.MeshStandardMaterial({ color: 0xa98b59, roughness: 0.68, metalness: 0.12 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0xd5cebf, roughness: 1 }),
+    ground: new THREE.MeshStandardMaterial({ color: 0xf0f2ef, roughness: 1 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x35342e, roughness: 0.52, metalness: 0.02 })
   };
 
@@ -98,7 +103,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const columnGroup = new THREE.Group();
   columnGroup.name = "sixteen-column-grid";
   columnGroup.userData.part = "columns";
-  frameGroup.add(columnGroup);
+  hall.add(columnGroup);
   const roofGroup = new THREE.Group();
   roofGroup.name = "single-eave-roof";
   roofGroup.userData.part = "roof";
@@ -120,9 +125,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const mainRoofSkin = buildRoof(roofGroup, {
     width: 17.25, depth: 16.8, baseY: 6.72, ridgeY: 9.55, ridgeHalf: 6.0, mats, style: "main"
   });
-  const extraRoofSkin = buildRoof(extraRoofGroup, {
-    width: 19.05, depth: 18.55, baseY: 5.72, ridgeY: 7.55, ridgeHalf: 5.95, mats, style: "lower"
-  });
+  const extraRoofSkin = buildLowerEave(extraRoofGroup, mats);
   buildInteriorHint(hall, mats);
   buildQingExtension(qingExtensionGroup, mats);
 
@@ -135,40 +138,110 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     base: new THREE.Vector3(6.45, 0.64, 7.1)
   };
   const moving = new Set();
+  const listenerController = new AbortController();
+  const listenerOptions = { signal: listenerController.signal };
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const interactiveGroups = [baseGroup, frameGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const interactiveGroups = [baseGroup, frameGroup, columnGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
   let exploded = false;
+  let explosionAmount = 0;
   let frameMode = false;
+  let cutaway = false;
   let currentStage = 0;
+  let qingOpacity = 0;
+  const fadeMaterialCache = new WeakMap();
   let cameraTween = null;
+  let cameraTouched = false;
   let disposed = false;
   let readyCalled = false;
   let raf = 0;
   let lastTime = performance.now();
 
+  function responsiveHomeFov() {
+    const aspect = frame.clientWidth / Math.max(frame.clientHeight, 1);
+    const progress = THREE.MathUtils.smoothstep(aspect, 0.5, 1.25);
+    return THREE.MathUtils.lerp(52, 37, progress);
+  }
+
+  function responsiveHomePosition() {
+    const aspect = frame.clientWidth / Math.max(frame.clientHeight, 1);
+    const fov = responsiveHomeFov();
+    const offset = CAMERA_HOME.clone().sub(TARGET_HOME);
+    const horizontalDistance = Math.hypot(offset.x, offset.z);
+    const projectedHalfWidth = (17.25 / 2) * Math.abs(offset.z / horizontalDistance)
+      + (16.8 / 2) * Math.abs(offset.x / horizontalDistance);
+    const horizontalHalfFov = Math.atan(Math.tan(THREE.MathUtils.degToRad(fov / 2)) * aspect);
+    const requiredDistance = projectedHalfWidth / Math.tan(horizontalHalfFov) * 1.12;
+    const distanceScale = Math.max(1, requiredDistance / offset.length());
+    return TARGET_HOME.clone().add(offset.multiplyScalar(distanceScale));
+  }
+
+  function responsiveTopPosition() {
+    const aspect = frame.clientWidth / Math.max(frame.clientHeight, 1);
+    const halfSpan = 9.35;
+    const distance = halfSpan / (Math.tan(THREE.MathUtils.degToRad(52 / 2)) * Math.max(aspect, 0.55));
+    return new THREE.Vector3(0.2, Math.max(20, distance), 0.4);
+  }
+
+  function setGroupOpacity(root, opacity) {
+    root.traverse((node) => {
+      if (!node.isMesh && !node.isLine) return;
+      let materials = fadeMaterialCache.get(node);
+      if (!materials) {
+        const originals = Array.isArray(node.material) ? node.material : [node.material];
+        const copies = originals.map((material) => material.clone());
+        materials = {
+          original: node.material,
+          copies: Array.isArray(node.material) ? copies : copies[0],
+          opacity: originals.map((material) => material.opacity),
+          depthWrite: originals.map((material) => material.depthWrite)
+        };
+        fadeMaterialCache.set(node, materials);
+      }
+      if (opacity >= 0.995) {
+        node.material = materials.original;
+        return;
+      }
+      node.material = materials.copies;
+      const copies = Array.isArray(materials.copies) ? materials.copies : [materials.copies];
+      copies.forEach((material, index) => {
+        material.transparent = true;
+        material.opacity = materials.opacity[index] * opacity;
+        material.depthWrite = opacity > 0.92 ? materials.depthWrite[index] : false;
+      });
+    });
+  }
+
   function setStage(stage) {
-    currentStage = stage;
-    extraRoofGroup.visible = stage === 1;
-    extraRoofGroup.position.y = stage === 1 && exploded ? 1.37 : 0;
-    extraRoofGroup.scale.x = stage === 1 ? 1.15 : 1;
-    roofGroup.scale.x = stage === 1 ? 1.2 : 1;
-    qingExtensionGroup.visible = stage === 1;
-    extraRoofSkin.visible = !frameMode;
+    currentStage = THREE.MathUtils.clamp(Number(stage) || 0, 0, 3);
+    if (currentStage <= 1) qingOpacity = currentStage;
+    else if (currentStage <= 2) qingOpacity = 2 - currentStage;
+    else qingOpacity = 0;
+    qingOpacity = THREE.MathUtils.clamp(qingOpacity, 0, 1);
+    extraRoofGroup.visible = qingOpacity > 0.005;
+    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 0.78;
+    extraRoofGroup.scale.x = 1 + qingOpacity * 0.15;
+    roofGroup.scale.x = 1;
+    qingExtensionGroup.visible = qingOpacity > 0.005;
+    setGroupOpacity(extraRoofGroup, qingOpacity);
+    setGroupOpacity(qingExtensionGroup, qingOpacity);
+    extraRoofSkin.visible = !frameMode && qingOpacity > 0.005;
   }
 
   function moveCamera(position, target, nextView) {
     cameraTween = {
       startTime: performance.now(),
-      duration: reducedMotion ? 1 : 850,
+      duration: reducedMotionQuery.matches ? 1 : 850,
       fromPosition: camera.position.clone(),
       toPosition: position.clone(),
       fromTarget: controls.target.clone(),
       toTarget: target.clone()
     };
     activeView = nextView;
+    camera.fov = nextView === "top" ? 52 : nextView === "outside" ? responsiveHomeFov() : 37;
+    camera.updateProjectionMatrix();
     if (nextView === "top") {
       camera.up.set(0, 0, -1);
       controls.maxPolarAngle = Math.PI;
@@ -183,17 +256,19 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     controls.update();
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
     document.getElementById("exploreHint").textContent = nextView === "inside"
-      ? "WASD / 触屏方向键移动 · 拖动转头 · 滚轮靠近"
-      : "拖动旋转 · 滚轮缩放 · 右键平移";
+      ? "WASD 移动 · 佛像轮廓为待核占位"
+      : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
   function setView(view) {
+    cameraTouched = false;
+    if (view !== "inside") moving.clear();
     if (view === "inside") {
-      moveCamera(new THREE.Vector3(0, 2.1, 3.1), new THREE.Vector3(0, 2.65, -1.5), "inside");
+      moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
     } else if (view === "top") {
-      moveCamera(new THREE.Vector3(0.2, 24, 0.4), new THREE.Vector3(0, 0, 0), "top");
+      moveCamera(responsiveTopPosition(), new THREE.Vector3(0, 0.7, 0), "top");
     } else {
-      moveCamera(CAMERA_HOME, TARGET_HOME, "outside");
+      moveCamera(responsiveHomePosition(), TARGET_HOME, "outside");
     }
     document.querySelectorAll(".view-button[data-view]").forEach((button) => {
       button.classList.toggle("is-selected", button.dataset.view === view);
@@ -202,8 +277,6 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
 
   function toggleExploded(force) {
     exploded = typeof force === "boolean" ? force : !exploded;
-    roofGroup.position.y = exploded ? 1.75 : 0;
-    extraRoofGroup.position.y = currentStage === 1 && exploded ? 1.37 : 0;
     return exploded;
   }
 
@@ -214,20 +287,30 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     return frameMode;
   }
 
+  function toggleCutaway(force) {
+    cutaway = typeof force === "boolean" ? force : !cutaway;
+    // Render actual WebGL section, not a screen-space screenshot.
+    renderer.clippingPlanes = cutaway ? [new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0)] : [];
+    return cutaway;
+  }
+
   function resetView() {
     moving.clear();
+    cameraTouched = false;
     setView("outside");
     toggleExploded(false);
     toggleFrame(false);
+    toggleCutaway(false);
     document.getElementById("explodeToggle").setAttribute("aria-pressed", "false");
     document.getElementById("frameToggle").setAttribute("aria-pressed", "false");
+    document.getElementById("cutawayToggle").setAttribute("aria-pressed", "false");
   }
 
   async function exportGLB() {
     const exportRoot = hall.clone(true);
     exportRoot.traverse((node) => {
       if (node.userData.isRoofSkin) node.visible = true;
-      if (node.name === "single-eave-roof" || node.name === "Qing-period-added-eave-study") node.position.y = 0;
+      if (["single-eave-roof", "Qing-period-added-eave-study", "timber-frame", "sixteen-column-grid", "Qing-period-five-bay-outline-study"].includes(node.name)) node.position.y = 0;
     });
     const exportScene = new THREE.Scene();
     exportScene.add(exportRoot);
@@ -248,14 +331,14 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
 
   let downPoint = null;
-  canvas.addEventListener("pointerdown", (event) => { downPoint = { x: event.clientX, y: event.clientY }; });
+  canvas.addEventListener("pointerdown", (event) => { downPoint = { x: event.clientX, y: event.clientY }; }, listenerOptions);
   canvas.addEventListener("pointerup", (event) => {
     if (!downPoint) return;
     if (Math.hypot(event.clientX - downPoint.x, event.clientY - downPoint.y) < 5) selectAt(event);
     downPoint = null;
-  });
-  canvas.addEventListener("contextmenu", (event) => event.preventDefault());
-  canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }));
+  }, listenerOptions);
+  canvas.addEventListener("contextmenu", (event) => event.preventDefault(), listenerOptions);
+  canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }), listenerOptions);
 
   function rotateCameraBy(horizontal, vertical) {
     cameraTween = null;
@@ -276,6 +359,19 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const key = event.key.toLowerCase();
     const editing = event.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
     if (editing) return;
+    if (key === "escape") {
+      const inspector = document.getElementById("componentInspector");
+      if (inspector && !inspector.hidden) {
+        event.preventDefault();
+        inspector.hidden = true;
+        document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
+        canvas.focus({ preventScroll: true });
+      } else if (activeView === "inside") {
+        event.preventDefault();
+        setView("outside");
+      }
+      return;
+    }
     if (["w", "a", "s", "d"].includes(key) && activeView === "inside") {
       event.preventDefault();
       moving.add(key);
@@ -293,18 +389,49 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   }
   function onKeyUp(event) { moving.delete(event.key.toLowerCase()); }
   function onBlur() { moving.clear(); }
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", onKeyUp);
-  window.addEventListener("blur", onBlur);
+  window.addEventListener("keydown", onKeyDown, listenerOptions);
+  window.addEventListener("keyup", onKeyUp, listenerOptions);
+  window.addEventListener("blur", onBlur, listenerOptions);
 
   document.querySelectorAll(".walk-pad [data-move]").forEach((button) => {
     const directions = { forward: "w", back: "s", left: "a", right: "d" };
     const key = directions[button.dataset.move];
-    button.addEventListener("pointerdown", (event) => { event.preventDefault(); button.setPointerCapture(event.pointerId); setMove(key, true); });
-    button.addEventListener("pointerup", () => setMove(key, false));
-    button.addEventListener("pointercancel", () => setMove(key, false));
-    button.addEventListener("lostpointercapture", () => setMove(key, false));
+    const press = () => { setMove(key, true); button.setAttribute("aria-pressed", "true"); };
+    const release = () => { setMove(key, false); button.setAttribute("aria-pressed", "false"); };
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      button.focus({ preventScroll: true });
+      button.setPointerCapture(event.pointerId);
+      press();
+    }, listenerOptions);
+    button.addEventListener("pointerup", release, listenerOptions);
+    button.addEventListener("pointercancel", release, listenerOptions);
+    button.addEventListener("lostpointercapture", release, listenerOptions);
+    button.addEventListener("keydown", (event) => {
+      if (["Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+        event.preventDefault();
+        press();
+      }
+    }, listenerOptions);
+    button.addEventListener("keyup", (event) => {
+      if (["Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+        event.preventDefault();
+        release();
+      }
+    }, listenerOptions);
+    button.addEventListener("blur", release, listenerOptions);
   });
+
+  const onVisibilityChange = () => {
+    if (document.hidden) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    } else if (!disposed && !raf) {
+      lastTime = performance.now();
+      raf = requestAnimationFrame(animate);
+    }
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange, listenerOptions);
 
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(frame);
@@ -312,105 +439,108 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const width = Math.max(1, frame.clientWidth);
     const height = Math.max(1, frame.clientHeight);
     camera.aspect = width / height;
+    if (activeView === "outside") camera.fov = responsiveHomeFov();
+    else if (activeView === "top") camera.fov = 52;
+    else camera.fov = 37;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    if (activeView === "outside" && !cameraTouched) {
+      const homePosition = responsiveHomePosition();
+      const homeTarget = TARGET_HOME.clone();
+      if (cameraTween) {
+        cameraTween.toPosition = homePosition;
+        cameraTween.toTarget = homeTarget;
+      } else {
+        camera.position.copy(homePosition);
+        controls.target.copy(homeTarget);
+        controls.update();
+      }
+    } else if (activeView === "top" && !cameraTouched) {
+      const topPosition = responsiveTopPosition();
+      const topTarget = new THREE.Vector3(0, 0.7, 0);
+      if (cameraTween) {
+        cameraTween.toPosition = topPosition;
+        cameraTween.toTarget = topTarget;
+      } else {
+        camera.position.copy(topPosition);
+        controls.target.copy(topTarget);
+        controls.update();
+      }
+    }
   }
   resize();
 
   function updatePins() {
     const rect = frame.getBoundingClientRect();
+    const bounds = { left: 16, right: rect.width - 16, top: 100, bottom: rect.height - 114 };
+    const obstacles = [...document.querySelectorAll(".hero-copy, .viewer-topline, .view-tools, .viewer-bottom, .component-inspector, .walk-pad")]
+      .filter((element) => getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
+      .map((element) => {
+        const box = element.getBoundingClientRect();
+        return { left: box.left - rect.left - 6, right: box.right - rect.left + 6, top: box.top - rect.top - 6, bottom: box.bottom - rect.top + 6 };
+      });
+    const candidates = [];
     for (const [part, element] of Object.entries(pins)) {
       const point = pinAnchors[part].clone().project(camera);
       const x = (point.x * 0.5 + 0.5) * rect.width;
       const y = (-point.y * 0.5 + 0.5) * rect.height;
-      const inBounds = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 92 && y < rect.height - 110;
-      element.classList.toggle("is-visible", inBounds && activeView !== "inside");
-      element.style.left = String(x) + "px";
-      element.style.top = String(y) + "px";
+      const visible = point.z > -1 && point.z < 1 && x > 10 && x < rect.width - 10 && y > 10 && y < rect.height - 10 && activeView === "outside";
+      element.classList.toggle("is-visible", visible);
+      if (visible) candidates.push({ element, x, y, part });
+    }
+    candidates.sort((a, b) => a.y - b.y || a.x - b.x);
+    const placed = [];
+    const overlaps = (a, b, gap = 8) => !(a.right + gap <= b.left || a.left - gap >= b.right || a.bottom + gap <= b.top || a.top - gap >= b.bottom);
+    for (const item of candidates) {
+      const width = item.element.offsetWidth || 68;
+      const height = item.element.offsetHeight || 24;
+      const stepX = width + 16;
+      const stepY = height + 12;
+      const offsets = [[0, 0], [0, -stepY], [0, stepY], [stepX, 0], [-stepX, 0], [stepX, -stepY], [-stepX, -stepY], [stepX, stepY], [-stepX, stepY], [0, -stepY * 2], [0, stepY * 2], [stepX * 2, 0], [-stepX * 2, 0]];
+      let chosen = null;
+      for (const [dx, dy] of offsets) {
+        const cx = THREE.MathUtils.clamp(item.x + dx, bounds.left + width / 2, bounds.right - width / 2);
+        const cy = THREE.MathUtils.clamp(item.y + dy, bounds.top + height / 2, bounds.bottom - height / 2);
+        const box = { left: cx - width / 2, right: cx + width / 2, top: cy - height / 2, bottom: cy + height / 2 };
+        if (![...placed, ...obstacles].some((other) => overlaps(box, other))) { chosen = { x: cx, y: cy, box }; break; }
+      }
+      if (!chosen) {
+        const cx = THREE.MathUtils.clamp(item.x, bounds.left + width / 2, bounds.right - width / 2);
+        const cy = THREE.MathUtils.clamp(item.y, bounds.top + height / 2, bounds.bottom - height / 2);
+        chosen = { x: cx, y: cy, box: { left: cx - width / 2, right: cx + width / 2, top: cy - height / 2, bottom: cy + height / 2 } };
+      }
+      item.element.style.left = String(chosen.x) + "px";
+      item.element.style.top = String(chosen.y) + "px";
+      placed.push(chosen.box);
     }
   }
   Object.values(pins).forEach((element) => {
-    element.addEventListener("click", () => onPart(element.dataset.part));
+    element.addEventListener("click", () => onPart(element.dataset.part), listenerOptions);
   });
 
-  function animate(now) {
-    if (disposed) return;
-    raf = requestAnimationFrame(animate);
-    const delta = Math.min((now - lastTime) / 1000, 0.05);
-    lastTime = now;
-    if (cameraTween) {
-      const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
-      const eased = t * t * (3 - 2 * t);
-      camera.position.lerpVectors(cameraTween.fromPosition, cameraTween.toPosition, eased);
-      controls.target.lerpVectors(cameraTween.fromTarget, cameraTween.toTarget, eased);
-      if (t >= 1) cameraTween = null;
-    }
-    if (moving.size && activeView === "inside") {
-      const forward = new THREE.Vector3();
-      camera.getWorldDirection(forward);
-      forward.y = 0;
-      forward.normalize();
-      const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
-      const velocity = new THREE.Vector3();
-      if (moving.has("w")) velocity.add(forward);
-      if (moving.has("s")) velocity.sub(forward);
-      if (moving.has("d")) velocity.add(right);
-      if (moving.has("a")) velocity.sub(right);
-      if (velocity.lengthSq()) {
-        velocity.normalize().multiplyScalar(2.2 * delta);
-        const nextX = THREE.MathUtils.clamp(camera.position.x + velocity.x, -5.9, 5.9);
-        const nextZ = THREE.MathUtils.clamp(camera.position.z + velocity.z, -5.9, 5.9);
-        const blocked = POST_X.some((x) => POST_Z.some((z) => Math.hypot(nextX - x, nextZ - z) < 0.48));
-        if (!blocked) {
-          const dx = nextX - camera.position.x;
-          const dz = nextZ - camera.position.z;
-          camera.position.x = nextX;
-          camera.position.z = nextZ;
-          controls.target.x += dx;
-          controls.target.z += dz;
-        }
-        camera.position.y = 2.1;
-      }
-    }
-    controls.update();
-    updatePins();
-    renderer.render(scene, camera);
-    if (!readyCalled && now > 600) {
-      readyCalled = true;
-      onReady();
-    }
+  function getSceneState() {
+    return {
+      stage: currentStage,
+      view: activeView,
+      exploded,
+      frameMode,
+      cutaway,
+      qingRoofVisible: extraRoofGroup.visible,
+      qingExtensionVisible: qingExtensionGroup.visible,
+      mainRoofSurfaceVisible: mainRoofSkin.visible,
+      lowerRoofSurfaceVisible: extraRoofSkin.visible,
+      camera: camera.position.toArray(),
+      target: controls.target.toArray(),
+      mainRoofOffset: roofGroup.position.y,
+      frameOffset: frameGroup.position.y,
+      columnOffset: columnGroup.position.y,
+      lowerEaveOffset: extraRoofGroup.position.y
+    };
   }
-  raf = requestAnimationFrame(animate);
-
-  return {
-    setStage,
-    setView,
-    toggleExploded,
-    toggleFrame,
-    resetView,
-    exportGLB,
-    destroy() {
-      disposed = true;
-      cancelAnimationFrame(raf);
-      resizeObserver.disconnect();
-      controls.dispose();
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("blur", onBlur);
-      const geometries = new Set();
-      const materials = new Set();
-      scene.traverse((node) => {
-        if (node.geometry) geometries.add(node.geometry);
-        if (node.material) (Array.isArray(node.material) ? node.material : [node.material]).forEach((material) => materials.add(material));
-      });
-      geometries.forEach((geometry) => geometry.dispose());
-      materials.forEach((material) => material.dispose());
-      renderer.dispose();
-    }
-  };
-}
-
-function addCourtyardLines(scene) {
+  function getDiagnostics() {
+    let objects = 0;
+    let renderables = 0;
+    scene.traverse((node) => { objec…1046 tokens truncated…es(scene) {
   const points = [];
   for (let i = -12; i <= 12; i += 1.2) {
     points.push(-16, 0.005, i, 16, 0.005, i);
@@ -418,7 +548,7 @@ function addCourtyardLines(scene) {
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
-  scene.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xaaa58c, transparent: true, opacity: 0.1 })));
+  scene.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0x98a19b, transparent: true, opacity: 0.15 })));
 }
 
 function meshBox(parent, dimensions, position, material, part) {
@@ -713,26 +843,59 @@ function buildRoof(parent, options) {
   surfacePatch(skin, (u, v) => sidePoint(u, v, -1), mats.roofSide, "roof", 22, 16);
   surfacePatch(skin, (u, v) => sidePoint(u, v, 1), roofMaterial, "roof", 22, 16);
 
-  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x555449 : 0x353a34, roughness: 0.94 });
-  const tileCourse = new THREE.MeshStandardMaterial({ color: 0xaaa087, roughness: 0.9 });
+  const tileRib = new THREE.MeshStandardMaterial({ color: style === "lower" ? 0x68716c : 0x626b66, roughness: 0.94 });
+  const tileCourse = new THREE.MeshStandardMaterial({ color: 0x9da49f, roughness: 0.92 });
   const drawRoofGrid = (pointFn, ribs, courses) => {
     for (let i = 0; i <= ribs; i += 1) {
       const u = -0.96 + 1.92 * i / ribs;
       const points = [];
       for (let j = 0; j <= 8; j += 1) points.push(raised(pointFn(u, j / 8)));
-      addTube(skin, points, 0.026, tileRib, "roof");
+      addTube(skin, points, 0.014, tileRib, "roof");
     }
     for (let j = 1; j <= courses; j += 1) {
       const v = j / (courses + 1);
       const points = [];
       for (let i = 0; i <= 20; i += 1) points.push(raised(pointFn(-1 + 2 * i / 20, v)));
-      addTube(skin, points, 0.012, tileCourse, "roof");
+      addTube(skin, points, 0.008, tileCourse, "roof");
     }
   };
-  drawRoofGrid((u, v) => frontPoint(u, v, 1), 18, 12);
-  drawRoofGrid((u, v) => frontPoint(u, v, -1), 18, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, -1), 16, 12);
-  drawRoofGrid((u, v) => sidePoint(u, v, 1), 16, 12);
+  drawRoofGrid((u, v) => frontPoint(u, v, 1), 24, 13);
+  drawRoofGrid((u, v) => frontPoint(u, v, -1), 24, 13);
+  drawRoofGrid((u, v) => sidePoint(u, v, -1), 22, 13);
+  drawRoofGrid((u, v) => sidePoint(u, v, 1), 22, 13);
+
+  // Repeated, restrained tile-end caps make the eaves readable at close range.
+  const eaveCapMaterial = new THREE.MeshStandardMaterial({ color: 0x858b86, roughness: 0.88 });
+  const eaveCapGeometry = new THREE.CylinderGeometry(0.115, 0.115, 0.075, 12, 1);
+  const eaveCaps = new THREE.InstancedMesh(eaveCapGeometry, eaveCapMaterial, 140);
+  eaveCaps.name = "repeated-eave-tile-caps";
+  eaveCaps.userData.part = "roof";
+  eaveCaps.castShadow = true;
+  const capTransform = new THREE.Object3D();
+  const capCount = 35;
+  let capIndex = 0;
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < capCount; i += 1) {
+      const u = -0.96 + 1.92 * i / (capCount - 1);
+      const point = frontPoint(u, 1, sign);
+      capTransform.position.set(point[0], point[1] - 0.035, point[2] + sign * 0.015);
+      capTransform.rotation.set(Math.PI / 2, 0, 0);
+      capTransform.updateMatrix();
+      eaveCaps.setMatrixAt(capIndex++, capTransform.matrix);
+    }
+  }
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < capCount; i += 1) {
+      const u = -0.96 + 1.92 * i / (capCount - 1);
+      const point = sidePoint(u, 1, sign);
+      capTransform.position.set(point[0] + sign * 0.015, point[1] - 0.035, point[2]);
+      capTransform.rotation.set(0, 0, Math.PI / 2);
+      capTransform.updateMatrix();
+      eaveCaps.setMatrixAt(capIndex++, capTransform.matrix);
+    }
+  }
+  eaveCaps.instanceMatrix.needsUpdate = true;
+  skin.add(eaveCaps);
 
   for (const sign of [-1, 1]) {
     const points = [];
@@ -811,24 +974,107 @@ function buildQingExtension(group, mats) {
   }
 }
 
-function buildInteriorHint(hall, mats) {
-  const warm = new THREE.MeshStandardMaterial({ color: 0x9b7340, emissive: 0x4a2b0d, emissiveIntensity: 0.5, roughness: 0.55 });
-  meshBox(hall, [3.5, 0.36, 1.35], [0, 1.15, -3.65], mats.woodDark, "frame");
-  meshBox(hall, [2.7, 0.14, 0.96], [0, 1.42, -3.55], mats.woodLight, "frame");
-  for (const x of [-1.17, 1.17]) {
-    meshBox(hall, [0.13, 0.72, 0.13], [x, 1.78, -3.55], mats.wood, "frame");
-    meshBox(hall, [0.13, 0.72, 0.13], [x, 1.78, -2.89], mats.wood, "frame");
+function buildLowerEave(parent, mats) {
+  // Qing-period additional lower eave: annular roof only.
+  // Its construction is conjectural, not a scan of the lost 19th-century configuration.
+  const skin = new THREE.Group();
+  skin.name = "Qing-addition-eave-skin";
+  skin.userData.part = "roof";
+  skin.userData.isRoofSkin = true;
+  parent.add(skin);
+  const outerX = 11.2;
+  const outerZ = 9.35;
+  const innerX = 6.55;
+  const innerZ = 6.42;
+  const topY = 6.12;
+  const outerY = 5.64;
+  const eaveMat = mats.roofSun;
+  for (const sign of [-1, 1]) {
+    const front = [
+      [-outerX, outerY + 0.17, sign * outerZ],
+      [outerX, outerY + 0.17, sign * outerZ],
+      [innerX, topY, sign * innerZ],
+      [-innerX, topY, sign * innerZ]
+    ];
+    polygonMesh(skin, front, eaveMat, "roof");
+    const side = [
+      [sign * outerX, outerY + 0.17, -outerZ],
+      [sign * outerX, outerY + 0.17, outerZ],
+      [sign * innerX, topY, innerZ],
+      [sign * innerX, topY, -innerZ]
+    ];
+    polygonMesh(skin, side, eaveMat, "roof");
+    const frontEave = [];
+    const sideEave = [];
+    for (let i = 0; i <= 24; i++) {
+      const u = -1 + 2 * i / 24;
+      frontEave.push([u * outerX, outerY + 0.17 + 0.1 * u * u, sign * outerZ]);
+      sideEave.push([sign * outerX, outerY + 0.17 + 0.1 * u * u, u * outerZ]);
+    }
+    addTube(skin, frontEave, 0.08, mats.woodDark, "roof");
+    addTube(skin, sideEave, 0.08, mats.woodDark, "roof");
+    for (let i = -12; i <= 12; i++) {
+      const u = i / 12;
+      addTube(skin, [[u * innerX, topY + 0.015, sign * innerZ], [u * outerX, outerY + 0.21 + 0.1 * u * u, sign * outerZ]],
+        0.022, mats.woodDark, "roof");
+      addTube(skin, [[sign * innerX, topY + 0.015, u * innerZ], [sign * outerX, outerY + 0.21 + 0.1 * u * u, u * outerZ]],
+        0.022, mats.woodDark, "roof");
+    }
   }
-  meshBox(hall, [2.5, 0.12, 0.8], [0, 2.13, -3.22], mats.woodLight, "frame");
-  const lamp = new THREE.Mesh(new THREE.OctahedronGeometry(0.22, 1), warm);
-  lamp.position.set(0, 4.25, 0.6);
-  lamp.scale.set(0.72, 1.18, 0.72);
-  lamp.userData.part = "frame";
-  hall.add(lamp);
-  const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.65, 7), mats.brass);
-  chain.position.set(0, 4.76, 0.6);
-  hall.add(chain);
+  return skin;
+}
+
+function buildInteriorHint(hall, mats) {
+  const interior = new THREE.Group();
+  interior.name = "interior-altar-and-scale-study";
+  interior.userData.part = "frame";
+  hall.add(interior);
+
+  // The altar is a spatial study. Its dimensions and carving are not surveyed.
+  meshBox(interior, [4.25, 0.22, 1.25], [0, 1.1, -3.88], mats.woodDark, "frame");
+  meshBox(interior, [3.95, 0.12, 1.12], [0, 1.26, -3.88], mats.woodLight, "frame");
+  meshBox(interior, [3.5, 0.42, 0.98], [0, 1.54, -3.82], mats.wood, "frame");
+  meshBox(interior, [3.3, 0.1, 1.02], [0, 1.79, -3.82], mats.woodEdge, "frame");
+  for (const x of [-1.43, -0.72, 0, 0.72, 1.43]) {
+    meshBox(interior, [0.025, 0.32, 0.02], [x, 1.54, -3.315], mats.woodLight, "frame");
+  }
+  for (const x of [-1.76, 1.76]) {
+    meshBox(interior, [0.1, 0.5, 0.08], [x, 1.55, -3.8], mats.woodDark, "frame");
+  }
+
+  // Neutral silhouette only: replace after a permitted, multi-view altar survey.
+  const silhouetteMaterial = new THREE.MeshStandardMaterial({
+    color: 0x8b806b, roughness: 0.78, metalness: 0.02, transparent: true, opacity: 0.76
+  });
+  const figure = new THREE.Group();
+  figure.name = "unverified-statue-silhouette-placeholder";
+  figure.userData.part = "frame";
+  figure.userData.evidence = "spatial placeholder; iconography and dimensions unverified";
+  interior.add(figure);
+  const ellipsoid = (radius, scale, position) => {
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 14), silhouetteMaterial);
+    mesh.scale.set(...scale);
+    mesh.position.set(...position);
+    mesh.castShadow = true;
+    mesh.userData.part = "frame";
+    figure.add(mesh);
+  };
+  ellipsoid(1, [0.56, 0.27, 0.38], [0, 1.98, -3.78]);
+  ellipsoid(1, [0.4, 0.52, 0.32], [0, 2.34, -3.82]);
+  ellipsoid(1, [0.57, 0.24, 0.34], [0, 2.57, -3.82]);
+  ellipsoid(1, [0.19, 0.16, 0.2], [0, 2.82, -3.8]);
+  ellipsoid(1, [0.255, 0.31, 0.25], [0, 3.13, -3.8]);
+  ellipsoid(1, [0.09, 0.12, 0.09], [0, 3.53, -3.8]);
+  ellipsoid(1, [0.21, 0.13, 0.19], [-0.47, 2.35, -3.78]);
+  ellipsoid(1, [0.21, 0.13, 0.19], [0.47, 2.35, -3.78]);
+
+  // A plain backing plane records the altar's depth without inventing ornament.
+  meshBox(interior, [4.7, 3.25, 0.12], [0, 3.2, -4.72], mats.woodDark, "frame");
+  meshBox(interior, [4.36, 2.92, 0.035], [0, 3.2, -4.64], mats.woodLight, "frame");
 }
 
 function lerp3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
 function raised(point) { return [point[0], point[1] + 0.022, point[2]]; }
+
+
+
