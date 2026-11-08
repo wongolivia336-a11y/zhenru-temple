@@ -64,3 +64,21 @@ Edge CDP 报告下载状态 `canceled`，目录没有文件，因此未对磁盘
 2. Blender 不在本机；没有 glTF Validator 或 Blender round-trip。自动化 Edge 取消了下载落盘，GLB 只在页面 Blob 中做了结构验证。
 3. SwiftShader 软件 WebGL 的 draw-call/triangle 统计有参考价值，但 FPS、显存和温度不可外推到硬件。
 4. 当前模型不是实测复原。斗栱、屋架细部、瓦件、檐口曲线、门窗分格、清代外扩细节及构件年代位置仍待寺方/修缮档案和测绘确认。
+
+
+## 2026-11-08 · Focused visual regression pass
+
+**Tested source tree:** `369d196990f14ab0790f414852001c9bfbda6f53` (same tree as merge commit `2f942e78dd3eb13ec5a17b2b090a1e05091605bd`).  
+**Environment:** Microsoft Edge Headless, WebGL2 / SwiftShader software rendering, local HTTP server.
+
+| Regression | Result | Observation |
+| --- | --- | --- |
+| Desktop toolbar and heading | Pass | At 1440×1000 the toolbar sits clear of the title; the toolbar toggle and structure controls receive pointer input. |
+| Screen-reader-only timeline hint | Pass | The hint is visually clipped to 1×1px instead of appearing as page text. |
+| Narrow viewport model fit | Pass | At 390×844 the exterior hall remains fully in frame with no horizontal page overflow. |
+| Timeline and structure controls | Pass | All four timeline stages switched; cutaway, structure separation, frame view, and reset changed their expected states. |
+| Interior and camera controls | Pass | Enter/exit, WASD movement, and overhead view changed the scene as expected. |
+| Resize during camera transition | Pass | Switching back outside and resizing immediately to 390×844 kept the final camera target aligned with the outside view; the hall stayed in frame. |
+| Runtime errors | Pass | No application JavaScript errors or failed local requests during the focused run. |
+
+This pass covers desktop 1440×1000 and mobile 390×844. SwiftShader is a software renderer; this run does not claim hardware-GPU performance, physical-device touch behavior, or Blender round-trip validation. The screenshots indexed above are from the earlier 2026-11-07 broad QA run; this focused regression pass was checked live in Edge.
