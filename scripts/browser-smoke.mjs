@@ -226,6 +226,10 @@ async function run() {
   await home.setViewportSize({width:390,height:844});
   await sleep(250);
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-mobile-390.png",fullPage:true});
+  await home.locator("#treeView").click();
+  assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"courtyard");
+  await sleep(1050);
+  await home.screenshot({path:"qa/runtime-screenshots/v8-ginkgo-focus-mobile-390.png",fullPage:true});
   const homeMobileOverflow=await home.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   assert.ok(homeMobileOverflow<=1,"Homepage mobile horizontal overflow "+homeMobileOverflow);
   await home.close();

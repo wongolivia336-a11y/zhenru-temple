@@ -1214,3 +1214,20 @@ html.viewer-only .model-tools {right:0;left:auto;}
 @media(prefers-reduced-motion:reduce){
  .environment-controls button {transition:none;}
 }
+
+/* V8 final art direction: protect heading without adding a glass card or poster gradient. */
+.hero-copy { position:relative; isolation:isolate; z-index:6; }
+.hero-copy::before {
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:58px -84px 102px 18px;
+  background:radial-gradient(ellipse 60% 53% at 30% 43%,
+     rgba(244,247,244,.97) 0%,rgba(244,247,244,.90) 44%,
+     rgba(244,247,244,.57) 70%,rgba(244,247,244,0) 100%);
+}
+.environment-controls {max-width:calc(100% - 26px);}
+.environment-controls button#treeView {color:#5e6e61;border-color:#aebfb0;}
+@media(max-width:650px) {
+  .hero-copy::before {inset:4px -14px 36px 4px;opacity:.84;}
+  .environment-copy small {display:none;}
+  .environment-controls {max-width:calc(100% - 18px);}
+}

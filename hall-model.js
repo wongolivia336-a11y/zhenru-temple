@@ -282,7 +282,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const zoomOutput = document.querySelector("#zoomValue");
     if (zoomOutput) zoomOutput.textContent = "100%";
     ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
-    camera.fov = nextView === "top" ? 52 : nextView === "outside" ? responsiveHomeFov() : 37;
+    camera.fov = nextView === "top" ? 52 : nextView === "courtyard" ? 46 : nextView === "outside" ? responsiveHomeFov() : 37;
     camera.updateProjectionMatrix();
     if (nextView === "top") {
       camera.up.set(0, 0, -1);
@@ -307,6 +307,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "courtyard") {
+      // Separate contemplative sightline for mobile users whose default tight
+      // framing crops the ginkgo. The planted x/z remains a declared study.
+      moveCamera(new THREE.Vector3(11.8, 11.4, 28),
+        new THREE.Vector3(-4.9, 6.6, 6.5), "courtyard");
     } else if (view === "eave") {
       // Close-up based on the main front eave + real model bracket stations.
       // No generic dolly zoom overlaid onto a photo plane.
@@ -524,6 +529,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     camera.aspect = width / height;
     if (activeView === "outside") camera.fov = responsiveHomeFov();
     else if (activeView === "top") camera.fov = 52;
+    else if (activeView === "courtyard") camera.fov = 46;
     else camera.fov = 37;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);

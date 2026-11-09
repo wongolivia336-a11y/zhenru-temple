@@ -64,7 +64,8 @@ export function createGinkgoStudy(scene,{compact=false}={}){
  leafShape.lineTo(0.013,0.010);leafShape.closePath();
  const leafGeom=new THREE.ShapeGeometry(leafShape,7);
  const leafMaterial=new THREE.MeshStandardMaterial({color:0xffffff,side:THREE.DoubleSide,roughness:0.96,metalness:0});
- const count=compact?240:580;
+ // Denser but still single-draw-call canopy; modest golden fans, no billboards.
+ const count=compact?540:1450;
  const leaves=new THREE.InstancedMesh(leafGeom,leafMaterial,count);
  leaves.name="银杏扇叶 / instanced fan silhouettes";
  leaves.userData.evidence="PHOTO_OBSERVED_LEAF_SHAPE__DISTRIBUTION_INFERRED";
@@ -78,7 +79,7 @@ export function createGinkgoStudy(scene,{compact=false}={}){
    const xx=Math.sin(azimuth)*radius,zz=Math.cos(azimuth)*radius;
    obj.position.set(xx,Math.min(13.0,Math.max(5.7,y)),zz);
    obj.rotation.set((random()-.5)*1.45,(random()-.5)*5.8,(random()-.5)*1.7);
-   const scale=0.65+0.75*random();obj.scale.setScalar(scale);
+   const scale=0.78+0.85*random();obj.scale.setScalar(scale);
    obj.updateMatrix();leaves.setMatrixAt(i,obj.matrix);
    indices.push(Math.floor(random()*4));
  }

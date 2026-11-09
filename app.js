@@ -274,6 +274,12 @@ seasonToggle?.addEventListener("click",()=>{
   seasonToggle.setAttribute("aria-pressed",String(seasonMode==="autumn"));
   seasonToggle.textContent=seasonMode==="autumn"?"秋色":"春绿";
 });
+document.querySelector("#treeView")?.addEventListener("click",()=>{
+  if(!hallScene)return;
+  hallScene.setView("courtyard");
+  document.querySelectorAll(".view-button[data-view]").forEach(button=>button.classList.remove("is-selected"));
+  document.querySelector("#hallCanvas")?.focus({preventScroll:true});
+});
 
 document.querySelector("#frameToggle").addEventListener("click", (event) => {
   if (!hallScene) return;
