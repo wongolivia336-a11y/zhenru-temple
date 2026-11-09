@@ -107,7 +107,6 @@ const stageFields = {
   detail: document.querySelector("#stageDetail"),
   grade: document.querySelector("#sourceGrade"),
   index: document.querySelector("#stageIndex"),
-  viewerEra: document.querySelector("#viewerEra"),
   viewerShape: document.querySelector("#viewerShape")
 };
 const inspector = {
@@ -138,7 +137,6 @@ function setStage(value) {
   stageFields.detail.textContent = stage.detail;
   stageFields.grade.textContent = stage.grade;
   stageFields.index.textContent = String(activeStage + 1).padStart(2, "0");
-  stageFields.viewerEra.textContent = stage.period;
   stageFields.viewerShape.textContent = stage.shape;
   if (stageSlider) {
     stageSlider.value = String(stageProgress);
@@ -149,23 +147,52 @@ function setStage(value) {
   if (timelineYear) timelineYear.textContent = stage.year;
   if (hallScene) hallScene.setStage(stageProgress);
   if (ginkgoEra) ginkgoEra.textContent = ginkgoStageNotes[activeStage];
-  if (inspector.root) inspector.root.hidden = true;
-  document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
+  closeInspector();
 }
 
+let activeComponentPart = null;
+let lastComponentPin = null;
+function closeInspector({ restoreFocus = false } = {}) {
+  if (inspector.root) inspector.root.hidden = true;
+  document.querySelector("#viewerFrame")?.classList.remove("has-inspector");
+  document.querySelectorAll(".scene-pin").forEach(pin => {
+    pin.classList.remove("is-selected");
+    pin.setAttribute("aria-expanded", "false");
+  });
+  activeComponentPart = null;
+  if (restoreFocus) {
+    const target = lastComponentPin?.classList.contains("is-visible") ?
+      lastComponentPin : document.querySelector("#hallCanvas");
+    target?.focus({ preventScroll: true });
+  }
+}
 function setObservation(part) {
   const note = partNotes[part];
   if (!note) return;
-  stageFields.question.textContent = note.question;
-  stageFields.detail.textContent = note.detail;
-  document.querySelectorAll(".scene-pin").forEach((pin) => {
-    pin.classList.toggle("is-selected", pin.dataset.part === part);
+  if (activeComponentPart === part && inspector.root && !inspector.root.hidden) {
+    closeInspector();
+    return;
+  }
+  // Only the component inspector changes; the history-stage narrative does not.
+  const tools = document.querySelector("#modelTools");
+  if (tools && !tools.hidden) {
+    tools.hidden = true;
+    document.querySelector("#toolsToggle")?.setAttribute("aria-expanded", "false");
+    document.querySelector("#viewerFrame")?.classList.remove("has-research-panel");
+  }
+  activeComponentPart = part;
+  lastComponentPin = document.querySelector(`.scene-pin[data-part="${part}"]`);
+  document.querySelectorAll(".scene-pin").forEach(pin => {
+    const selected = pin.dataset.part === part;
+    pin.classList.toggle("is-selected", selected);
+    pin.setAttribute("aria-expanded", String(selected));
   });
   inspector.title.textContent = note.question;
   inspector.text.textContent = note.detail;
   inspector.grade.textContent = note.grade;
   inspector.source.textContent = note.source;
   inspector.root.hidden = false;
+  document.querySelector("#viewerFrame")?.classList.add("has-inspector");
 }
 
 timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
@@ -189,8 +216,7 @@ stageSlider?.addEventListener("keydown", (event) => {
   }
 });
 function clearObservation({ restoreFocus = false } = {}) {
-  setStage(activeStage);
-  if (restoreFocus) document.querySelector("#hallCanvas")?.focus({ preventScroll: true });
+  closeInspector({ restoreFocus });
 }
 document.querySelector("#closeInspector")?.addEventListener("click", () => clearObservation({ restoreFocus: true }));
 window.addEventListener("keydown", (event) => {
@@ -210,22 +236,25 @@ document.querySelectorAll(".view-button[data-view]").forEach((button) => {
 
 const toolsToggle = document.querySelector("#toolsToggle");
 const modelTools = document.querySelector("#modelTools");
-toolsToggle?.addEventListener("click", () => {
-  const expanded = toolsToggle.getAttribute("aria-expanded") !== "true";
-  toolsToggle.setAttribute("aria-expanded", String(expanded));
+function setResearchOpen(expanded) {
+  if (!modelTools) return;
+  if (expanded) closeInspector();
   modelTools.hidden = !expanded;
+  toolsToggle?.setAttribute("aria-expanded", String(expanded));
+  document.querySelector("#viewerFrame")?.classList.toggle("has-research-panel", expanded);
+}
+toolsToggle?.addEventListener("click", () => {
+  setResearchOpen(toolsToggle.getAttribute("aria-expanded") !== "true");
 });
 // Close the structure popover when interacting with the model or other UI.
 document.addEventListener("pointerdown", (event) => {
   if (modelTools && !modelTools.hidden && !event.target.closest(".view-tools")) {
-    modelTools.hidden = true;
-    toolsToggle?.setAttribute("aria-expanded", "false");
+    setResearchOpen(false);
   }
 });
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && modelTools && !modelTools.hidden) {
-    modelTools.hidden = true;
-    toolsToggle?.setAttribute("aria-expanded", "false");
+    setResearchOpen(false);
     toolsToggle?.focus({ preventScroll: true });
   }
 });
@@ -248,7 +277,17 @@ explodeSlider?.addEventListener("input",event=>{
   if(hallScene) hallScene.setExplosion(value/100);
   syncExplodeUI(value);
 });
-focusSelect?.addEventListener("change",event=>hallScene?.setExplosionFocus(event.currentTarget.value));
+function setFocus(value) {
+  const focus = ["all", "roof", "frame", "columns"].includes(value) ? value : "all";
+  if (focusSelect) focusSelect.value = focus;
+  document.querySelectorAll("[data-explode-focus]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.explodeFocus === focus));
+  });
+  hallScene?.setExplosionFocus(focus);
+}
+document.querySelectorAll("[data-explode-focus]").forEach(button => {
+  button.addEventListener("click", () => setFocus(button.dataset.explodeFocus));
+});
 zoomSlider?.addEventListener("input",event=>{
   const value=Number(event.currentTarget.value);
   if(hallScene) hallScene.setZoomPercent(value);
@@ -301,11 +340,10 @@ document.querySelector("#resetView").addEventListener("click", () => {
   syncExplodeUI(0);
   if (zoomSlider) zoomSlider.value="100";
   if (zoomValue) zoomValue.textContent="100%";
-  if (focusSelect) focusSelect.value="all";
+  setFocus("all");
   document.querySelector("#frameToggle").textContent = "构架透视";
   document.querySelector("#cutawayToggle").textContent = "剖视";
-  modelTools.hidden = true;
-  toolsToggle?.setAttribute("aria-expanded", "false");
+  setResearchOpen(false);
   // Reset both visual state and accessibility semantics.
   for (const id of ["explodeToggle", "frameToggle", "cutawayToggle"]) {
     document.getElementById(id)?.setAttribute("aria-pressed", "false");

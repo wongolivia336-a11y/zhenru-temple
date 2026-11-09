@@ -1234,3 +1234,95 @@ html.viewer-only .model-tools {right:0;left:auto;}
 
 /* The tree is now in the right-hand courtyard study position, not behind the headline. */
 @media(min-width:951px){.hero-copy::before{opacity:.62;}}
+
+
+/* V9 / Timeline has one information hierarchy and no floating caption band. */
+.viewer-bottom {
+  left: clamp(15px, 3vw, 48px);
+  right: clamp(15px, 3vw, 48px);
+  bottom: clamp(16px, 2.3vw, 28px);
+  gap: 0;
+}
+.timeline-strip {
+  width: 100%;
+  min-height: 108px;
+  padding: 12px 17px 13px;
+  background: rgba(250, 252, 250, .965);
+  border: 1px solid #cdd7cf;
+  border-radius: 2px;
+  box-shadow: 0 8px 22px rgba(33, 47, 37, .065);
+}
+.timeline-readout { min-height: 21px; align-items: baseline; }
+.timeline-context { display: inline-flex; align-items: baseline; gap: 13px; min-width: 0; flex-wrap: wrap; }
+.timeline-context #timelinePeriod { font-size: 11px; color: var(--clay); font-weight: 600; }
+.timeline-shape { font-size: 10px; letter-spacing: .015em; color: #67746d; }
+#timelineYear { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.timeline-range-label { margin-top: 5px; }
+.timeline-ticks { margin-top: 2px; }
+.viewer-instruction { display: none !important; }
+
+/* Component information moves to the right inspection bay rather than the
+   lower-left editorial copy or the historical scrubber. */
+.component-inspector {
+  left: auto !important;
+  bottom: auto !important;
+  top: clamp(185px, 21%, 238px);
+  right: clamp(17px, 2.8vw, 44px);
+  width: min(326px, calc(100% - 38px));
+  max-height: min(245px, calc(100% - 365px));
+  padding: 16px 19px 14px;
+  border: 1px solid #cbd6cd;
+  border-radius: 3px;
+  background: #fbfcf9;
+  box-shadow: 0 12px 36px rgba(32, 48, 37, .11);
+  backdrop-filter: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.component-inspector h3 { margin-top: 11px; }
+.component-inspector .inspector-top button {
+  min-width: 30px; min-height: 30px;
+  border: 1px solid #d9e1d9;
+  border-radius: 50%;
+  font: 20px/1 var(--serif);
+}
+.component-inspector .inspector-top button:hover { background: #edf2ed; color: #354c3b; }
+.component-inspector .inspector-top button:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.focus-options { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+.focus-options button {
+  min-width: 0; min-height: 34px; padding: 8px 5px;
+  border: 1px solid #d5ded6; border-radius: 2px;
+  background: #f7f9f6; color: #536358;
+  font: 11px/1.4 var(--serif); cursor: pointer;
+  transition: border-color .16s, background .16s, color .16s;
+}
+.focus-options button:hover { background: #eaf0ea; border-color: #a7bba9; }
+.focus-options button[aria-pressed="true"] { color: #fff; background: #425b49; border-color: #425b49; }
+.focus-options button:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+.model-tools { gap: 10px; max-height: min(72dvh, 450px); overflow: auto; }
+.viewer-frame.has-research-panel .environment-controls,
+.viewer-frame.has-inspector .environment-controls { visibility: hidden; pointer-events: none; }
+@media (max-width: 950px) {
+  .component-inspector { right: 17px; top: 220px; max-height: min(242px, calc(100% - 355px)); }
+}
+@media (max-width: 650px) {
+  .viewer-bottom { left: 9px; right: 9px; bottom: 10px; }
+  .timeline-strip { min-height: 106px; padding: 10px 10px 11px; }
+  .timeline-readout { align-items: flex-start; }
+  .timeline-context { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .timeline-context #timelinePeriod { font-size: 10px; }
+  .timeline-shape { font-size: 9px; }
+  .timeline-ticks { margin-top: 2px; }
+  .component-inspector {
+    top: auto !important; bottom: 205px !important;
+    left: 12px !important; right: 12px !important;
+    width: auto !important;
+    max-height: 200px; padding: 13px 14px;
+  }
+  .model-tools { max-height: min(65dvh, 450px); }
+  .focus-options button { min-height: 36px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .focus-options button { transition: none; }
+}
