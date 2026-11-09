@@ -377,12 +377,13 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function resetView() {
     moving.clear();
     cameraTouched = false;
+    // Reset previous user zoom BEFORE creating the home-view tween.
+    setZoomPercent(100);
     setView("outside");
     toggleExploded(false);
     setExplosionFocus("all");
     toggleFrame(false);
     toggleCutaway(false);
-    setZoomPercent(100);
     document.getElementById("explodeToggle").setAttribute("aria-pressed", "false");
     document.getElementById("frameToggle").setAttribute("aria-pressed", "false");
     document.getElementById("cutawayToggle").setAttribute("aria-pressed", "false");
