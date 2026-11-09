@@ -92,6 +92,13 @@ const timelineButtons = [...document.querySelectorAll(".time-step")];
 const stageSlider = document.querySelector("#stageSlider");
 const timelinePeriod = document.querySelector("#timelinePeriod");
 const timelineYear = document.querySelector("#timelineYear");
+const ginkgoEra = document.querySelector("#ginkgoEra");
+const ginkgoStageNotes = [
+  "1320年是否已植，史料不足",
+  "清代树形 · 研究性生长模拟",
+  "1963年前后 · 生长状态推定",
+  "现状尺寸参照 · 树形研究模拟"
+];
 const stageFields = {
   period: document.querySelector("#stagePeriod"),
   title: document.querySelector("#stageTitle"),
@@ -141,6 +148,7 @@ function setStage(value) {
   if (timelinePeriod) timelinePeriod.textContent = stage.period;
   if (timelineYear) timelineYear.textContent = stage.year;
   if (hallScene) hallScene.setStage(stageProgress);
+  if (ginkgoEra) ginkgoEra.textContent = ginkgoStageNotes[activeStage];
   if (inspector.root) inspector.root.hidden = true;
   document.querySelectorAll(".scene-pin").forEach((pin) => pin.classList.remove("is-selected"));
 }
@@ -222,11 +230,49 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
+const explodeSlider = document.querySelector("#explodeSlider");
+const explodeValue = document.querySelector("#explodeValue");
+const zoomSlider = document.querySelector("#zoomSlider");
+const zoomValue = document.querySelector("#zoomValue");
+const focusSelect = document.querySelector("#explodeFocus");
+function syncExplodeUI(value) {
+  const numeric = Math.max(0,Math.min(100,Math.round(value)));
+  if (explodeSlider) explodeSlider.value=String(numeric);
+  if (explodeValue) explodeValue.textContent=numeric+"%";
+  const btn=document.querySelector("#explodeToggle");
+  btn.setAttribute("aria-pressed",String(numeric>0));
+  btn.textContent=numeric>0 ? "合拢结构" : "分层拆解";
+}
+explodeSlider?.addEventListener("input",event=>{
+  const value=Number(event.currentTarget.value);
+  if(hallScene) hallScene.setExplosion(value/100);
+  syncExplodeUI(value);
+});
+focusSelect?.addEventListener("change",event=>hallScene?.setExplosionFocus(event.currentTarget.value));
+zoomSlider?.addEventListener("input",event=>{
+  const value=Number(event.currentTarget.value);
+  if(hallScene) hallScene.setZoomPercent(value);
+  zoomValue.textContent=value+"%";
+});
 document.querySelector("#explodeToggle").addEventListener("click", (event) => {
   if (!hallScene) return;
   const active = hallScene.toggleExploded();
-  event.currentTarget.setAttribute("aria-pressed", String(active));
-  event.currentTarget.textContent = active ? "合拢结构" : "分层拆解";
+  syncExplodeUI(active ? 100 : 0);
+});
+let treeEnabled=true,seasonMode="autumn";
+const treeToggle=document.querySelector("#treeToggle");
+const seasonToggle=document.querySelector("#seasonToggle");
+treeToggle?.addEventListener("click",()=>{
+  treeEnabled=!treeEnabled;
+  hallScene?.setTreeVisible(treeEnabled);
+  treeToggle.setAttribute("aria-pressed",String(treeEnabled));
+  treeToggle.textContent=treeEnabled?"古树 · 显示":"古树 · 隐藏";
+});
+seasonToggle?.addEventListener("click",()=>{
+  seasonMode=seasonMode==="autumn"?"spring":"autumn";
+  hallScene?.setSeason(seasonMode);
+  seasonToggle.setAttribute("aria-pressed",String(seasonMode==="autumn"));
+  seasonToggle.textContent=seasonMode==="autumn"?"秋色":"春绿";
 });
 
 document.querySelector("#frameToggle").addEventListener("click", (event) => {
@@ -246,7 +292,10 @@ document.querySelector("#cutawayToggle").addEventListener("click", (event) => {
 document.querySelector("#resetView").addEventListener("click", () => {
   if (!hallScene) return;
   hallScene.resetView();
-  document.querySelector("#explodeToggle").textContent = "分层拆解";
+  syncExplodeUI(0);
+  if (zoomSlider) zoomSlider.value="100";
+  if (zoomValue) zoomValue.textContent="100%";
+  if (focusSelect) focusSelect.value="all";
   document.querySelector("#frameToggle").textContent = "构架透视";
   document.querySelector("#cutawayToggle").textContent = "剖视";
   modelTools.hidden = true;
@@ -368,6 +417,9 @@ async function bootModel() {
     });
     startupStage = "setting initial history stage";
     hallScene.setStage(activeStage);
+    hallScene.setSeason(seasonMode);
+    hallScene.setTreeVisible(treeEnabled);
+    hallScene.setExplosionFocus(focusSelect?.value||"all");
   } catch (error) {
     console.error(`Three.js scene failed during ${startupStage}:`, error);
     loading.classList.add("is-hidden");
