@@ -53,7 +53,7 @@
         <div class="viewer-shell">
           <div class="viewer-frame" id="viewerFrame" tabindex="-1">
             <div class="site-ink-wash" aria-hidden="true"></div>
-            <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
+            <canvas id="hallCanvas" tabindex="0" aria-describedby="viewerKeyboardHelp" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
               <div class="viewer-ident"><span class="live-dot"></span><span>INTERACTIVE STUDY / 01</span><b>真如寺大殿</b></div>
@@ -77,13 +77,14 @@
                   <input type="range" id="zoomSlider" min="60" max="180" step="5" value="100" aria-label="调整三维相机观察缩放" />
                 </div>
                 <div class="research-control">
-                  <label for="explodeFocus">分层侧重</label>
-                  <select id="explodeFocus" aria-label="选择重点拆解的结构层">
-                    <option value="all">全部构件</option>
-                    <option value="roof">屋顶与瓦作</option>
-                    <option value="frame">梁架与斗栱</option>
-                    <option value="columns">柱网与台基</option>
-                  </select>
+                  <span id="focusLabel">分层侧重</span>
+                  <div class="focus-options" role="group" aria-labelledby="focusLabel">
+                    <button type="button" data-explode-focus="all" aria-pressed="true">全部构件</button>
+                    <button type="button" data-explode-focus="roof" aria-pressed="false">屋顶与瓦作</button>
+                    <button type="button" data-explode-focus="frame" aria-pressed="false">梁架与斗栱</button>
+                    <button type="button" data-explode-focus="columns" aria-pressed="false">柱网与台基</button>
+                  </div>
+                  <input type="hidden" id="explodeFocus" value="all" />
                 </div>
                 <div class="research-panel-actions">
                   <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">分层拆解</button>
@@ -108,7 +109,7 @@
               <button type="button" data-move="back" aria-label="后退" aria-pressed="false">↓</button>
               <button type="button" data-move="right" aria-label="右移" aria-pressed="false">→</button>
             </div>
-            <aside class="component-inspector" id="componentInspector" aria-live="polite" hidden>
+            <aside class="component-inspector" id="componentInspector" role="region" aria-labelledby="inspectorTitle" aria-live="polite" hidden>
               <div class="inspector-top"><span>构件档案 / PART NOTE</span><button type="button" id="closeInspector" aria-label="关闭构件说明">×</button></div>
               <h3 id="inspectorTitle">屋面与檐口</h3>
               <p id="inspectorText">选择一个构件，查看它的历史依据与模型边界。</p>
@@ -125,9 +126,11 @@
               <button type="button" id="treeView" title="移动三维相机，近距离观察古银杏与大殿">观树</button>
             </div>
             <div class="viewer-bottom">
-              <div class="viewer-caption"><span class="caption-kicker" id="viewerEra">元 · 延祐七年</span><strong id="viewerShape">单檐歇山 · 形制示意</strong><span class="caption-divider"></span><span class="explore-hint" id="exploreHint">拖动旋转 · 滚轮缩放 · 右键平移</span></div>
               <div class="timeline-strip" aria-label="大殿形制时间轴">
-                <div class="timeline-readout"><span id="timelinePeriod">元 · 延祐七年</span><span id="timelineYear">1320</span></div>
+                <div class="timeline-readout">
+                  <div class="timeline-context"><span id="timelinePeriod">元 · 延祐七年</span><span class="timeline-shape" id="viewerShape">单檐歇山 · 形制示意</span></div>
+                  <span id="timelineYear">1320</span>
+                </div>
                 <label class="timeline-range-label" for="stageSlider">
                   <span class="sr-only">拖动查看大殿历史阶段</span>
                   <input id="stageSlider" type="range" min="0" max="3" step="0.01" value="0" aria-valuetext="1320，元代题记节点" />
@@ -142,7 +145,7 @@
             </div>
             <div class="webgl-message" id="webglMessage" hidden>当前浏览器未能启动 WebGL 2。请使用支持 WebGL 2 的浏览器，并确认浏览器已启用图形加速。</div>
           </div>
-          <div class="viewer-instruction"><span><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> 聚焦模型后旋转 · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 入殿移动</span><span>拖动旋转 · 滚轮缩放 · 右键平移</span><span class="model-badge">程序化几何 · 非照片贴图</span></div>
+          <p class="sr-only" id="viewerKeyboardHelp">拖动环绕模型，滚轮缩放。聚焦模型后可用方向键旋转；入殿后可用 W A S D 移动。</p>
         </div>
       </section>
 
