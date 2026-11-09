@@ -311,7 +311,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       // Separate contemplative sightline for mobile users whose default tight
       // framing crops the ginkgo. The planted x/z remains a declared study.
       moveCamera(new THREE.Vector3(27.2, 11.5, 14.5),
-        new THREE.Vector3(14.0, 6.2, -8.6), "courtyard");
+        new THREE.Vector3(12.9, 6.2, -6.2), "courtyard");
     } else if (view === "eave") {
       // Close-up based on the main front eave + real model bracket stations.
       // No generic dolly zoom overlaid onto a photo plane.
@@ -660,10 +660,13 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
           [box.max.x,box.min.y,box.min.z],[box.max.x,box.min.y,box.max.z],
           [box.max.x,box.max.y,box.min.z],[box.max.x,box.max.y,box.max.z]
         ].map(pos=>new THREE.Vector3(...pos).project(camera));
+        const trunk=ginkgo.root.localToWorld(new THREE.Vector3(0,4.15,0)).project(camera);
         return {left:Math.min(...corners.map(p=>local.left+(p.x+1)*local.width/2)),
           right:Math.max(...corners.map(p=>local.left+(p.x+1)*local.width/2)),
           top:Math.min(...corners.map(p=>local.top+(1-p.y)*local.height/2)),
-          bottom:Math.max(...corners.map(p=>local.top+(1-p.y)*local.height/2))};
+          bottom:Math.max(...corners.map(p=>local.top+(1-p.y)*local.height/2)),
+          trunkX:local.left+(trunk.x+1)*local.width/2,
+          trunkY:local.top+(1-trunk.y)*local.height/2};
       },
       getRoofCalibration() {
         roofGroup.updateMatrixWorld(true);

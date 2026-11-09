@@ -229,6 +229,9 @@ async function run() {
     "Ginkgo foliage projects over editorial heading; move the illustrative courtyard position");
   assert.ok(treeProjection.left < homeLayout.frontView.right-20,
     "Ginkgo is outside visible scene; the ecological timeline must remain discoverable");
+  assert.ok(treeProjection.trunkX > homeLayout.frontView.left+40 &&
+            treeProjection.trunkX < homeLayout.frontView.right-30,
+    "Ginkgo trunk should be meaningfully visible within the exterior camera framing");
   await home.setViewportSize({width:390,height:844});
   await sleep(250);
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-mobile-390.png",fullPage:true});
