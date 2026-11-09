@@ -95,15 +95,17 @@ async function run() {
   assert.equal((await getState()).explosionTarget,0.5);
   assert.equal(await viewer.locator("#explodeValue").textContent(),"50%");
   await until(async()=>(await getState()).mainRoofOffset>0.45,"Real roof geometry must separate at 50%",15000);
-  await viewer.locator("#explodeFocus").selectOption("roof");
+  await viewer.locator('[data-explode-focus="roof"]').click();
   assert.equal((await getState()).explosionFocus,"roof");
+  assert.equal(await viewer.locator('[data-explode-focus="roof"]').getAttribute("aria-pressed"),"true");
+  assert.equal(await viewer.locator('[data-explode-focus="all"]').getAttribute("aria-pressed"),"false");
   await until(async()=>{
     const state=await getState();
     return state.mainRoofOffset>state.frameOffset*10 ? state : null;
   },"roof focus changes geometry, not just UI",15000);
   const focused=await getState();
   assert.ok(focused.mainRoofOffset>focused.frameOffset*10,"Roof focus must be genuinely different");
-  await viewer.locator("#explodeFocus").selectOption("all");
+  await viewer.locator('[data-explode-focus="all"]').click();
   await setRange("#explodeSlider",0);
   assert.equal((await getState()).exploded,false);
   await setRange("#zoomSlider",135);
@@ -181,7 +183,10 @@ async function run() {
       const doc=document.querySelector("#model")?.contentDocument;
       if(!doc)return null;
       const rect=s=>{const e=doc.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
-      return {caption:rect(".viewer-caption"),timeline:rect(".timeline-strip"),environment:rect(".environment-controls"),
+      return {timeline:rect(".timeline-strip"),environment:rect(".environment-controls"),
+        timelineDetail:rect(".timeline-context"),
+        duplicateCaptionCount:doc.querySelectorAll(".viewer-caption").length,
+        keyboardHelpVisible:getComputedStyle(doc.querySelector("#viewerKeyboardHelp")).position!=="absolute",
         heroFoot:doc.querySelector(".hero-foot")?getComputedStyle(doc.querySelector(".hero-foot")).display:null,
         ink:!!doc.querySelector(".site-ink-wash")};
     });
@@ -189,7 +194,9 @@ async function run() {
   const desktopLayout=await layout();
   assert.ok(desktopLayout&&desktopLayout.ink);
   assert.equal(desktopLayout.heroFoot,"none");
-  assert.ok(desktopLayout.caption.bottom<=desktopLayout.timeline.top+1,"Timeline must not overlap stage caption");
+  assert.equal(desktopLayout.duplicateCaptionCount,0,"Duplicate floating stage strip must be gone");
+  assert.ok(desktopLayout.timelineDetail.top>=desktopLayout.timeline.top-1);
+  assert.ok(desktopLayout.timelineDetail.bottom<=desktopLayout.timeline.bottom+1);
   let overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   assert.ok(overflow<=1,"Desktop horizontal overflow "+overflow);
   await page.setViewportSize({width:768,height:1000});
@@ -198,10 +205,10 @@ async function run() {
   await page.setViewportSize({width:390,height:844});
   await sleep(180);
   const mobileLayout=await layout();
-  assert.ok(mobileLayout.caption.bottom<=mobileLayout.timeline.top+1,"Mobile caption/timeline collide");
-  assert.ok(mobileLayout.environment.bottom<=mobileLayout.caption.top+2 ||
-     mobileLayout.environment.top>=mobileLayout.timeline.bottom,
-     "Mobile ecology controls collide with timeline/caption");
+  assert.equal(mobileLayout.duplicateCaptionCount,0);
+  assert.ok(mobileLayout.timelineDetail.bottom<=mobileLayout.timeline.bottom+1);
+  assert.ok(mobileLayout.environment.bottom<=mobileLayout.timeline.top-6,
+     "Mobile ecology controls collide with timeline");
   await page.screenshot({path:"qa/runtime-screenshots/mobile-390.png",fullPage:true});
   // Direct public homepage audit (the user's screenshot showed this page,
   // not only the side-by-side reference lab).
@@ -217,11 +224,13 @@ async function run() {
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-desktop-1440.png",fullPage:true});
   const homeLayout=await home.evaluate(()=>{
     const r=sel=>{const v=document.querySelector(sel).getBoundingClientRect();return {left:v.left,top:v.top,right:v.right,bottom:v.bottom};};
-    return {caption:r(".viewer-caption"),timeline:r(".timeline-strip"),mainTitle:r(".hero h1"),
-      environment:r(".environment-controls"),frontView:r(".viewer-frame"),
-      controls:r(".view-tools")};
+    return {timeline:r(".timeline-strip"),timelineDetail:r(".timeline-context"),
+      mainTitle:r(".hero h1"),environment:r(".environment-controls"),
+      frontView:r(".viewer-frame"),controls:r(".view-tools")};
   });
-  assert.ok(homeLayout.caption.bottom<=homeLayout.timeline.top+2,"Homepage stage copy overlays timeline");
+  assert.ok(homeLayout.timelineDetail.top>=homeLayout.timeline.top-1 &&
+            homeLayout.timelineDetail.bottom<=homeLayout.timeline.bottom+1,
+    "Homepage stage information should be contained by a single timeline rail");
   assert.ok(homeLayout.mainTitle.bottom<homeLayout.timeline.top,"Hero title intersects time rail");
   const treeProjection=await home.evaluate(()=>window.__zhenruQA.getGinkgoScreenBounds());
   assert.ok(treeProjection&&Number.isFinite(treeProjection.left),"Ginkgo projected bounds must exist");
@@ -232,9 +241,61 @@ async function run() {
   assert.ok(treeProjection.trunkX > homeLayout.frontView.left+40 &&
             treeProjection.trunkX < homeLayout.frontView.right-30,
     "Ginkgo trunk should be meaningfully visible within the exterior camera framing");
+  // Test the same component hot-spot flow the user captured in screenshots.
+  await until(async()=>home.locator(".scene-pin.is-visible").count()>0,"3D component hotspot visible");
+  const firstPin=home.locator(".scene-pin.is-visible").first();
+  const firstPart=await firstPin.getAttribute("data-part");
+  await firstPin.click();
+  const inspector=home.locator("#componentInspector");
+  assert.equal(await inspector.isHidden(),false,"Part detail should open");
+  assert.equal(await home.locator('.scene-pin[data-part="'+firstPart+'"]').getAttribute("aria-expanded"),"true");
+  const pop=await home.evaluate(()=>{
+    const bounds=s=>{const r=document.querySelector(s).getBoundingClientRect();
+      return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};};
+    return {inspector:bounds("#componentInspector"),
+      timeline:bounds(".timeline-strip"),heading:bounds(".hero h1"),
+      environmentVisible:getComputedStyle(document.querySelector(".environment-controls")).visibility};
+  });
+  assert.ok(pop.inspector.left>pop.heading.right+14,
+     "Part card should be docked to the RIGHT, clear of editorial headline");
+  assert.ok(pop.inspector.bottom<pop.timeline.top-9,
+     "Part card must never cover the chronology rail");
+  assert.equal(pop.environmentVisible,"hidden",
+     "Contextual ecology controls should yield to the part inspector");
+  await home.screenshot({path:"qa/runtime-screenshots/v9-part-dock-desktop.png",fullPage:true});
+  await home.locator("#closeInspector").click();
+  assert.equal(await inspector.isHidden(),true,"Closing part note should dismiss the dock");
+  assert.equal(await home.locator('.scene-pin[data-part="'+firstPart+'"]').getAttribute("aria-expanded"),"false");
+  const stageStoryBefore=await home.locator("#stageDetail").textContent();
+  await home.locator(".scene-pin.is-visible").first().click();
+  assert.equal(await home.locator("#stageDetail").textContent(),stageStoryBefore,
+    "Opening a part note should not overwrite the historical stage narrative");
+  await home.keyboard.press("Escape");
+  assert.equal(await inspector.isHidden(),true,"Escape closes component note");
+  // Focus choices are contained buttons, not a native SELECT popup crossing the tools.
+  await home.locator("#toolsToggle").click();
+  assert.equal(await home.locator("#modelTools").isHidden(),false);
+  assert.equal(await home.locator("#explodeFocus").evaluate(x=>x.type),"hidden");
+  await home.locator('[data-explode-focus="frame"]').click();
+  assert.equal(await home.locator('[data-explode-focus="frame"]').getAttribute("aria-pressed"),"true");
+  await home.screenshot({path:"qa/runtime-screenshots/v9-inline-focus-desktop.png",fullPage:true});
+  await home.keyboard.press("Escape");
+  assert.equal(await home.locator("#modelTools").isHidden(),true);
+  assert.equal(await home.locator(".environment-controls").evaluate(el=>getComputedStyle(el).visibility),"visible");
+
   await home.setViewportSize({width:390,height:844});
   await sleep(250);
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-mobile-390.png",fullPage:true});
+  // Mobile part note becomes a compact sheet, with time rail kept in its own lane.
+  await until(async()=>home.locator(".scene-pin.is-visible").count()>0,"mobile 3D pin visible");
+  await home.locator(".scene-pin.is-visible").first().click();
+  const mobileDock=await home.evaluate(()=>{
+    const r=s=>{const b=document.querySelector(s).getBoundingClientRect();return {top:b.top,bottom:b.bottom};};
+    return {card:r("#componentInspector"),timeline:r(".timeline-strip")};
+  });
+  assert.ok(mobileDock.card.bottom<mobileDock.timeline.top-8,"Mobile part card covers historical timeline");
+  await home.screenshot({path:"qa/runtime-screenshots/v9-part-dock-mobile.png",fullPage:true});
+  await home.locator("#closeInspector").click();
   await home.locator("#treeView").click();
   assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"courtyard");
   await sleep(1050);
