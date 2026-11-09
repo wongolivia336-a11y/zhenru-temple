@@ -5,6 +5,8 @@ import { populateDougongStudy, addRoofTileStudy } from "./model-fidelity.js";
 import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.mjs";
 import { createHipGableStudy } from "./reconstruction/hip-gable-topology.mjs";
 import { addEaveTerminations } from "./reconstruction/eave-details.js";
+import { createGinkgoStudy } from "./reconstruction/ginkgo-study.js";
+import { sanitizeExplosion, sanitizeFocus, explosionWeights } from "./reconstruction/ginkgo-phases.mjs";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
 const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
@@ -88,6 +90,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   floor.receiveShadow = true;
   scene.add(floor);
   addCourtyardLines(scene);
+  const ginkgo = createGinkgoStudy(scene, {
+    compact: window.innerWidth <= 720 || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+  });
+  // Environment is scene decoration with its own measured-vs-inferred labeling.
+  // GLB export intentionally exports the main hall only.
 
   const hall = new THREE.Group();
   hall.name = "ZhenruMainHallStudy";
@@ -169,7 +176,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
   let exploded = false;
+  let explosionTarget = 0;
   let explosionAmount = 0;
+  let explosionFocus = "all";
+  let zoomReferenceDistance = 0;
+  let zoomPercent = 100;
   let frameMode = false;
   let cutaway = false;
   let currentStage = 0;
@@ -251,6 +262,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     setGroupOpacity(extraRoofGroup, qingOpacity);
     setGroupOpacity(qingExtensionGroup, qingOpacity);
     extraRoofSkin.visible = !frameMode && qingOpacity > 0.005;
+    ginkgo.setStage(currentStage);
   }
 
   function moveCamera(position, target, nextView) {
@@ -263,6 +275,12 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       toTarget: target.clone()
     };
     activeView = nextView;
+    zoomReferenceDistance = position.distanceTo(target);
+    zoomPercent = 100;
+    const zoomInput = document.querySelector("#zoomSlider");
+    if (zoomInput) zoomInput.value = "100";
+    const zoomOutput = document.querySelector("#zoomValue");
+    if (zoomOutput) zoomOutput.textContent = "100%";
     ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
     camera.fov = nextView === "top" ? 52 : nextView === "outside" ? responsiveHomeFov() : 37;
     camera.updateProjectionMatrix();
@@ -304,12 +322,41 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     });
   }
 
-  function toggleExploded(force) {
-    exploded = typeof force === "boolean" ? force : !exploded;
+  function setExplosion(value) {
+    explosionTarget = sanitizeExplosion(value);
+    exploded = explosionTarget > 0.003;
     roofFrameStudy.visible = exploded || frameMode;
     ceilingRafterStudy.visible = exploded || frameMode || activeView === "inside";
+    return explosionTarget;
+  }
+
+  function toggleExploded(force) {
+    const next = typeof force === "boolean" ? (force ? 1 : 0) : (explosionTarget > 0.003 ? 0 : 1);
+    setExplosion(next);
     return exploded;
   }
+
+  function setExplosionFocus(value) {
+    explosionFocus = sanitizeFocus(value);
+    return explosionFocus;
+  }
+
+  function setZoomPercent(value) {
+    const numeric = Number(value);
+    zoomPercent = Number.isFinite(numeric) ? THREE.MathUtils.clamp(numeric,60,180) : 100;
+    if (!zoomReferenceDistance) zoomReferenceDistance = camera.position.distanceTo(controls.target);
+    const radius = THREE.MathUtils.clamp(zoomReferenceDistance / (zoomPercent / 100),
+      controls.minDistance + 0.08, controls.maxDistance - 0.08);
+    cameraTween = null;
+    cameraTouched = true;
+    const direction = camera.position.clone().sub(controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(direction, radius);
+    controls.update();
+    return zoomPercent;
+  }
+
+  function setSeason(value) { return ginkgo.setSeason(value); }
+  function setTreeVisible(value) { return ginkgo.setEnabled(value); }
 
   function toggleFrame(force) {
     frameMode = typeof force === "boolean" ? force : !frameMode;
@@ -332,8 +379,10 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     cameraTouched = false;
     setView("outside");
     toggleExploded(false);
+    setExplosionFocus("all");
     toggleFrame(false);
     toggleCutaway(false);
+    setZoomPercent(100);
     document.getElementById("explodeToggle").setAttribute("aria-pressed", "false");
     document.getElementById("frameToggle").setAttribute("aria-pressed", "false");
     document.getElementById("cutawayToggle").setAttribute("aria-pressed", "false");
@@ -556,6 +605,10 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       stage: currentStage,
       view: activeView,
       exploded,
+      explosionTarget,
+      explosionFocus,
+      zoomPercent,
+      ginkgo: ginkgo.getState(),
       frameMode,
       cutaway,
       qingRoofVisible: extraRoofGroup.visible,
@@ -611,12 +664,14 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     raf = requestAnimationFrame(animate);
     const delta = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
-    explosionAmount = THREE.MathUtils.damp(explosionAmount, exploded ? 1 : 0, 7, delta);
-    frameGroup.position.y = explosionAmount * 0.42;
-    columnGroup.position.y = explosionAmount * 0.07;
-    roofGroup.position.y = explosionAmount * 1.28;
-    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 0.78;
-    qingExtensionGroup.position.y = explosionAmount * 0.27;
+    explosionAmount = THREE.MathUtils.damp(explosionAmount, explosionTarget, 9, delta);
+    const weights = explosionWeights(explosionFocus);
+    frameGroup.position.y = explosionAmount * 0.78 * weights.frame;
+    columnGroup.position.y = explosionAmount * 0.28 * weights.columns;
+    roofGroup.position.y = explosionAmount * 2.25 * weights.roof;
+    extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 1.36 * weights.extension;
+    qingExtensionGroup.position.y = explosionAmount * 0.32 * weights.frame;
+    ginkgo.tick(now / 1000, reducedMotionQuery.matches);
     if (cameraTween) {
       const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
       const eased = t * t * (3 - 2 * t);
@@ -672,6 +727,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   return {
     setStage,
     setView,
+    setExplosion,
+    setExplosionFocus,
+    setZoomPercent,
+    setSeason,
+    setTreeVisible,
     toggleExploded,
     toggleFrame,
     toggleCutaway,
