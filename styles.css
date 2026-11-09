@@ -1216,7 +1216,7 @@ html.viewer-only .model-tools {right:0;left:auto;}
 }
 
 /* V8 final art direction: protect heading without adding a glass card or poster gradient. */
-.hero-copy { position:relative; isolation:isolate; z-index:6; }
+.hero-copy { isolation:isolate; z-index:6; } /* Preserve its absolute positioning! */
 .hero-copy::before {
   content:"";position:absolute;z-index:-1;pointer-events:none;
   inset:58px -84px 102px 18px;
