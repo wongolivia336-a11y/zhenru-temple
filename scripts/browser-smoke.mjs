@@ -114,7 +114,12 @@ async function run() {
   await viewer.locator("#cutawayToggle").click();
   assert.equal((await getState()).cutaway,true);
   await viewer.locator("#explodeToggle").click();
+  // With the slider already at 100%, the legacy button now correctly collapses.
+  assert.equal((await getState()).exploded,false);
+  assert.equal(await viewer.locator("#explodeSlider").inputValue(),"0");
+  await viewer.locator("#explodeToggle").click();
   assert.equal((await getState()).exploded,true);
+  assert.equal(await viewer.locator("#explodeSlider").inputValue(),"100");
   assert.equal((await getRoof()).framingStudyVisible,true);
   assert.equal((await getRoof()).ceilingRafterStudyVisible,true);
   await viewer.locator("#frameToggle").click();
