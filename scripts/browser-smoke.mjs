@@ -94,11 +94,13 @@ async function run() {
   await setRange("#explodeSlider",50);
   assert.equal((await getState()).explosionTarget,0.5);
   assert.equal(await viewer.locator("#explodeValue").textContent(),"50%");
-  await sleep(350);
-  assert.ok((await getState()).mainRoofOffset>0.45,"Real roof geometry must separate at 50%");
+  await until(async()=>(await getState()).mainRoofOffset>0.45,"Real roof geometry must separate at 50%",15000);
   await viewer.locator("#explodeFocus").selectOption("roof");
   assert.equal((await getState()).explosionFocus,"roof");
-  await sleep(350);
+  await until(async()=>{
+    const state=await getState();
+    return state.mainRoofOffset>state.frameOffset*10 ? state : null;
+  },"roof focus changes geometry, not just UI",15000);
   const focused=await getState();
   assert.ok(focused.mainRoofOffset>focused.frameOffset*10,"Roof focus must be genuinely different");
   await viewer.locator("#explodeFocus").selectOption("all");
