@@ -1227,7 +1227,10 @@ html.viewer-only .model-tools {right:0;left:auto;}
 .environment-controls {max-width:calc(100% - 26px);}
 .environment-controls button#treeView {color:#5e6e61;border-color:#aebfb0;}
 @media(max-width:650px) {
-  .hero-copy::before {inset:4px -14px 36px 4px;opacity:.84;}
+  .hero-copy::before {inset:4px -14px 36px 4px;opacity:.72;}
   .environment-copy small {display:none;}
   .environment-controls {max-width:calc(100% - 18px);}
 }
+
+/* The tree is now in the right-hand courtyard study position, not behind the headline. */
+@media(min-width:951px){.hero-copy::before{opacity:.62;}}

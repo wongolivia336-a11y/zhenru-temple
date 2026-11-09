@@ -223,6 +223,12 @@ async function run() {
   });
   assert.ok(homeLayout.caption.bottom<=homeLayout.timeline.top+2,"Homepage stage copy overlays timeline");
   assert.ok(homeLayout.mainTitle.bottom<homeLayout.timeline.top,"Hero title intersects time rail");
+  const treeProjection=await home.evaluate(()=>window.__zhenruQA.getGinkgoScreenBounds());
+  assert.ok(treeProjection&&Number.isFinite(treeProjection.left),"Ginkgo projected bounds must exist");
+  assert.ok(treeProjection.left > homeLayout.mainTitle.right+18,
+    "Ginkgo foliage projects over editorial heading; move the illustrative courtyard position");
+  assert.ok(treeProjection.left < homeLayout.frontView.right-20,
+    "Ginkgo is outside visible scene; the ecological timeline must remain discoverable");
   await home.setViewportSize({width:390,height:844});
   await sleep(250);
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-mobile-390.png",fullPage:true});
@@ -237,7 +243,7 @@ async function run() {
   assert.ok(overflow<=1,"Mobile horizontal overflow "+overflow);
   assert.deepEqual(errors,[]);
   const report={pass:true,referencePhotoDimensions:photoDimensions,base26:normal,pitch18:low,pitch34:high,reset26:reset,
-   ginkgo:{stage0:tree0,qing:treeQing,stage1963:tree1963,present:treeNow,homepage:treeFront},layout:{desktop:desktopLayout,mobile:mobileLayout,homepage:homeLayout},
+   ginkgo:{stage0:tree0,qing:treeQing,stage1963:tree1963,present:treeNow,homepage:treeFront,projectedBounds:treeProjection},layout:{desktop:desktopLayout,mobile:mobileLayout,homepage:homeLayout},
    note:"WebGL geometry and control verification in headless Chromium; NOT calibrated historical accuracy."};
   fs.writeFileSync("qa/runtime-screenshots/browser-report.json",JSON.stringify(report,null,2));
   console.log("PASS actual WebGL roof bounds",low.meshTopY,normal.meshTopY,high.meshTopY);

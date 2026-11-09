@@ -13,7 +13,8 @@ export function createGinkgoStudy(scene,{compact=false}={}){
  // Forecourt illustration only. Never use this location as measured mapping.
  // The foreground tree must be visible in the default exterior study view.
  // This x/z is an intentionally staged relative position, NOT a measured survey coordinate.
- root.position.set(-6.8,0,12.6);
+ // East-side courtyard study position. NOT a survey-grade tree coordinate.
+ root.position.set(15.2,0,-9.6);
  scene.add(root);
  const bark=new THREE.MeshStandardMaterial({color:0x665844,roughness:0.98});
  const underBark=new THREE.MeshStandardMaterial({color:0x786951,roughness:0.98});

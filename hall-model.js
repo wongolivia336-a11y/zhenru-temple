@@ -310,8 +310,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     } else if (view === "courtyard") {
       // Separate contemplative sightline for mobile users whose default tight
       // framing crops the ginkgo. The planted x/z remains a declared study.
-      moveCamera(new THREE.Vector3(11.8, 11.4, 28),
-        new THREE.Vector3(-4.9, 6.6, 6.5), "courtyard");
+      moveCamera(new THREE.Vector3(27.2, 11.5, 14.5),
+        new THREE.Vector3(14.0, 6.2, -8.6), "courtyard");
     } else if (view === "eave") {
       // Close-up based on the main front eave + real model bracket stations.
       // No generic dolly zoom overlaid onto a photo plane.
@@ -648,6 +648,23 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   if (new URLSearchParams(window.location.search).get("qa") === "1") {
     window.__zhenruQA = {
       getSceneState, getDiagnostics,
+      getGinkgoScreenBounds() {
+        if (!ginkgo.root.visible) return null;
+        camera.updateMatrixWorld(true);
+        ginkgo.root.updateMatrixWorld(true);
+        const box=new THREE.Box3().setFromObject(ginkgo.root,true);
+        const local=renderer.domElement.getBoundingClientRect();
+        const corners=[
+          [box.min.x,box.min.y,box.min.z],[box.min.x,box.min.y,box.max.z],
+          [box.min.x,box.max.y,box.min.z],[box.min.x,box.max.y,box.max.z],
+          [box.max.x,box.min.y,box.min.z],[box.max.x,box.min.y,box.max.z],
+          [box.max.x,box.max.y,box.min.z],[box.max.x,box.max.y,box.max.z]
+        ].map(pos=>new THREE.Vector3(...pos).project(camera));
+        return {left:Math.min(...corners.map(p=>local.left+(p.x+1)*local.width/2)),
+          right:Math.max(...corners.map(p=>local.left+(p.x+1)*local.width/2)),
+          top:Math.min(...corners.map(p=>local.top+(1-p.y)*local.height/2)),
+          bottom:Math.max(...corners.map(p=>local.top+(1-p.y)*local.height/2))};
+      },
       getRoofCalibration() {
         roofGroup.updateMatrixWorld(true);
         const box = new THREE.Box3().setFromObject(mainRoofSkin);
