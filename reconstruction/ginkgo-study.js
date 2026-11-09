@@ -11,7 +11,9 @@ export function createGinkgoStudy(scene,{compact=false}={}){
  root.name="0067-ginkgo-chronoscape-schematic";
  root.userData={part:"environment",evidence:"PRESENT_TREE_DIMENSIONS_DOCUMENTED__PAST_SHAPE_INFERRED",source:GINKGO_EVIDENCE.source};
  // Forecourt illustration only. Never use this location as measured mapping.
- root.position.set(-15.6,0,13.2);
+ // The foreground tree must be visible in the default exterior study view.
+ // This x/z is an intentionally staged relative position, NOT a measured survey coordinate.
+ root.position.set(-6.8,0,12.6);
  scene.add(root);
  const bark=new THREE.MeshStandardMaterial({color:0x665844,roughness:0.98});
  const underBark=new THREE.MeshStandardMaterial({color:0x786951,roughness:0.98});
