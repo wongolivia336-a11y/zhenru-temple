@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import {ginkgoAtStage,GINKGO_EVIDENCE,sanitizeSeason,sanitizeExplosion,sanitizeFocus,explosionWeights} from "../reconstruction/ginkgo-phases.mjs";
+assert.equal(GINKGO_EVIDENCE.officialTreeId,"0067");
+assert.equal(ginkgoAtStage(0).visible,false);
+assert.equal(ginkgoAtStage(0).growthScale,0);
+assert.equal(ginkgoAtStage(3).growthScale,1);
+assert.ok(ginkgoAtStage(1).growthScale<ginkgoAtStage(2).growthScale);
+assert.ok(ginkgoAtStage(2).growthScale<ginkgoAtStage(3).growthScale);
+assert.ok(ginkgoAtStage(2.5).growthScale>ginkgoAtStage(2).growthScale);
+assert.equal(sanitizeSeason("nonsense"),"autumn");
+assert.equal(sanitizeSeason("spring"),"spring");
+assert.equal(sanitizeExplosion(-2),0);
+assert.equal(sanitizeExplosion(5),1);
+assert.equal(sanitizeExplosion(0.5),0.5);
+assert.equal(sanitizeFocus("roof"),"roof");
+assert.equal(sanitizeFocus("x"),"all");
+assert.ok(explosionWeights("roof").roof>explosionWeights("roof").frame);
+assert.equal(explosionWeights("all").columns,1);
+console.log("PASS documented present-day ginkgo reference; unsupported 1320 tree hidden; historical phase interpolation; season and explosion bounds");

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" fill="none" aria-label="真如寺院落关系示意（非测绘）">
+  <defs>
+    <radialGradient id="wash"><stop stop-color="#9ba89d" stop-opacity=".29"/><stop offset=".62" stop-color="#b7c3b7" stop-opacity=".09"/><stop offset="1" stop-color="#cad4c8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pool"><stop stop-color="#8c9b94" stop-opacity=".12"/><stop offset="1" stop-color="#9cae9e" stop-opacity="0"/></radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="15"/></filter>
+  </defs>
+  <ellipse cx="345" cy="352" rx="320" ry="230" fill="url(#wash)" filter="url(#soft)"/>
+  <ellipse cx="655" cy="248" rx="155" ry="260" fill="url(#pool)" filter="url(#soft)"/>
+  <g stroke="#51665a" stroke-width="1.15" stroke-linejoin="round" stroke-linecap="round" opacity=".46">
+    <path d="M82 574 C95 470 117 390 157 319 C192 250 201 174 178 70" stroke-dasharray="5 9"/>
+    <path d="M750 76 C773 162 781 273 800 350 C825 455 833 508 872 585" stroke-dasharray="5 9"/>
+    <path d="M277 164 L611 164 L648 189 L648 314 L619 333 L254 333 L238 309 L238 194 Z"/>
+    <path d="M277 164 L305 139 L586 139 L611 164 M238 194 L278 224 L607 224 L648 189"/>
+    <path d="M277 164 L277 333 M611 164 L611 333 M238 309 L274 289 L610 289 L648 314"/>
+    <path d="M287 344 L600 344 M302 352 L583 352" stroke-dasharray="3 11"/>
+    <path d="M328 452 L575 452 L586 465 L586 508 L564 525 L335 525 L317 509 L317 466 Z"/>
+    <path d="M317 466 L341 439 L559 439 L586 465 M328 452 L328 525 M575 452 L575 525"/>
+    <path d="M189 180 L220 180 L220 468 L191 468 M680 165 L711 165 L711 470 L681 470"/>
+    <path d="M197 225 L213 225 M196 266 L213 266 M197 307 L213 307 M197 348 L213 348 M197 389 L213 389"/>
+    <path d="M687 224 L702 224 M687 265 L702 265 M687 306 L702 306 M687 347 L702 347 M687 389 L702 389"/>
+    <path d="M707 447 C703 409 690 368 681 332 M708 448 C722 419 736 391 746 362"/>
+    <path d="M717 422 C699 404 675 405 654 396 M718 415 C741 409 752 391 759 380"/>
+    <circle cx="715" cy="438" r="26" stroke-dasharray="1 6"/>
+    <circle cx="715" cy="438" r="40" stroke-dasharray="1 8"/>
+    <path d="M715 438 L715 474"/>
+  </g>
+  <g fill="#5f7166" opacity=".57" font-family="serif" font-size="12" letter-spacing="2">
+    <text x="420" y="266">大雄宝殿</text>
+    <text x="411" y="488">天王殿</text>
+    <text x="750" y="450">古银杏</text>
+  </g>
+  <g fill="#697b70" opacity=".67" font-family="monospace" font-size="12" letter-spacing="1.4">
+    <text x="80" y="600">庭院关系示意  /  NOT A SURVEY</text>
+  </g>
+</svg>

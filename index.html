@@ -52,6 +52,7 @@
 
         <div class="viewer-shell">
           <div class="viewer-frame" id="viewerFrame" tabindex="-1">
+            <div class="site-ink-wash" aria-hidden="true"></div>
             <canvas id="hallCanvas" tabindex="0" aria-label="真如寺大雄宝殿的交互式三维研究模型。鼠标或触屏拖动旋转，滚轮缩放；聚焦模型后使用方向键旋转，入殿后使用 WASD 移动。"></canvas>
             <div class="viewer-vignette" aria-hidden="true"></div>
             <div class="viewer-topline">
@@ -65,11 +66,32 @@
               <button type="button" class="view-button" data-view="eave" title="近距离检查补间斗栱、瓦当和滴水">檐下细看</button>
               <button type="button" class="view-button" id="toolsToggle" aria-expanded="false" aria-controls="modelTools" aria-label="展开结构工具：剖视、分层拆解、构架透视、下载模型" title="剖视 / 分层拆解 / 构架透视">结构 · 剖视 ▾</button>
               <button type="button" class="view-button reset-button" id="resetView">重置</button>
-              <div class="model-tools" id="modelTools" role="group" aria-label="结构观察工具" hidden>
-                <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">分层拆解</button>
-                <button type="button" class="view-button tool-button" id="frameToggle" aria-pressed="false">构架透视</button>
-                <button type="button" class="view-button tool-button" id="cutawayToggle" aria-pressed="false">剖视</button>
-                <button type="button" class="view-button tool-button" id="modelDownload">下载 GLB</button>
+              <div class="model-tools" id="modelTools" role="group" aria-label="三维结构研究面板" hidden>
+                <div class="research-panel-head"><strong>结构解读</strong><small>3D STUDY / 可调参数</small></div>
+                <div class="research-control">
+                  <label for="explodeSlider">分层距离 <output id="explodeValue" for="explodeSlider">0%</output></label>
+                  <input type="range" id="explodeSlider" min="0" max="100" step="1" value="0" aria-label="连续调整构件拆解距离" />
+                </div>
+                <div class="research-control">
+                  <label for="zoomSlider">观察视距 <output id="zoomValue" for="zoomSlider">100%</output></label>
+                  <input type="range" id="zoomSlider" min="60" max="180" step="5" value="100" aria-label="调整三维相机观察缩放" />
+                </div>
+                <div class="research-control">
+                  <label for="explodeFocus">分层侧重</label>
+                  <select id="explodeFocus" aria-label="选择重点拆解的结构层">
+                    <option value="all">全部构件</option>
+                    <option value="roof">屋顶与瓦作</option>
+                    <option value="frame">梁架与斗栱</option>
+                    <option value="columns">柱网与台基</option>
+                  </select>
+                </div>
+                <div class="research-panel-actions">
+                  <button type="button" class="view-button tool-button" id="explodeToggle" aria-pressed="false">分层拆解</button>
+                  <button type="button" class="view-button tool-button" id="frameToggle" aria-pressed="false">构架透视</button>
+                  <button type="button" class="view-button tool-button" id="cutawayToggle" aria-pressed="false">剖视</button>
+                  <button type="button" class="view-button tool-button" id="modelDownload">下载 GLB</button>
+                </div>
+                <p class="research-note">滑动改变真实三维组间距离 · 非建筑实测拆卸路径</p>
               </div>
             </div>
             <div class="scene-pins" aria-label="建筑构件热点">
@@ -95,6 +117,12 @@
             <div class="viewer-loading" id="viewerLoading" role="status">
               <span class="loading-glyph">如</span><span>正在构建三维木构场景…</span>
             <small>Three.js r187 · 本地模块</small>
+            </div>
+            <div class="environment-controls" role="group" aria-label="古银杏与季候">
+              <div class="environment-copy"><strong>0067 · 古银杏</strong><small id="ginkgoEra">1320年是否已植，尚无充分证据</small></div>
+              <button type="button" id="treeToggle" aria-pressed="true" title="显示或隐藏研究性古树模型">古树 · 显示</button>
+              <button type="button" id="seasonToggle" aria-pressed="true" title="切换银杏叶片的春绿与秋黄">秋色</button>
+              <button type="button" id="treeView" title="移动三维相机，近距离观察古银杏与大殿">观树</button>
             </div>
             <div class="viewer-bottom">
               <div class="viewer-caption"><span class="caption-kicker" id="viewerEra">元 · 延祐七年</span><strong id="viewerShape">单檐歇山 · 形制示意</strong><span class="caption-divider"></span><span class="explore-hint" id="exploreHint">拖动旋转 · 滚轮缩放 · 右键平移</span></div>

@@ -4,6 +4,12 @@ on:
   pull_request:
     paths:
       - 'hall-model.js'
+      - 'index.html'
+      - 'app.js'
+      - 'styles.css'
+      - 'assets/courtyard-ink.svg'
+      - 'reconstruction/ginkgo-study.js'
+      - 'scripts/check-ginkgo-story.mjs'
       - 'model-fidelity.js'
       - 'reconstruction/**'
       - 'scripts/check-roof-parameters.mjs'
@@ -28,6 +34,9 @@ jobs:
       - name: JavaScript syntax and geometry contracts
         run: |
           node --check hall-model.js
+          node --check app.js
+          node --check reconstruction/ginkgo-study.js
+          node scripts/check-ginkgo-story.mjs
           node --check model-fidelity.js
           node scripts/check-model-fidelity.mjs
           node scripts/check-roof-parameters.mjs
