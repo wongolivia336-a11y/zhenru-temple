@@ -47,6 +47,10 @@
           <p class="hero-deck">一座木构殿堂的形制、修缮与再现</p>
           <p class="hero-intro">从檐口到柱础，从外部轮廓到内部柱网。慢慢环绕、靠近，再进入殿内，观察一座建筑如何叠合出不同的时间。</p>
           <a class="text-link" href="#chronology">沿着屋檐，进入时间 <span aria-hidden="true">↘</span></a>
+          <button type="button" class="visit-enter" id="enterVisit">
+            <span>进入寺院</span><small>ENTER THE COURTYARD <span aria-hidden="true">↗</span></small>
+          </button>
+          <p class="visit-entry-note">第一人称参访 · 无需登录 · 默认独处</p>
           <div class="hero-foot"><span>1320 — 至今</span><span class="hero-foot-rule"></span><span>一座殿 · 多重时间</span></div>
         </div>
 
@@ -124,6 +128,39 @@
               <button type="button" id="treeToggle" aria-pressed="true" title="显示或隐藏研究性古树模型">古树 · 显示</button>
               <button type="button" id="seasonToggle" aria-pressed="true" title="切换银杏叶片的春绿与秋黄">秋色</button>
               <button type="button" id="treeView" title="移动三维相机，近距离观察古银杏与大殿">观树</button>
+            </div>
+            <div class="visit-hud" id="visitHud" hidden>
+              <div class="visit-header">
+                <div class="visit-place">
+                  <span class="visit-place-index">ZHENRU / LIVE SITE STUDY</span>
+                  <strong>真如寺 · 一座殿的现在</strong>
+                  <small id="visitClock">上海时间 · —</small>
+                </div>
+                <div class="visit-header-actions">
+                  <button type="button" id="visitSound" aria-pressed="false" title="可选合成风声，非真实现场录音">风声 · 关闭</button>
+                  <button type="button" id="visitShare" aria-pressed="false" disabled title="需要先部署匿名实时共在服务">共在 · 尚未开放</button>
+                  <button type="button" id="visitExit" class="visit-exit">返回建筑档案 <span aria-hidden="true">↗</span></button>
+                </div>
+              </div>
+              <div class="visit-discovery" id="visitDiscovery" aria-live="polite">
+                <span class="visit-annotation">01 / COURTYARD</span>
+                <h2 id="visitZoneTitle">从庭院，望向大殿。</h2>
+                <p id="visitZoneText">拖动转头，用 WASD 或右侧方向键缓缓向前。建筑并不是一件可以随意旋转的展品。</p>
+                <div class="visit-discovery-actions" id="visitEaveActions" hidden>
+                  <button type="button" id="visitMark">留意这处斗栱 <span aria-hidden="true">◌</span></button>
+                  <button type="button" id="visitStudy">查看构件研究 <span aria-hidden="true">↗</span></button>
+                </div>
+                <p class="visit-moment" id="visitMoment" role="status" aria-live="polite"></p>
+              </div>
+              <div class="visit-footer">
+                <div class="visit-presence"><span class="visit-presence-dot"></span><span id="visitPresenceState">独处参访 · 不上传位置</span></div>
+                <nav class="visit-waypoints" aria-label="参访空间锚点">
+                  <button type="button" data-visit-view="walk" aria-current="true"><span>01</span> 庭院</button>
+                  <button type="button" data-visit-view="threshold" aria-current="false"><span>02</span> 檐下</button>
+                  <button type="button" data-visit-view="interior-walk" aria-current="false"><span>03</span> 殿内</button>
+                </nav>
+                <span class="visit-help">拖动观察 · WASD 行走 · 可独自参访</span>
+              </div>
             </div>
             <div class="viewer-bottom">
               <div class="timeline-strip" aria-label="大殿形制时间轴">
