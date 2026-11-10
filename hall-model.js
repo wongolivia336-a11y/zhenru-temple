@@ -6,6 +6,8 @@ import { makeRoofStudy, parseRoofPitch } from "./reconstruction/roof-parameters.
 import { createHipGableStudy } from "./reconstruction/hip-gable-topology.mjs";
 import { addEaveTerminations } from "./reconstruction/eave-details.js";
 import { createGinkgoStudy } from "./reconstruction/ginkgo-study.js";
+import { createVisitCourtyard } from "./reconstruction/visit-courtyard.js";
+import { createVisitorFigures } from "./reconstruction/visitor-figures.js";
 import { sanitizeExplosion, sanitizeFocus, explosionWeights } from "./reconstruction/ginkgo-phases.mjs";
 
 const CAMERA_HOME = new THREE.Vector3(19, 13.5, 22);
@@ -13,7 +15,7 @@ const TARGET_HOME = new THREE.Vector3(0, 4.6, 0);
 const POST_X = [-6.7, -3.05, 3.05, 6.7];
 const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 
-export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
+export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZone }) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#f0f3f0");
   scene.fog = new THREE.Fog("#f0f3f0", 48, 96);
@@ -93,6 +95,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const ginkgo = createGinkgoStudy(scene, {
     compact: window.innerWidth <= 720 || (navigator.deviceMemory && navigator.deviceMemory <= 4)
   });
+  const visitCourtyard = createVisitCourtyard(scene);
+  const remoteVisitors = createVisitorFigures(scene);
   // Environment is scene decoration with its own measured-vs-inferred labeling.
   // GLB export intentionally exports the main hall only.
 
@@ -175,6 +179,14 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   const interactiveGroups = [baseGroup, frameGroup, columnGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
+  const isCourtyardWalk = () => activeView === "walk" || activeView === "threshold";
+  const isWalkView = () => isCourtyardWalk() || activeView === "interior-walk";
+  let walkYaw = 0;
+  let walkPitch = 0;
+  let lookDrag = null;
+  let lastVisitZone = "";
+  const visitColor = new THREE.Color("#e2e7df");
+  const archiveColor = new THREE.Color("#f0f3f0");
   let exploded = false;
   let explosionTarget = 0;
   let explosionAmount = 0;
@@ -275,6 +287,19 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       toTarget: target.clone()
     };
     activeView = nextView;
+    controls.enabled = !isWalkView();
+    visitCourtyard.setVisible(isCourtyardWalk());
+    scene.background.copy(isWalkView() ? visitColor : archiveColor);
+    scene.fog.color.copy(scene.background);
+    scene.fog.near = isWalkView() ? 28 : 48;
+    scene.fog.far = isWalkView() ? 71 : 96;
+    if (isWalkView()) {
+      const toward = target.clone().sub(position).normalize();
+      walkYaw = Math.atan2(toward.x, -toward.z);
+      walkPitch = Math.asin(THREE.MathUtils.clamp(toward.y, -1, 1));
+    } else {
+      lastVisitZone = "";
+    }
     zoomReferenceDistance = position.distanceTo(target);
     zoomPercent = 100;
     const zoomInput = document.querySelector("#zoomSlider");
@@ -282,7 +307,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     const zoomOutput = document.querySelector("#zoomValue");
     if (zoomOutput) zoomOutput.textContent = "100%";
     ceilingRafterStudy.visible = frameMode || exploded || activeView === "inside";
-    camera.fov = nextView === "top" ? 52 : nextView === "courtyard" ? 46 : nextView === "outside" ? responsiveHomeFov() : 37;
+    camera.fov = nextView === "top" ? 52 : nextView === "courtyard" ? 46 : isWalkView() ? 67 : nextView === "outside" ? responsiveHomeFov() : 37;
     camera.updateProjectionMatrix();
     if (nextView === "top") {
       camera.up.set(0, 0, -1);
@@ -295,10 +320,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     }
     controls.minDistance = nextView === "inside" ? 0.7 : 0.75;
     controls.maxDistance = nextView === "inside" ? 8.5 : nextView === "eave" ? 17 : 42;
-    controls.update();
-    document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside");
-    document.getElementById("exploreHint").textContent = nextView === "inside"
-      ? "WASD 移动 · 佛像轮廓为待核占位"
+    if (!isWalkView()) controls.update();
+    document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside" || isWalkView());
+    document.getElementById("exploreHint").textContent = isWalkView()
+      ? "拖动转头 · WASD 走动 · 移动端使用方向按键"
+      : nextView === "inside" ? "WASD 移动 · 佛像轮廓为待核占位"
       : nextView === "eave" ? "檐下近观 · 拖动查看瓦当与补间斗栱" : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
@@ -307,6 +333,16 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "interior-walk") {
+      // Inside is first-person too. The silhouette altar is research-only:
+      // this is not a survey or a documented original Buddha sculpture.
+      moveCamera(new THREE.Vector3(0, 1.72, 4.5), new THREE.Vector3(0, 2.55, -2.6), "interior-walk");
+    } else if (view === "walk") {
+      // Human-height first-person visit from an illustrative open courtyard.
+      moveCamera(new THREE.Vector3(0, 1.72, 24), new THREE.Vector3(0, 3.25, 6), "walk");
+    } else if (view === "threshold") {
+      // Human-height vantage under the eave, NOT an invented historical doorway.
+      moveCamera(new THREE.Vector3(1.5, 1.72, 10.2), new THREE.Vector3(1.25, 6.38, 6.56), "threshold");
     } else if (view === "courtyard") {
       // Separate contemplative sightline for mobile users whose default tight
       // framing crops the ginkgo. The planted x/z remains a declared study.
@@ -428,7 +464,33 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   canvas.addEventListener("contextmenu", (event) => event.preventDefault(), listenerOptions);
   canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }), listenerOptions);
 
+  // First-person looking is not OrbitControls: orbiting would move the visitor
+  // bodily around a pivot and destroy the architectural scale illusion.
+  canvas.addEventListener("pointerdown",event=>{
+    if(!isWalkView()||event.button!==0)return;
+    lookDrag={id:event.pointerId,x:event.clientX,y:event.clientY};
+    canvas.setPointerCapture(event.pointerId);
+  },listenerOptions);
+  canvas.addEventListener("pointermove",event=>{
+    if(!isWalkView()||!lookDrag||event.pointerId!==lookDrag.id)return;
+    const dx=event.clientX-lookDrag.x,dy=event.clientY-lookDrag.y;
+    if(Math.abs(dx)+Math.abs(dy)<0.3)return;
+    cameraTween=null;
+    walkYaw-=dx*0.0035;
+    walkPitch=THREE.MathUtils.clamp(walkPitch-dy*0.0031,-.47,1.1);
+    lookDrag.x=event.clientX;lookDrag.y=event.clientY;
+  },listenerOptions);
+  const clearLook=(event)=>{if(lookDrag&&event.pointerId===lookDrag.id)lookDrag=null;};
+  canvas.addEventListener("pointerup",clearLook,listenerOptions);
+  canvas.addEventListener("pointercancel",clearLook,listenerOptions);
+
   function rotateCameraBy(horizontal, vertical) {
+    if (isWalkView()) {
+      cameraTween=null;
+      walkYaw-=horizontal;
+      walkPitch=THREE.MathUtils.clamp(walkPitch-vertical,-.47,1.1);
+      return;
+    }
     cameraTween = null;
     const offset = camera.position.clone().sub(controls.target);
     const spherical = new THREE.Spherical().setFromVector3(offset);
@@ -460,7 +522,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       }
       return;
     }
-    if (["w", "a", "s", "d"].includes(key) && activeView === "inside") {
+    if (["w", "a", "s", "d"].includes(key) && (activeView === "inside" || isWalkView())) {
       event.preventDefault();
       moving.add(key);
       return;
@@ -530,6 +592,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     if (activeView === "outside") camera.fov = responsiveHomeFov();
     else if (activeView === "top") camera.fov = 52;
     else if (activeView === "courtyard") camera.fov = 46;
+    else if (isWalkView()) camera.fov = 67;
     else camera.fov = 37;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
@@ -607,8 +670,21 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     element.addEventListener("click", () => onPart(element.dataset.part), listenerOptions);
   });
 
+  function getVisitPose() {
+    return { x: camera.position.x, z: camera.position.z, yaw: walkYaw };
+  }
+  function addVisitTrace(part="dougong", id="local") {
+    return visitCourtyard.leaveTrace(id,part);
+  }
+  function setRemoteVisitor(peer) { remoteVisitors.upsert(peer); }
+  function removeRemoteVisitor(id) { remoteVisitors.remove(id); }
+  function clearRemoteVisitors() { remoteVisitors.clear(); }
+
   function getSceneState() {
     return {
+      visit:{active:isWalkView(), traces:visitCourtyard.getTraceCount(),
+        remoteVisitors:remoteVisitors.count, pose:getVisitPose(),
+        movementKeys:[...moving], transitioning:Boolean(cameraTween)},
       stage: currentStage,
       view: activeView,
       exploded,
@@ -689,7 +765,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
   function animate(now) {
     if (disposed || document.hidden) { raf = 0; return; }
     raf = requestAnimationFrame(animate);
-    const delta = Math.min((now - lastTime) / 1000, 0.05);
+    const elapsed = Math.max(0, (now - lastTime) / 1000);
+    const delta = Math.min(elapsed, 0.05);
+    // Human walking must remain time-based under low-fps software WebGL.
+    // This bounded integration avoids both slow-motion and tab-resume jumps.
+    const walkDelta = Math.min(elapsed, 0.24);
     lastTime = now;
     explosionAmount = THREE.MathUtils.damp(explosionAmount, explosionTarget, 9, delta);
     const weights = explosionWeights(explosionFocus);
@@ -699,12 +779,39 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     extraRoofGroup.position.y = 1.08 * (1 - qingOpacity) + explosionAmount * 1.36 * weights.extension;
     qingExtensionGroup.position.y = explosionAmount * 0.32 * weights.frame;
     ginkgo.tick(now / 1000, reducedMotionQuery.matches);
+    visitCourtyard.tick(now);
+    remoteVisitors.tick(delta,now);
     if (cameraTween) {
       const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
       const eased = t * t * (3 - 2 * t);
       camera.position.lerpVectors(cameraTween.fromPosition, cameraTween.toPosition, eased);
       controls.target.lerpVectors(cameraTween.fromTarget, cameraTween.toTarget, eased);
+      if (isWalkView())camera.lookAt(controls.target);
       if (t >= 1) cameraTween = null;
+    }
+    if (moving.size && isWalkView() && !cameraTween) {
+      const forward = new THREE.Vector3(Math.sin(walkYaw),0,-Math.cos(walkYaw));
+      const right = new THREE.Vector3(Math.cos(walkYaw),0,Math.sin(walkYaw));
+      const direction = new THREE.Vector3();
+      if(moving.has("w"))direction.add(forward);
+      if(moving.has("s"))direction.sub(forward);
+      if(moving.has("a"))direction.sub(right);
+      if(moving.has("d"))direction.add(right);
+      if(direction.lengthSq()>0) {
+        direction.normalize().multiplyScalar(walkDelta*2.05);
+        if (activeView === "interior-walk") {
+          const startX=camera.position.x,startZ=camera.position.z;
+          let x=THREE.MathUtils.clamp(startX+direction.x,-5.75,5.75);
+          let z=THREE.MathUtils.clamp(startZ+direction.z,-5.75,5.75);
+          const blocked=(px,pz)=>POST_X.some(cx=>POST_Z.some(cz=>Math.hypot(px-cx,pz-cz)<.52))
+            || (pz < -3.05 && Math.abs(px)<1.68);
+          if(blocked(x,z)) {if(!blocked(x,startZ))z=startZ;else if(!blocked(startX,z))x=startX;else{x=startX;z=startZ;}}
+          camera.position.x=x;camera.position.z=z;
+        } else {
+          camera.position.x = THREE.MathUtils.clamp(camera.position.x+direction.x,-6.25,6.25);
+          camera.position.z = THREE.MathUtils.clamp(camera.position.z+direction.z,8.3,30.3);
+        }
+      }
     }
     if (moving.size && activeView === "inside") {
       const forward = new THREE.Vector3();
@@ -741,7 +848,21 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
         camera.position.y = 2.1;
       }
     }
-    controls.update();
+    if (isWalkView()) {
+      if (!cameraTween) {
+        const look = new THREE.Vector3(
+          Math.sin(walkYaw)*Math.cos(walkPitch),
+          Math.sin(walkPitch),
+          -Math.cos(walkYaw)*Math.cos(walkPitch)
+        );
+        controls.target.copy(camera.position).addScaledVector(look, 8);
+        camera.lookAt(controls.target);
+      }
+      const zone=activeView==="interior-walk"?"interior":camera.position.z<13.2?"eave":"courtyard";
+      if(lastVisitZone!==zone){lastVisitZone=zone;onVisitZone?.(zone);}
+    } else {
+      controls.update();
+    }
     updatePins();
     renderer.render(scene, camera);
     if (!readyCalled && now > 600) {
@@ -759,6 +880,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
     setZoomPercent,
     setSeason,
     setTreeVisible,
+    getVisitPose,
+    addVisitTrace,
+    setRemoteVisitor,
+    removeRemoteVisitor,
+    clearRemoteVisitors,
     toggleExploded,
     toggleFrame,
     toggleCutaway,
@@ -771,6 +897,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady }) {
       listenerController.abort();
       controls.removeEventListener("start", cancelCameraTween);
       controls.dispose();
+      visitCourtyard.dispose();
+      remoteVisitors.clear();
       if (window.__zhenruQA) delete window.__zhenruQA;
       const geometries = new Set();
       const materials = new Set();

@@ -1,0 +1,8 @@
+{
+  "name": "zhenru-anonymous-presence",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node presence-server.mjs" },
+  "dependencies": { "ws": "^8.18.3" },
+  "engines": { "node": ">=20" }
+}

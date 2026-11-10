@@ -12,6 +12,9 @@ on:
       - 'scripts/check-ginkgo-story.mjs'
       - 'model-fidelity.js'
       - 'reconstruction/**'
+      - 'presence/**'
+      - 'audio/**'
+      - 'server/**'
       - 'scripts/check-roof-parameters.mjs'
       - 'scripts/check-bracket-layout.mjs'
       - 'scripts/check-eave-layout.mjs'
@@ -36,6 +39,12 @@ jobs:
           node --check hall-model.js
           node --check app.js
           node --check reconstruction/ginkgo-study.js
+          node --check reconstruction/visit-courtyard.js
+          node --check reconstruction/visitor-figures.js
+          node --check presence/client.js
+          node --check presence/config.js
+          node --check audio/quiet-air.js
+          node --check server/presence-server.mjs
           node scripts/check-ginkgo-story.mjs
           node --check model-fidelity.js
           node scripts/check-model-fidelity.mjs

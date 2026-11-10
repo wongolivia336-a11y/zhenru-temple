@@ -1,3 +1,7 @@
+import { createQuietAir } from "./audio/quiet-air.js";
+import { createPresenceClient } from "./presence/client.js";
+import { PRESENCE_WEBSOCKET_URL } from "./presence/config.js";
+
 const stages = [
   {
     period: "元 · 延祐七年",
@@ -457,6 +461,7 @@ async function bootModel() {
       frame: document.querySelector("#viewerFrame"),
       pins: pinElements,
       onPart: setObservation,
+      onVisitZone: onVisitZoneChanged,
       onReady: () => loading.classList.add("is-hidden")
     });
     startupStage = "setting initial history stage";
@@ -478,3 +483,205 @@ async function bootModel() {
 
 bootModel();
 
+
+/* V10 / Enter Temple: a complete, private first-person visit before any social UI.
+   No fake players or remotely stored routes. The archive remains available. */
+let visitActive = false;
+let visitZone = "courtyard";
+let visitPoseTimer = null;
+let visitClockTimer = null;
+const visitHud = document.querySelector("#visitHud");
+const visitShare = document.querySelector("#visitShare");
+const visitPresenceState = document.querySelector("#visitPresenceState");
+const visitMoment = document.querySelector("#visitMoment");
+const visitSound = document.querySelector("#visitSound");
+const quietAir = createQuietAir();
+const presence = createPresenceClient({
+  url: PRESENCE_WEBSOCKET_URL,
+  onState({ status, detail, joined }) {
+    if (!joined) hallScene?.clearRemoteVisitors();
+    if (visitPresenceState) {
+      visitPresenceState.textContent = joined
+        ? "共在中 · 仅同步匿名位置与动作"
+        : status === "connecting" ? "正在加入共享庭院…"
+        : detail && status === "error" ? "连接失败 · 仍可独处参访"
+        : "独处参访 · 不上传位置";
+    }
+    if (visitShare) {
+      visitShare.disabled = !joined && (!presence.available || visitZone!=="eave");
+      visitShare.textContent = joined ? "退出共在"
+        : presence.available ? visitZone==="eave" ? "进入共在" : "檐下可共在"
+        : "共在 · 尚未开放";
+      visitShare.setAttribute("aria-pressed", String(joined));
+    }
+  },
+  onPeer(peer) { if (visitActive) hallScene?.setRemoteVisitor(peer); },
+  onLeave(id) { hallScene?.removeRemoteVisitor(id); },
+  onTrace(data) {
+    if (visitActive && data && ["dougong","roof","ginkgo"].includes(data.part))
+      hallScene?.addVisitTrace(data.part, "other-" + data.id + "-" + performance.now());
+  }
+});
+if (visitShare) {
+  visitShare.disabled = !presence.available;
+  visitShare.title = presence.available
+    ? "进入共享庭院后，其他访客可以看到你的匿名化身；可随时退出，不保存路径"
+    : "共在后端尚未部署。本版本不会虚构其他在线访客。";
+}
+
+function updateShanghaiClock() {
+  const node=document.querySelector("#visitClock");
+  if (!node) return;
+  const time=new Intl.DateTimeFormat("zh-CN",{
+    timeZone:"Asia/Shanghai",hour:"2-digit",minute:"2-digit",hour12:false
+  }).format(new Date());
+  node.textContent="上海时间 · "+time+" · 现状研究场景";
+}
+function onVisitZoneChanged(zone) {
+  if (!visitActive) return;
+  visitZone=zone;
+  const title=document.querySelector("#visitZoneTitle");
+  const text=document.querySelector("#visitZoneText");
+  const annotation=document.querySelector(".visit-annotation");
+  const actions=document.querySelector("#visitEaveActions");
+  // Threshold consent: sharing is offered only under the eaves. Walking
+  // back into the courtyard leaves shared presence without a goodbye.
+  if(zone!=="eave"&&presence.joined)presence.disconnect();
+  if(visitShare && !presence.joined) {
+    visitShare.disabled = !presence.available || zone!=="eave";
+    visitShare.textContent = presence.available
+      ? zone==="eave" ? "进入共在" : "檐下可共在"
+      : "共在 · 尚未开放";
+  }
+  if (zone==="eave") {
+    annotation.textContent="02 / UNDER THE EAVES";
+    title.textContent="抬头，看木构如何相互承托。";
+    text.textContent="靠近屋檐，注意斗栱的出跳关系。若想了解证据，可以打开构件档案；也可以只是站在这里。";
+    actions.hidden=false;
+  } else if(zone==="interior") {
+    annotation.textContent="03 / THE MAIN HALL";
+    title.textContent="从殿中重新感受空间的尺度。";
+    text.textContent="这是建筑研究性的室内空间。佛像轮廓与陈设尚未通过实测或寺方核验，不代表真实原状。";
+    actions.hidden=true;
+    if (presence.joined) presence.disconnect();
+  } else {
+    annotation.textContent="01 / COURTYARD";
+    title.textContent="从庭院，望向大殿。";
+    text.textContent="拖动转头，用 WASD 或方向按键缓缓向前。这里的庭院铺装与周边环境属于研究性表达，非现场测绘。";
+    actions.hidden=true;
+  }
+  document.querySelectorAll("[data-visit-view]").forEach(button=>{
+    const value=button.dataset.visitView;
+    const active=zone==="interior" ? value==="interior-walk"
+      : zone==="eave" ? value==="threshold" : value==="walk";
+    button.setAttribute("aria-current",String(active));
+  });
+}
+
+function enterTemple() {
+  if (!hallScene) {
+    const enter=document.querySelector("#enterVisit");
+    if(enter)enter.textContent="三维空间正在准备…";
+    return;
+  }
+  // First-person visit intentionally starts from a present-day study phase.
+  // It does not pretend the 1320 structure or the garden was measured.
+  visitActive=true;
+  setResearchOpen(false);
+  closeInspector();
+  setStage(3);
+  hallScene.resetView();
+  hallScene.setView("walk");
+  document.documentElement.classList.add("visit-mode");
+  visitHud.hidden=false;
+  visitMoment.textContent="";
+  visitZone="courtyard";
+  onVisitZoneChanged("courtyard");
+  updateShanghaiClock();
+  if (visitClockTimer) window.clearInterval(visitClockTimer);
+  visitClockTimer=window.setInterval(updateShanghaiClock,60000);
+  if (visitPoseTimer) window.clearInterval(visitPoseTimer);
+  visitPoseTimer=window.setInterval(()=>{
+    if(visitActive && visitZone!=="interior" && presence.joined)
+      presence.sendPose(hallScene.getVisitPose());
+  },155);
+  document.querySelector("#visitExit")?.focus({preventScroll:true});
+}
+function leaveTemple({ openStudy=false }={}) {
+  if (!visitActive) return;
+  visitActive=false;
+  presence.disconnect();
+  quietAir.stop();
+  if(visitSound){visitSound.textContent="风声 · 关闭";visitSound.setAttribute("aria-pressed","false");}
+  if(visitClockTimer)window.clearInterval(visitClockTimer);
+  if(visitPoseTimer)window.clearInterval(visitPoseTimer);
+  visitClockTimer=null;visitPoseTimer=null;
+  document.documentElement.classList.remove("visit-mode");
+  visitHud.hidden=true;
+  hallScene?.clearRemoteVisitors();
+  hallScene?.resetView();
+  if(openStudy) {
+    hallScene?.setView("eave");
+    setObservation("dougong");
+  }
+  document.querySelector(openStudy ? "#closeInspector" : "#enterVisit")
+    ?.focus({preventScroll:true});
+}
+document.querySelector("#enterVisit")?.addEventListener("click",enterTemple);
+document.querySelector("#visitExit")?.addEventListener("click",()=>leaveTemple());
+document.querySelector("#visitStudy")?.addEventListener("click",()=>leaveTemple({openStudy:true}));
+document.querySelectorAll("[data-visit-view]").forEach(button=>button.addEventListener("click",()=>{
+  if(!visitActive||!hallScene)return;
+  const view=button.dataset.visitView;
+  if(view==="interior-walk"&&presence.joined)presence.disconnect();
+  hallScene.setView(view);
+  onVisitZoneChanged(view==="interior-walk"?"interior":view==="threshold"?"eave":"courtyard");
+  visitMoment.textContent="";
+  document.querySelector("#hallCanvas")?.focus({preventScroll:true});
+}));
+document.querySelector("#visitMark")?.addEventListener("click",()=>{
+  if(!visitActive||!hallScene||visitZone!=="eave")return;
+  hallScene.addVisitTrace("dougong","local-attention");
+  presence.leaveTrace("dougong");
+  visitMoment.textContent=presence.joined
+    ? "这处观察线索会在约 85 秒后消失，共在访客可短暂看见。"
+    : "已留意此处 · 仅在本机本次参访短暂显现，约 85 秒后消散。";
+});
+visitShare?.addEventListener("click",()=>{
+  if(!visitActive||!presence.available)return;
+  if(presence.joined)presence.disconnect();
+  else if(visitZone!=="interior")presence.connect();
+});
+visitSound?.addEventListener("click",async()=>{
+  if(quietAir.playing) {
+    quietAir.stop();
+    visitSound.textContent="风声 · 关闭";
+    visitSound.setAttribute("aria-pressed","false");
+  }else{
+    const success=await quietAir.start();
+    visitSound.textContent=success?"风声 · 开启":"当前设备不支持音频";
+    visitSound.setAttribute("aria-pressed",String(success));
+  }
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&quietAir.playing){
+    quietAir.stop();
+    visitSound.textContent="风声 · 关闭";
+    visitSound.setAttribute("aria-pressed","false");
+  }
+});
+window.addEventListener("pagehide",()=>{presence.disconnect();quietAir.stop();});
+window.addEventListener("keydown",(event)=>{
+  if(event.key==="Escape"&&visitActive) {
+    const inspector=document.querySelector("#componentInspector");
+    if(!inspector?.hidden)return;
+    leaveTemple();
+  }
+});
+// QA-only extension exposes coherent UI state without affecting regular visitors.
+if(new URLSearchParams(location.search).get("qa")==="1") {
+  window.__zhenruVisitQA={
+    getState:()=>({active:visitActive,zone:visitZone,presenceAvailable:presence.available,
+      sharing:presence.joined, audio:quietAir.playing})
+  };
+}
