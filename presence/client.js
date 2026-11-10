@@ -2,7 +2,10 @@
 // The endpoint is blank by default. This module never generates fake peers.
 export function createPresenceClient({ url, onState, onPeer, onLeave, onTrace }) {
   let socket=null,joined=false,selfId=null,lastPose=0;
-  const safeEndpoint = typeof url === "string" && /^wss:\/\//i.test(url) ? url : "";
+  const safeEndpoint = typeof url === "string" && (
+    /^wss:\/\//i.test(url) ||
+    (/^ws:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/i.test(url) && location.hostname==="localhost")
+  ) ? url : "";
   function state(status,detail="") {onState?.({status,detail,joined,selfId});}
   function disconnect() {
     joined=false;selfId=null;

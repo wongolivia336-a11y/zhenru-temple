@@ -508,7 +508,10 @@ const presence = createPresenceClient({
         : "独处参访 · 不上传位置";
     }
     if (visitShare) {
-      visitShare.textContent = joined ? "退出共在" : presence.available ? "进入共在" : "共在 · 尚未开放";
+      visitShare.disabled = !joined && (!presence.available || visitZone!=="eave");
+      visitShare.textContent = joined ? "退出共在"
+        : presence.available ? visitZone==="eave" ? "进入共在" : "檐下可共在"
+        : "共在 · 尚未开放";
       visitShare.setAttribute("aria-pressed", String(joined));
     }
   },
@@ -541,6 +544,15 @@ function onVisitZoneChanged(zone) {
   const text=document.querySelector("#visitZoneText");
   const annotation=document.querySelector(".visit-annotation");
   const actions=document.querySelector("#visitEaveActions");
+  // Threshold consent: sharing is offered only under the eaves. Walking
+  // back into the courtyard leaves shared presence without a goodbye.
+  if(zone!=="eave"&&presence.joined)presence.disconnect();
+  if(visitShare && !presence.joined) {
+    visitShare.disabled = !presence.available || zone!=="eave";
+    visitShare.textContent = presence.available
+      ? zone==="eave" ? "进入共在" : "檐下可共在"
+      : "共在 · 尚未开放";
+  }
   if (zone==="eave") {
     annotation.textContent="02 / UNDER THE EAVES";
     title.textContent="抬头，看木构如何相互承托。";
