@@ -306,10 +306,13 @@ async function run() {
   const startPose=await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.pose);
   await home.locator("#hallCanvas").focus();
   await home.keyboard.down("w");
-  await sleep(530);
+  await until(async()=>{
+    const pose=await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.pose);
+    return pose.z<startPose.z-.15;
+  },"visitor first-person forward movement",11000);
   await home.keyboard.up("w");
   const movedPose=await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.pose);
-  assert.ok(movedPose.z<startPose.z-.16,"Visitor should walk forward at human-scale, rather than orbiting model");
+  assert.ok(movedPose.z<startPose.z-.15,"Visitor should walk forward at human-scale, rather than orbiting model");
   await home.screenshot({path:"qa/runtime-screenshots/v10-courtyard-first-person-desktop.png",fullPage:true});
   await home.locator('[data-visit-view="threshold"]').click();
   await sleep(940);

@@ -683,7 +683,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   function getSceneState() {
     return {
       visit:{active:isWalkView(), traces:visitCourtyard.getTraceCount(),
-        remoteVisitors:remoteVisitors.count, pose:getVisitPose()},
+        remoteVisitors:remoteVisitors.count, pose:getVisitPose(),
+        movementKeys:[...moving], transitioning:Boolean(cameraTween)},
       stage: currentStage,
       view: activeView,
       exploded,
@@ -764,7 +765,11 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   function animate(now) {
     if (disposed || document.hidden) { raf = 0; return; }
     raf = requestAnimationFrame(animate);
-    const delta = Math.min((now - lastTime) / 1000, 0.05);
+    const elapsed = Math.max(0, (now - lastTime) / 1000);
+    const delta = Math.min(elapsed, 0.05);
+    // Human walking must remain time-based under low-fps software WebGL.
+    // This bounded integration avoids both slow-motion and tab-resume jumps.
+    const walkDelta = Math.min(elapsed, 0.24);
     lastTime = now;
     explosionAmount = THREE.MathUtils.damp(explosionAmount, explosionTarget, 9, delta);
     const weights = explosionWeights(explosionFocus);
@@ -793,7 +798,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
       if(moving.has("a"))direction.sub(right);
       if(moving.has("d"))direction.add(right);
       if(direction.lengthSq()>0) {
-        direction.normalize().multiplyScalar(delta*2.05);
+        direction.normalize().multiplyScalar(walkDelta*2.05);
         if (activeView === "interior-walk") {
           const startX=camera.position.x,startZ=camera.position.z;
           let x=THREE.MathUtils.clamp(startX+direction.x,-5.75,5.75);
