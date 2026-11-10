@@ -179,7 +179,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   const interactiveGroups = [baseGroup, frameGroup, columnGroup, roofGroup, extraRoofGroup, qingExtensionGroup];
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeView = "outside";
-  const isWalkView = () => activeView === "walk" || activeView === "threshold";
+  const isCourtyardWalk = () => activeView === "walk" || activeView === "threshold";
+  const isWalkView = () => isCourtyardWalk() || activeView === "interior-walk";
   let walkYaw = 0;
   let walkPitch = 0;
   let lookDrag = null;
@@ -287,7 +288,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     };
     activeView = nextView;
     controls.enabled = !isWalkView();
-    visitCourtyard.setVisible(isWalkView());
+    visitCourtyard.setVisible(isCourtyardWalk());
     scene.background.copy(isWalkView() ? visitColor : archiveColor);
     scene.fog.color.copy(scene.background);
     scene.fog.near = isWalkView() ? 28 : 48;
@@ -332,6 +333,10 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     if (view !== "inside") moving.clear();
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
+    } else if (view === "interior-walk") {
+      // Inside is first-person too. The silhouette altar is research-only:
+      // this is not a survey or a documented original Buddha sculpture.
+      moveCamera(new THREE.Vector3(0, 1.72, 4.5), new THREE.Vector3(0, 2.55, -2.6), "interior-walk");
     } else if (view === "walk") {
       // Human-height first-person visit from an illustrative open courtyard.
       moveCamera(new THREE.Vector3(0, 1.72, 24), new THREE.Vector3(0, 3.25, 6), "walk");
@@ -789,8 +794,18 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
       if(moving.has("d"))direction.add(right);
       if(direction.lengthSq()>0) {
         direction.normalize().multiplyScalar(delta*2.05);
-        camera.position.x = THREE.MathUtils.clamp(camera.position.x+direction.x,-6.25,6.25);
-        camera.position.z = THREE.MathUtils.clamp(camera.position.z+direction.z,8.3,30.3);
+        if (activeView === "interior-walk") {
+          const startX=camera.position.x,startZ=camera.position.z;
+          let x=THREE.MathUtils.clamp(startX+direction.x,-5.75,5.75);
+          let z=THREE.MathUtils.clamp(startZ+direction.z,-5.75,5.75);
+          const blocked=(px,pz)=>POST_X.some(cx=>POST_Z.some(cz=>Math.hypot(px-cx,pz-cz)<.52))
+            || (pz < -3.05 && Math.abs(px)<1.68);
+          if(blocked(x,z)) {if(!blocked(x,startZ))z=startZ;else if(!blocked(startX,z))x=startX;else{x=startX;z=startZ;}}
+          camera.position.x=x;camera.position.z=z;
+        } else {
+          camera.position.x = THREE.MathUtils.clamp(camera.position.x+direction.x,-6.25,6.25);
+          camera.position.z = THREE.MathUtils.clamp(camera.position.z+direction.z,8.3,30.3);
+        }
       }
     }
     if (moving.size && activeView === "inside") {
@@ -838,7 +853,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
         controls.target.copy(camera.position).addScaledVector(look, 8);
         camera.lookAt(controls.target);
       }
-      const zone=camera.position.z<13.2?"eave":"courtyard";
+      const zone=activeView==="interior-walk"?"interior":camera.position.z<13.2?"eave":"courtyard";
       if(lastVisitZone!==zone){lastVisitZone=zone;onVisitZone?.(zone);}
     } else {
       controls.update();
