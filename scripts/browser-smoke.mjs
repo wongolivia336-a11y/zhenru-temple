@@ -291,9 +291,65 @@ async function run() {
   assert.equal(await home.locator("#modelTools").isHidden(),true);
   assert.equal(await home.locator(".environment-controls").evaluate(el=>getComputedStyle(el).visibility),"visible");
 
+  // V10: real first-person traversal, transparent consent and transient traces.
+  await home.locator("#enterVisit").click();
+  assert.equal(await home.evaluate(()=>document.documentElement.classList.contains("visit-mode")),true);
+  assert.equal(await home.locator("#visitHud").isHidden(),false);
+  let visit=await home.evaluate(()=>({ui:window.__zhenruVisitQA.getState(),scene:window.__zhenruQA.getSceneState()}));
+  assert.equal(visit.scene.view,"walk");
+  assert.equal(visit.scene.visit.active,true);
+  assert.equal(visit.ui.sharing,false);
+  assert.equal(visit.ui.presenceAvailable,false,"No mock online visitors without deployed WebSocket endpoint");
+  assert.equal(await home.locator("#visitShare").isDisabled(),true);
+  assert.equal(await home.locator(".viewer-bottom").isVisible(),false);
+  await sleep(980);
+  const startPose=await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.pose);
+  await home.locator("#hallCanvas").focus();
+  await home.keyboard.down("w");
+  await sleep(530);
+  await home.keyboard.up("w");
+  const movedPose=await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.pose);
+  assert.ok(movedPose.z<startPose.z-.16,"Visitor should walk forward at human-scale, rather than orbiting model");
+  await home.screenshot({path:"qa/runtime-screenshots/v10-courtyard-first-person-desktop.png",fullPage:true});
+  await home.locator('[data-visit-view="threshold"]').click();
+  await sleep(940);
+  visit=await home.evaluate(()=>({ui:window.__zhenruVisitQA.getState(),scene:window.__zhenruQA.getSceneState()}));
+  assert.equal(visit.scene.view,"threshold");
+  assert.equal(visit.ui.zone,"eave");
+  assert.equal(await home.locator("#visitEaveActions").isHidden(),false);
+  await home.locator("#visitMark").click();
+  assert.ok((await home.evaluate(()=>window.__zhenruQA.getSceneState().visit.traces))>=1,
+    "A real 3D ephemeral observation mark must appear");
+  assert.match(await home.locator("#visitMoment").textContent(),/仅在本机/);
+  await home.screenshot({path:"qa/runtime-screenshots/v10-eave-temporary-attention-desktop.png",fullPage:true});
+  await home.locator("#visitStudy").click();
+  assert.equal(await home.evaluate(()=>document.documentElement.classList.contains("visit-mode")),false);
+  assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"eave");
+  assert.equal(await home.locator("#componentInspector").isHidden(),false,
+    "Moving from felt space to architectural research should open evidence-backed part note");
+  await home.locator("#closeInspector").click();
+  await home.locator("#enterVisit").click();
+  await home.locator('[data-visit-view="interior-walk"]').click();
+  await sleep(950);
+  assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"interior-walk");
+  assert.match(await home.locator("#visitZoneText").textContent(),/尚未通过实测/);
+  await home.screenshot({path:"qa/runtime-screenshots/v10-interior-first-person-desktop.png",fullPage:true});
+  await home.locator("#visitExit").click();
+  assert.equal(await home.locator("#visitHud").isHidden(),true);
+  assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"outside");
+
   await home.setViewportSize({width:390,height:844});
   await sleep(250);
   await home.screenshot({path:"qa/runtime-screenshots/v8-home-mobile-390.png",fullPage:true});
+  await home.locator("#enterVisit").click();
+  await sleep(990);
+  assert.equal(await home.evaluate(()=>window.__zhenruQA.getSceneState().view),"walk");
+  const visitMobileOverflow=await home.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+  assert.ok(visitMobileOverflow<=1,"First-person mobile viewport horizontal overflow "+visitMobileOverflow);
+  await home.screenshot({path:"qa/runtime-screenshots/v10-courtyard-first-person-mobile.png",fullPage:true});
+  await home.locator('[data-visit-view="threshold"]').click();
+  assert.equal(await home.locator("#visitEaveActions").isHidden(),false);
+  await home.locator("#visitExit").click();
   // Mobile part note becomes a compact sheet, with time rail kept in its own lane.
   await home.locator("#pinDoor").evaluate(el=>el.click());
   const mobileDock=await home.evaluate(()=>{
@@ -320,6 +376,7 @@ async function run() {
   fs.writeFileSync("qa/runtime-screenshots/browser-report.json",JSON.stringify(report,null,2));
   console.log("PASS actual WebGL roof bounds",low.meshTopY,normal.meshTopY,high.meshTopY);
   console.log("PASS V8 continuous explode, zoom, focus, reset, chronology tree, season, 390/768 layout and no JS exceptions");
+  console.log("PASS V10 first-person courtyard walk, mobile visit, transient 3D trace, study transition, private-by-default presence");
 }
 try { await run(); }
 finally { await browser?.close(); server.kill("SIGTERM"); }
