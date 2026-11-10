@@ -505,6 +505,35 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     if (isDown) moving.add(direction);
     else moving.delete(direction);
   }
+  // Immediate small displacement makes a single key tap meaningful even
+  // when software WebGL is rendering slower than the user's key press.
+  // Held movement continues in animate(); key repeat does not add extra jumps.
+  function initialWalkStep(key) {
+    if(!isWalkView()) return;
+    if(cameraTween) {
+      camera.position.copy(cameraTween.toPosition);
+      controls.target.copy(cameraTween.toTarget);
+      cameraTween=null;
+    }
+    const step=.21;
+    const fwdX=Math.sin(walkYaw),fwdZ=-Math.cos(walkYaw);
+    const rightX=Math.cos(walkYaw),rightZ=Math.sin(walkYaw);
+    const dx=key==="w"?fwdX*step:key==="s"?-fwdX*step:key==="d"?rightX*step:-rightX*step;
+    const dz=key==="w"?fwdZ*step:key==="s"?-fwdZ*step:key==="d"?rightZ*step:-rightZ*step;
+    if(activeView==="interior-walk") {
+      let x=THREE.MathUtils.clamp(camera.position.x+dx,-5.75,5.75);
+      let z=THREE.MathUtils.clamp(camera.position.z+dz,-5.75,5.75);
+      const blocked=(px,pz)=>POST_X.some(cx=>POST_Z.some(cz=>Math.hypot(px-cx,pz-cz)<.52))
+        || (pz < -3.05 && Math.abs(px)<1.68);
+      if(blocked(x,z)) {if(!blocked(x,camera.position.z))z=camera.position.z;
+        else if(!blocked(camera.position.x,z))x=camera.position.x;
+        else {x=camera.position.x;z=camera.position.z;}}
+      camera.position.x=x;camera.position.z=z;
+    } else {
+      camera.position.x=THREE.MathUtils.clamp(camera.position.x+dx,-6.25,6.25);
+      camera.position.z=THREE.MathUtils.clamp(camera.position.z+dz,8.3,30.3);
+    }
+  }
   function onKeyDown(event) {
     const key = event.key.toLowerCase();
     const editing = event.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
@@ -524,6 +553,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     }
     if (["w", "a", "s", "d"].includes(key) && (activeView === "inside" || isWalkView())) {
       event.preventDefault();
+      if(isWalkView() && !event.repeat && !moving.has(key)) initialWalkStep(key);
       moving.add(key);
       return;
     }
