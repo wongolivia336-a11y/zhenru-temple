@@ -810,6 +810,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     qingExtensionGroup.position.y = explosionAmount * 0.32 * weights.frame;
     ginkgo.tick(now / 1000, reducedMotionQuery.matches);
     visitCourtyard.tick(now);
+    visitCourtyard.updateLooseLeaves(now,isCourtyardWalk()?
+      {x:camera.position.x,z:camera.position.z}:null,reducedMotionQuery.matches);
     remoteVisitors.tick(delta,now);
     if (cameraTween) {
       const t = Math.min((now - cameraTween.startTime) / cameraTween.duration, 1);
