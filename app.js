@@ -519,7 +519,7 @@ const presence = createPresenceClient({
   onLeave(id) { hallScene?.removeRemoteVisitor(id); },
   onTrace(data) {
     if (visitActive && data && ["dougong","roof","ginkgo"].includes(data.part))
-      hallScene?.addVisitTrace(data.part, "other-" + data.id + "-" + performance.now());
+      hallScene?.addVisitTrace(data.part, "shared-" + data.key);
   }
 });
 if (visitShare) {

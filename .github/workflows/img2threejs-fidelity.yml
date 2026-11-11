@@ -40,6 +40,7 @@ jobs:
           node --check app.js
           node --check reconstruction/ginkgo-study.js
           node --check reconstruction/visit-courtyard.js
+          node scripts/check-leaf-presence.mjs
           node --check reconstruction/visitor-figures.js
           node --check presence/client.js
           node --check presence/config.js
