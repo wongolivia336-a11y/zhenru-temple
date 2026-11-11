@@ -703,8 +703,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   function getVisitPose() {
     return { x: camera.position.x, z: camera.position.z, yaw: walkYaw };
   }
-  function addVisitTrace(part="dougong", id="local") {
-    return visitCourtyard.leaveTrace(id,part);
+  function addVisitTrace(part="dougong", id="local", seconds=85) {
+    return visitCourtyard.leaveTrace(id,part,performance.now(),seconds);
   }
   function setRemoteVisitor(peer) { remoteVisitors.upsert(peer); }
   function removeRemoteVisitor(id) { remoteVisitors.remove(id); }
@@ -713,6 +713,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   function getSceneState() {
     return {
       visit:{active:isWalkView(), traces:visitCourtyard.getTraceCount(),
+        leaves:visitCourtyard.getLeafState(),
         remoteVisitors:remoteVisitors.count, pose:getVisitPose(),
         movementKeys:[...moving], transitioning:Boolean(cameraTween)},
       stage: currentStage,

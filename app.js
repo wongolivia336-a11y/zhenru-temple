@@ -518,8 +518,12 @@ const presence = createPresenceClient({
   onPeer(peer) { if (visitActive) hallScene?.setRemoteVisitor(peer); },
   onLeave(id) { hallScene?.removeRemoteVisitor(id); },
   onTrace(data) {
-    if (visitActive && data && ["dougong","roof","ginkgo"].includes(data.part))
-      hallScene?.addVisitTrace(data.part, "shared-" + data.key);
+    if (visitActive && data && ["dougong","roof","ginkgo"].includes(data.part)
+      && typeof data.key==="string") {
+      const seconds=Number.isFinite(data.expires)
+        ? Math.min(85,Math.max(0,(data.expires-Date.now())/1000)):85;
+      if(seconds>0)hallScene?.addVisitTrace(data.part,"shared-"+data.key,seconds);
+    }
   }
 });
 if (visitShare) {

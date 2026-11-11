@@ -158,6 +158,10 @@ export function createVisitCourtyard(scene) {
       previousVisitor=null;previousLeafTime=null;
     },
     updateLooseLeaves,
+    getLeafState() {
+      return {count:leafCount, visible:group.visible,
+        displaced:leafSeeds.filter(leaf=>Math.hypot(leaf.offsetX,leaf.offsetZ)>.0003).length};
+    },
     leaveTrace,
     tick,
     getTraceCount() { return traces.size; },

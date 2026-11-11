@@ -298,6 +298,8 @@ async function run() {
   let visit=await home.evaluate(()=>({ui:window.__zhenruVisitQA.getState(),scene:window.__zhenruQA.getSceneState()}));
   assert.equal(visit.scene.view,"walk");
   assert.equal(visit.scene.visit.active,true);
+  assert.ok(visit.scene.visit.leaves.visible,"Ground leaves should be in the visit scene");
+  assert.ok(visit.scene.visit.leaves.count>=62,"Instanced 3D foliage available for subtle footstep response");
   assert.equal(visit.ui.sharing,false);
   assert.equal(visit.ui.presenceAvailable,false,"No mock online visitors without deployed WebSocket endpoint");
   assert.equal(await home.locator("#visitShare").isDisabled(),true);
