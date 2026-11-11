@@ -12,6 +12,15 @@ const wss=new WebSocketServer({
   }
 });
 const MAX=14;
+const TRACE_TTL_MS=85000;
+const MAX_ACTIVE_TRACES=24;
+// An anonymous trace is a temporary in-memory observation of a component,
+// not a record of where any visitor has walked.
+const activeTraceMap=new Map();
+function ephemeralTraces(now=Date.now()) {
+  for(const [key,trace] of activeTraceMap)if(trace.expires<=now)activeTraceMap.delete(key);
+  return [...activeTraceMap.values()].map(({key,part,expires})=>({key,part,expires}));
+}
 function send(ws,payload) {
   if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(payload));
 }
@@ -31,7 +40,9 @@ wss.on("connection",ws=>{
       const peers=[...wss.clients].filter(c=>c.joined&&c!==ws);
       if(peers.length>=MAX){send(ws,{type:"full"});ws.close(1008);return;}
       ws.joined=true;
-      send(ws,{type:"welcome",id:ws.id,peers:peers.filter(c=>c.pose).map(c=>({id:c.id,...c.pose}))});
+      send(ws,{type:"welcome",id:ws.id,
+        peers:peers.filter(c=>c.pose).map(c=>({id:c.id,...c.pose})),
+        traces:ephemeralTraces()});
       // Clients do not know this visitor's position until a pose is shared.
     } else if(data.type==="pose" && ws.joined && validPose(data)) {
       const now=Date.now();
@@ -42,7 +53,11 @@ wss.on("connection",ws=>{
     } else if(data.type==="trace" && ws.joined && ["dougong","roof","ginkgo"].includes(data.part)) {
       const now=Date.now();if(now-ws.lastTrace<10000)return;
       ws.lastTrace=now;
-      broadcast(ws,{type:"trace",id:ws.id,part:data.part});
+      ephemeralTraces(now);
+      if(activeTraceMap.size>=MAX_ACTIVE_TRACES)activeTraceMap.delete(activeTraceMap.keys().next().value);
+      const trace={key:randomUUID(),part:data.part,expires:now+TRACE_TTL_MS};
+      activeTraceMap.set(trace.key,trace);
+      broadcast(ws,{type:"trace",...trace});
     }
   });
   ws.on("close",()=>{if(ws.joined)broadcast(ws,{type:"leave",id:ws.id});});

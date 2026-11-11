@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import { makeLeafSeed,advanceLeaf } from "../reconstruction/leaf-presence.mjs";
+const l=Array.from({length:118},(_,i)=>makeLeafSeed(i));
+assert.equal(new Set(l.map(x=>x.x.toFixed(4)+"/"+x.z.toFixed(4))).size,118);
+assert.ok(l.every(x=>x.x>=-5&&x.x<=5&&x.z>=9&&x.z<=29));
+const leaf=makeLeafSeed(17);
+for(let n=0;n<50;n++)advanceLeaf(leaf,{x:leaf.x-.1,z:leaf.z-.1,vx:1.6,vz:.6},.02);
+const moved=Math.hypot(leaf.offsetX,leaf.offsetZ);
+assert.ok(moved>.002&&moved<.2,"Walking should move a nearby leaf subtly");
+for(let n=0;n<250;n++)advanceLeaf(leaf,null,.04);
+assert.ok(Math.hypot(leaf.offsetX,leaf.offsetZ)<moved*.2,"Leaf must settle");
+const still=makeLeafSeed(17);
+for(let n=0;n<30;n++)advanceLeaf(still,{x:still.x,z:still.z,vx:0,vz:0},.02);
+assert.equal(still.offsetX,0,"Standing should not generate motion");
+console.log("PASS local-only ephemeral leaf motion and settling");

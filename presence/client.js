@@ -25,9 +25,13 @@ export function createPresenceClient({ url, onState, onPeer, onLeave, onTrace })
         if(data.type==="welcome" && typeof data.id==="string") {
           joined=true;selfId=data.id;state("shared");
           if(Array.isArray(data.peers))data.peers.forEach(p=>onPeer?.(p));
+          if(Array.isArray(data.traces))data.traces.forEach(trace=>{
+            if(trace&&typeof trace.key==="string"&&typeof trace.part==="string")
+              onTrace?.(trace);
+          });
         } else if(data.type==="peer" && data.peer && data.peer.id!==selfId) onPeer?.(data.peer);
         else if(data.type==="leave")onLeave?.(data.id);
-        else if(data.type==="trace" && data.id!==selfId && typeof data.part==="string")onTrace?.(data);
+        else if(data.type==="trace" && typeof data.key==="string" && typeof data.part==="string")onTrace?.(data);
         else if(data.type==="full") {state("full","共享空间人数已满");ws.close();}
       });
       ws.addEventListener("close",()=>{

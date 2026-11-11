@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { makeLeafSeed, advanceLeaf } from "./leaf-presence.mjs";
 
 // The courtyard surface is an illustrative study layer, not a measured survey.
 // Kept separate from the hall mesh and GLB export.
@@ -44,6 +45,64 @@ export function createVisitCourtyard(scene) {
   stone.instanceColor.needsUpdate = true;
   stone.receiveShadow = true;
   group.add(stone);
+
+  // V11: actual low-poly ground geometry, not a 2D cursor effect.
+  // Reacts locally to footsteps, never stores personal movement history.
+  const leafCount = window.innerWidth < 650 ? 62 : 118;
+  const leafShape = new THREE.Shape();
+  leafShape.moveTo(0,-.075);
+  leafShape.quadraticCurveTo(-.053,-.002,-.085,.052);
+  leafShape.quadraticCurveTo(0,.11,.085,.052);
+  leafShape.quadraticCurveTo(.053,-.002,0,-.075);
+  const leafGeometry = new THREE.ShapeGeometry(leafShape,5);
+  const leafMaterial = new THREE.MeshStandardMaterial({
+    color:0xd3b883,side:THREE.DoubleSide,roughness:1,metalness:0
+  });
+  const leafMesh = new THREE.InstancedMesh(leafGeometry,leafMaterial,leafCount);
+  leafMesh.name = "locally-responsive-ground-leaves-not-a-footpath-log";
+  leafMesh.frustumCulled = false;
+  const leafSeeds = Array.from({length:leafCount},(_,i)=>makeLeafSeed(i));
+  const dummyLeaf = new THREE.Object3D();
+  let previousVisitor=null,previousLeafTime=null;
+  for(let i=0;i<leafSeeds.length;i++){
+    const leaf=leafSeeds[i];
+    dummyLeaf.position.set(leaf.x,.104,leaf.z);
+    dummyLeaf.rotation.set(-Math.PI/2,0,leaf.angle);
+    dummyLeaf.scale.setScalar(leaf.scale);
+    dummyLeaf.updateMatrix();
+    leafMesh.setMatrixAt(i,dummyLeaf.matrix);
+    const colors=[0xcbb586,0xc1ae84,0xd7c494,0xb4a482,0xd0c4a7];
+    leafMesh.setColorAt(i,new THREE.Color(colors[i%colors.length]));
+  }
+  leafMesh.instanceMatrix.needsUpdate=true;
+  if(leafMesh.instanceColor)leafMesh.instanceColor.needsUpdate=true;
+  group.add(leafMesh);
+  function updateLooseLeaves(now,visitor,reducedMotion=false) {
+    if(!group.visible)return;
+    const dt=previousLeafTime===null?0:Math.min(.05,Math.max(0,(now-previousLeafTime)/1000));
+    previousLeafTime=now;
+    let movement=null;
+    if(visitor&&previousVisitor&&dt>0&&!reducedMotion) {
+      const vx=(visitor.x-previousVisitor.x)/dt;
+      const vz=(visitor.z-previousVisitor.z)/dt;
+      if(Math.hypot(vx,vz)<5)movement={x:visitor.x,z:visitor.z,vx,vz};
+    }
+    previousVisitor=visitor?{x:visitor.x,z:visitor.z}:null;
+    if(dt<=0||reducedMotion)return;
+    let changed=false;
+    for(let i=0;i<leafSeeds.length;i++){
+      const leaf=leafSeeds[i];
+      const distance=advanceLeaf(leaf,movement,dt);
+      if(!movement&&distance<.00008)continue;
+      changed=true;
+      dummyLeaf.position.set(leaf.x+leaf.offsetX,.104,leaf.z+leaf.offsetZ);
+      dummyLeaf.rotation.set(-Math.PI/2,0,leaf.angle+leaf.offsetX*.2);
+      dummyLeaf.scale.setScalar(leaf.scale);
+      dummyLeaf.updateMatrix();
+      leafMesh.setMatrixAt(i,dummyLeaf.matrix);
+    }
+    if(changed)leafMesh.instanceMatrix.needsUpdate=true;
+  }
 
   const textureCanvas = document.createElement("canvas");
   textureCanvas.width = textureCanvas.height = 96;
@@ -94,10 +153,23 @@ export function createVisitCourtyard(scene) {
     }
   }
   return {
-    setVisible(value) { group.visible = Boolean(value); },
+    setVisible(value) {
+      group.visible=Boolean(value);
+      previousVisitor=null;previousLeafTime=null;
+    },
+    updateLooseLeaves,
+    getLeafState() {
+      return {count:leafCount, visible:group.visible,
+        displaced:leafSeeds.filter(leaf=>Math.hypot(leaf.offsetX,leaf.offsetZ)>.0003).length};
+    },
     leaveTrace,
     tick,
     getTraceCount() { return traces.size; },
-    dispose() { for (const item of traces.values()) item.sprite.material.dispose(); traceTexture.dispose(); }
+    dispose() {
+      for(const item of traces.values())item.sprite.material.dispose();
+      traceTexture.dispose();leafGeometry.dispose();leafMaterial.dispose();
+      stone.geometry.dispose();stone.material.dispose();
+      ground.geometry.dispose();ground.material.dispose();
+    }
   };
 }
