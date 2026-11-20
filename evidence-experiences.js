@@ -12,6 +12,7 @@ export const ARCHIVE_RECORDS = {
     shortRights: "图像未获转载授权",
     plate: "档案线索 / ARCHIVE LEAD",
     href: "https://www.thepaper.cn/newsDetail_forward_26636609",
+    action: "在原文查看旧照 ↗",
     features: {
       eave: ["公开旧照的东南角视角可见上、下两层檐的外轮廓。", "拍摄日期、下檐的真实尺寸和 1320 年屋顶原貌，均不能从单张旧照独立推出。"],
       bracket: ["旧照可帮助提出‘下檐与上檐之间如何相接’的问题；研究文章另讨论下檐未施斗栱。", "图像的分辨率不足以逐件判读斗栱构造；后一句属于研究解释，不能当成照片自动测得的事实。"],
@@ -29,6 +30,7 @@ export const ARCHIVE_RECORDS = {
     shortRights: "图名及年代有待核实",
     plate: "当代教学线描 / DRAWING STUDY",
     href: "https://www.thepaper.cn/newsDetail_forward_33190547",
+    action: "查看图纸展览报道 ↗",
     features: {
       eave: ["可确认修缮工程开展过测绘；若取得立剖面，可检查修缮前后的檐口关系。", "本站蓝图样式是新画的教学草图；未持有 1963 年檐口剖面，不能量读坡度与出檐。"],
       bracket: ["原始详图或构件编号表可能回答斗栱如何拆装、替换，因而是优先追索材料。", "展览报道没有足够信息证明展示的图纸包含斗栱详图，更不能为模型节点提供实测尺寸。"],
@@ -46,6 +48,7 @@ export const ARCHIVE_RECORDS = {
     shortRights: "现状照片 / 非定标影像",
     plate: "现场观察 / PRESENT VIEW",
     href: "#fieldnotes",
+    action: "查看本站现场笔记 ↓",
     features: {
       eave: ["照片能看到当前的屋面瓦件、檐口与部分屋脊外形。", "今天的单檐不能等同 1320 年原貌，也不能凭像素估计尺寸。"],
       bracket: ["通过屋檐近照可以观察构件所在区域，安排后续定点补拍。", "局部遮挡与视角限制，使铺作层数、年代和榫卯无法由这张照片确认。"],
@@ -63,6 +66,7 @@ export const ARCHIVE_RECORDS = {
     shortRights: "程序模型 / 非实测",
     plate: "当代三维 / PROCEDURAL MODEL",
     href: "#viewer",
+    action: "前往主三维模型 ↑",
     features: {
       eave: ["切换时间状态可看见‘双檐加建／去除’在空间中的可能关系。", "清代下檐体量、屋顶曲率与真实构造均缺少历史精确测绘依据。"],
       bracket: ["在‘檐下细看’视角可辨识斗与栱的大致位置关系。", "模型铺作和断面是程序化表达，不能替代古架测绘和构件详图。"],
@@ -172,7 +176,12 @@ function initArchiveDesk() {
     featureButtons.forEach(button => {
       button.setAttribute("aria-pressed", String(button.dataset.archiveFeature === feature));
     });
-    updateLink(document.querySelector("#archiveOriginalLink"), record.href);
+    const originalLink = document.querySelector("#archiveOriginalLink");
+    updateLink(originalLink, record.href);
+    const arrow = document.createElement("span");
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = record.action.slice(-1);
+    originalLink.replaceChildren(document.createTextNode(record.action.slice(0, -2)), arrow);
   }
 
   tabs.forEach((tab, index) => {
@@ -229,6 +238,7 @@ function initFieldGuide() {
     document.querySelector("#guidePeriod").textContent = stop.period;
     document.querySelector("#guideChapterTitle").textContent = stop.title;
     document.querySelector("#guideChapterText").textContent = stop.text;
+    document.querySelector("#guideQuestionIndex").textContent = `你来判断 / 0${active + 1}`;
     document.querySelector("#guideQuestion").textContent = stop.question;
     choices.replaceChildren();
     stop.choices.forEach((label, choiceIndex) => {

@@ -13,7 +13,7 @@ for (const [key, record] of Object.entries(ARCHIVE_RECORDS)) {
     assert.equal(record.features[feature].length, 2, `${key}/${feature}: 能证明与不能证明`);
     assert.ok(record.features[feature].every(text => text.length > 10));
   }
-  for (const field of ["date", "holder", "type", "rights", "href"]) {
+  for (const field of ["date", "holder", "type", "rights", "href", "action"]) {
     assert.ok(record[field].length > 2, `${key}: missing ${field}`);
   }
 }
@@ -27,7 +27,7 @@ for (const [index, stop] of GUIDE_STOPS.entries()) {
   assert.ok([0, 1].includes(stop.correct));
   assert.ok(stop.correctText.length > 15 && stop.incorrectText.length > 15);
 }
-for (const id of ["archiveOriginalLink", "archiveCanProve", "archiveCannotProve", "archiveLoadModel", "guideFeedback", "guidePrev", "guideNext"]) {
+for (const id of ["archiveOriginalLink", "archiveCanProve", "archiveCannotProve", "archiveLoadModel", "guideQuestionIndex", "guideFeedback", "guidePrev", "guideNext"]) {
   assert.ok(html.includes(`id="${id}"`), `DOM field ${id} missing`);
 }
 assert.match(html, /本站自绘教学草图/);
