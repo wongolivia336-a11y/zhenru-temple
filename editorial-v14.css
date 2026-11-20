@@ -458,30 +458,45 @@ h2 em, .section-heading h2 em { color: var(--saffron-text); }
 #stageSlider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(166,80,59,.25); }
 #stageSlider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(166,80,59,.25); }
 
-/* An ink-thin route, drafted from the actual chapter locations. */
+/* A loose, hand-led reading route. Dashes are clipped to scroll progress,
+   and move gently instead of drawing a sterile straight line. */
 main#top { position: relative; }
 .scroll-leaf-route {
   position: absolute; top: 0; left: 0; width: 100%; z-index: 7;
-  pointer-events: none; opacity: .76; contain: layout style;
+  pointer-events: none; opacity: .9; contain: layout style;
 }
 .scroll-leaf-route[hidden] { display: none; }
 .scroll-leaf-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .scroll-leaf-guide {
-  fill: none; stroke: #889396; stroke-width: 1.1; opacity: .34;
-  stroke-dasharray: 1 11; stroke-linecap: round;
+  fill: none; stroke: #a4a9a9; stroke-width: 1.6; opacity: .18;
+  stroke-dasharray: 2 19; stroke-linecap: round;
 }
-.scroll-leaf-trace { fill: none; stroke: #a5695e; stroke-width: 1.35; stroke-linecap: round; }
-.ginkgo-body { fill: #ba8875; stroke: #7a4b41; stroke-width: 1.05; stroke-linejoin: round; }
-.ginkgo-veins { fill: none; stroke: rgba(75,46,38,.48); stroke-width: .75; stroke-linecap: round; }
+.scroll-leaf-trace {
+  fill: none; stroke: #955c50; stroke-width: 2.9; stroke-linecap: round;
+  stroke-dasharray: 9 16; animation: leafTrailBreath 7s ease-in-out infinite;
+}
+.scroll-leaf-motif { filter: drop-shadow(0 2px 2px rgba(59,39,32,.17)); }
+.ginkgo-body { fill: url("#zhenru-ginkgo-shade"); stroke: #835043; stroke-width: 1.05; stroke-linejoin: round; }
+.ginkgo-veins { fill: none; stroke: rgba(75,46,38,.47); stroke-width: .78; stroke-linecap: round; }
+
+@keyframes leafTrailBreath {
+  0%, 100% { opacity: .6; stroke-width: 2.7; stroke-dashoffset: 0; }
+  50% { opacity: .92; stroke-width: 3.3; stroke-dashoffset: -12.5; }
+}
+@keyframes leafTrailBreathSmall {
+  0%, 100% { opacity: .52; stroke-width: 1.6; stroke-dashoffset: 0; }
+  50% { opacity: .75; stroke-width: 2.1; stroke-dashoffset: -10; }
+}
 
 @media (max-width: 700px) {
   .hero h1 { font-size: clamp(58px, 15vw, 75px); }
   .section-heading h2, .evidence-intro h2, .sources-heading h2 { font-size: clamp(34px, 8.7vw, 48px); }
   .archive-head h2, .guide-intro h2, .activation-heading h2 { font-size: clamp(33px, 8.2vw, 46px); }
-  .scroll-leaf-route { opacity: .48; }
-  .scroll-leaf-guide { stroke-width: .8; opacity: .24; }
-  .scroll-leaf-trace { stroke-width: 1.15; }
+  .scroll-leaf-route { opacity: .58; }
+  .scroll-leaf-guide { stroke-width: 1.1; opacity: .14; }
+  .scroll-leaf-trace { stroke-width: 2; stroke-dasharray: 6 14; animation: leafTrailBreathSmall 9s ease-in-out infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-leaf-route { display: none; }
+  .scroll-leaf-trace { animation: none; }
 }
