@@ -80,6 +80,7 @@ h2 em, .section-heading h2 em { color: var(--saffron-text); }
 .site-ink-wash { opacity: .045; filter: grayscale(1); }
 .viewer-vignette {
   background:
+    linear-gradient(90deg, rgba(245,247,248,.92) 0%, rgba(245,247,248,.84) 12%, rgba(245,247,248,.62) 22%, rgba(245,247,248,0) 43%),
     radial-gradient(ellipse 59% 65% at 3% 39%, rgba(250,251,251,.39), rgba(250,251,251,0) 78%),
     linear-gradient(180deg, rgba(237,239,240,.65), rgba(250,251,251,.18) 19%, transparent 37% 68%, rgba(245,247,247,.74));
 }
