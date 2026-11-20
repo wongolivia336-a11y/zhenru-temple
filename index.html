@@ -44,8 +44,8 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-mark">文物建筑 · 单体三维研究</span><span>上海 · 普陀</span></p>
           <h1>一殿<span class="hero-slash">、</span><br />三时</h1>
-          <p class="hero-deck">一座木构殿堂的形制、修缮与再现</p>
-          <p class="hero-intro">从檐口到柱础，从外部轮廓到内部柱网。慢慢环绕、靠近，再进入殿内，观察一座建筑如何叠合出不同的时间。</p>
+          <p class="hero-deck">同一座殿，为什么曾经多出一层檐？</p>
+          <p class="hero-intro">沿着一条屋檐读懂 1320 年的题记、清代的加建，以及 1960 年代的修缮。旋转模型，辨认证据，也看清尚未知晓的部分。</p>
           <a class="text-link" href="#chronology">沿着屋檐，进入时间 <span aria-hidden="true">↘</span></a>
           <button type="button" class="visit-enter" id="enterVisit">
             <span>进入寺院</span><small>ENTER THE COURTYARD <span aria-hidden="true">↗</span></small>
@@ -117,7 +117,13 @@
               <div class="inspector-top"><span>构件档案 / PART NOTE</span><button type="button" id="closeInspector" aria-label="关闭构件说明">×</button></div>
               <h3 id="inspectorTitle">屋面与檐口</h3>
               <p id="inspectorText">选择一个构件，查看它的历史依据与模型边界。</p>
+              <div class="inspector-lesson">
+                <div><span>① 先观察</span><p id="inspectorObserve"></p></div>
+                <div><span>② 证据支持</span><p id="inspectorKnown"></p></div>
+                <div><span>③ 尚待查证</span><p id="inspectorUnknown"></p></div>
+              </div>
               <div class="inspector-foot"><span id="inspectorGrade">形制有记载 · 几何待测绘</span><small id="inspectorSource">上海市文旅推广网</small></div>
+              <a id="inspectorLink" class="inspector-source-link" href="#sources">追溯来源 ↗</a>
             </aside>
             <div class="viewer-loading" id="viewerLoading" role="status">
               <span class="loading-glyph">如</span><span>正在构建三维木构场景…</span>
@@ -215,7 +221,55 @@
             <a href="#evidence">查看证据 <span aria-hidden="true">↓</span></a>
           </div>
         </article>
-        <div class="model-disclaimer"><span class="disclaimer-mark">注</span><p><strong>模型状态：</strong>程序几何 · 非实测复原。清代双檐为研究推定；屋面细部、佛像与构件节点待现场和档案校准。</p></div>
+        <section class="roof-lab" id="roofLab" data-stage="0" aria-labelledby="roofLabTitle">
+          <div class="roof-lab-heading">
+            <span>02 / EAVE READING ROOM</span>
+            <h3 id="roofLabTitle">一条檐口，<em>四个时间切片</em></h3>
+            <p>对照形制，不等于复原历史。下面的线描只解释「增加／去除下檐」的关系，不模拟真实立面尺寸。</p>
+          </div>
+          <div class="roof-lab-body">
+            <div class="roof-visual">
+              <div class="roof-drawing-heading"><span>形制剖读 · 非比例示意</span><strong id="roofDiagramPhase">1320 · 形制尚待证</strong></div>
+              <svg id="roofDiagram" viewBox="0 0 520 278" role="img" aria-label="元代题记节点的单檐研究示意；该形制不能视为1320年实测原貌">
+                <defs><pattern id="roofPaperGrid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M 26 0 L 0 0 0 26" fill="none" stroke="#d9d6cc" stroke-width="0.65" /></pattern></defs>
+                <rect x="0" y="0" width="520" height="278" fill="url(#roofPaperGrid)" />
+                <path d="M64 242 H458" fill="none" stroke="#b3a89a" stroke-width="1.7" />
+                <path d="M87 233 H434 V242 H87Z" fill="#d9d0bd" stroke="#8f8272" stroke-width="1.4" />
+                <g class="diagram-posts" fill="#897b69"><rect x="112" y="123" width="12" height="110" /><rect x="250" y="119" width="12" height="114" /><rect x="386" y="123" width="12" height="110" /></g>
+                <path d="M97 130 Q159 120 211 78 L260 58 L309 78 Q361 120 423 130 L432 135 Q344 129 301 91 L260 75 L219 91 Q176 129 88 135 Z" fill="#53695e" stroke="#32483d" stroke-width="2.4" />
+                <path d="M101 130 Q168 122 219 89 L260 72 L301 89 Q353 122 419 130" fill="none" stroke="#e2ded0" stroke-width="2.3" />
+                <path d="M206 80 L260 58 L314 80" fill="none" stroke="#32483d" stroke-width="4" stroke-linecap="round" />
+                <path d="M260 58 L260 44" stroke="#32483d" stroke-width="3" stroke-linecap="round" />
+                <g class="diagram-added" aria-hidden="true">
+                  <path d="M56 177 Q133 161 185 153 L335 153 Q387 161 464 177 L470 184 Q385 179 327 166 L193 166 Q135 179 50 184 Z" fill="#a75e4d" stroke="#8d4c3d" stroke-width="2" />
+                  <path d="M66 180 Q133 168 193 160 L327 160 Q387 168 454 180" fill="none" stroke="#ead4c7" stroke-width="1.8" />
+                  <path d="M79 182 H441" fill="none" stroke="#8d4c3d" stroke-width="1.2" stroke-dasharray="4 6" />
+                </g>
+                <path class="diagram-removed" d="M52 187 Q136 173 193 163 H327 Q384 173 468 187" fill="none" stroke="#ab5949" stroke-width="2" stroke-dasharray="8 7" />
+                <g fill="#697366" font-family="serif" font-size="11"><text x="24" y="27">屋脊</text><path d="M56 23 L222 53" stroke="#a5ada0" stroke-width="1" /><text x="27" y="256">台基</text><path d="M56 249 L88 237" stroke="#a5ada0" stroke-width="1" /></g>
+                <g class="diagram-eave-label" font-family="serif" font-size="12"><path d="M392 154 L450 108" stroke="#9d4d3d" stroke-width="1.2" /><text x="420" y="95" fill="#9d4d3d">后加下檐</text></g>
+              </svg>
+              <p class="roof-legend"><i class="legend-solid"></i>上部屋盖（示意） <i class="legend-added"></i>清代增设下檐的研究表达 <i class="legend-dashed"></i>已去除的历史层次</p>
+              <figure class="roof-photo-evidence"><img src="./assets/hall-eaves.jpg" alt="项目发起者拍摄的真如寺大殿现状屋檐与瓦件" loading="lazy" /><figcaption><span>现场观察 / 今日</span><strong>照片能证明今天看到了什么，<br />不能单独证明七百年前是什么样。</strong><a href="#fieldnotes">前往现场照片 ↗</a></figcaption></figure>
+            </div>
+            <div class="roof-reading" aria-live="polite">
+              <p class="roof-reading-kicker">选择一个时期 · READ THE EAVE</p>
+              <div class="roof-period-switch" role="group" aria-label="屋檐形制阶段对照">
+                <button type="button" data-roof-stage="0" aria-pressed="true">1320<small>题记</small></button>
+                <button type="button" data-roof-stage="1" aria-pressed="false">1894—97<small>双檐</small></button>
+                <button type="button" data-roof-stage="2" aria-pressed="false">1963—64<small>大修</small></button>
+                <button type="button" data-roof-stage="3" aria-pressed="false">现状<small>观察</small></button>
+              </div>
+              <h4 id="roofReadingTitle">1320 是时间证据，未必是外观答案。</h4>
+              <div class="roof-fact"><span>有依据可说</span><p id="roofReadingKnown">元延祐七年的木构题记是重要时间线索。</p></div>
+              <div class="roof-fact roof-caution"><span>仍不可断言</span><p id="roofReadingUnknown">目前没有足以逐项还原1320年完整立面与细部的测绘依据。</p></div>
+              <a class="roof-source" id="roofReadingSource" href="https://www.meet-in-shanghai.net/cn/national-key-cultural-relics-protection-unit/it-is-really-like-the-main-hall-of-the-temple-415416/" target="_blank" rel="noopener noreferrer">查看本阶段依据 <span aria-hidden="true">↗</span></a>
+              <button type="button" class="roof-to-model" id="roofToModel">返回三维，观察这一时期 <span aria-hidden="true">↗</span></button>
+              <p class="roof-method">方法提示：史料记载 ≠ 照片观察 ≠ 可量测几何。两层屋檐的具体曲率、比例与节点尚待原始图档核对。</p>
+            </div>
+          </div>
+        </section>
+        <div class="model-disclaimer"><span class="disclaimer-mark">注</span><p><strong>模型状态：</strong>程序几何 · 非实测复原。清代双檐为研究推定；屋面细部、构件节点与殿内造像尚无足够资料复原。室内仅保留研究性祭台体量。</p></div>
       </section>
 
       <section class="anatomy-section">
@@ -225,11 +279,20 @@
             <p class="section-aside">点选屋面、梁架、斗栱、隔扇、柱网或台基，查看来源与模型状态。</p>
           </div>
           <div class="anatomy-grid">
-            <article><span>01 / ROOF</span><h3>屋面与檐口</h3><p>公开记载给出单檐／双檐的阶段变化。当前的举架与瓦作细节只是形制表达。</p></article>
-            <article><span>02 / FRAME</span><h3>梁架与斗栱</h3><p>落架大修回顾提到古架测绘与构件复原；若取得图纸，可把节点升级为可量读模型。</p></article>
-            <article><span>03 / COLUMNS</span><h3>柱网与旧木</h3><p>资料记载殿内16根柱中有10根为元代柏木柱；旧柱的准确位置仍待核验。</p></article>
-            <article><span>04 / BASE</span><h3>台基与柱础</h3><p>资料记载6个石柱础为元代旧物。模型目前不虚构其具体分布与更换历史。</p></article>
+            <article><span>01 / ROOF</span><h3>屋面与檐口</h3><p>公开记载给出单檐／双檐的阶段变化。当前的举架与瓦作细节只是形制表达。</p><button type="button" data-learn-part="roof" data-learn-view="outside">在模型中找屋檐 ↗</button></article>
+            <article><span>02 / FRAME</span><h3>梁架与斗栱</h3><p>落架大修回顾提到古架测绘与构件复原；若取得图纸，可把节点升级为可量读模型。</p><button type="button" data-learn-part="dougong" data-learn-view="eave">从檐下辨认斗栱 ↗</button></article>
+            <article><span>03 / COLUMNS</span><h3>柱网与旧木</h3><p>资料记载殿内16根柱中有10根为元代柏木柱；旧柱的准确位置仍待核验。</p><button type="button" data-learn-part="columns" data-learn-view="outside">数一数十六根柱 ↗</button></article>
+            <article><span>04 / BASE</span><h3>台基与柱础</h3><p>资料记载6个石柱础为元代旧物。模型目前不虚构其具体分布与更换历史。</p><button type="button" data-learn-part="base" data-learn-view="outside">查看台基与柱础 ↗</button></article>
           </div>
+        </div>
+      </section>
+
+      <section class="activation-section section-wrap" id="activation">
+        <div class="activation-heading"><span>知识如何成为可参与的公共文化 / PUBLIC INTERPRETATION</span><h2>从“看过一座寺”，<br /><em>到“读懂一条檐”。</em></h2></div>
+        <div class="activation-grid">
+          <article><span>01 / 现场导览</span><h3>一张能带走的屋檐读图卡</h3><p>访客先拍下眼前的檐口，再在手机上切换清代加檐与1960年代去檐的示意，最后回答：你能辨认哪一处是真实可见的？</p><small>当前可体验：上方的时间对照；实体导览卡尚未制作。</small></article>
+          <article><span>02 / 数字教学</span><h3>不是“猜这是元代的”，而是追问依据</h3><p>每一个构件有三行：先观察什么、哪项材料有据、还缺什么证据。公开档案进入后，可继续叠加年份、编号与原始图像。</p><small>当前可体验：点击三维热点或上方构件卡。</small></article>
+          <article><span>03 / 街区共创</span><h3>让研究从寺门延伸到真如街区</h3><p>以地方口述、旧照片征集与建筑观察路线组成寺外展陈。宗教空间的活动和影像使用，应先与管理者确认许可与边界。</p><small>下一阶段提案：照片来源核验、授权与共同策展。</small></article>
         </div>
       </section>
 
@@ -283,6 +346,8 @@
           <a href="https://www.shpt.gov.cn/zhengwu/wbcg-wljwhyc/2024/106/163758/b91c233608204309aad9254cfbfef98a.pdf" target="_blank" rel="noreferrer"><span class="source-no">04</span><span><strong>普陀区文物保护单位名录 · 上海普陀</strong><small>文物身份与地址信息</small></span><span class="source-arrow">↗</span></a>
           <a href="https://threejs.org/docs/pages/OrbitControls.html" target="_blank" rel="noreferrer"><span class="source-no">05</span><span><strong>Three.js · OrbitControls</strong><small>相机旋转、缩放与平移交互</small></span><span class="source-arrow">↗</span></a>
           <a href="https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html" target="_blank" rel="noreferrer"><span class="source-no">06</span><span><strong>走进真如寺，探秘大殿的建筑密码 · 上海普陀</strong><small>斗栱、梁架与屋面参数的报道线索；非测绘图</small></span><span class="source-arrow">↗</span></a>
+          <a href="https://icomoschina.org.cn/Upload/File/202108/20210804181048_6645.pdf" target="_blank" rel="noreferrer"><span class="source-no">07</span><span><strong>中国古迹遗址保护协会资料 · 上海真如寺大殿（PDF）</strong><small>含历史图像及构架资料线索；使用图像前须核实图源与授权</small></span><span class="source-arrow">↗</span></a>
+          <a href="https://www.thepaper.cn/newsDetail_forward_26636609" target="_blank" rel="noreferrer"><span class="source-no">08</span><span><strong>原始文献追索 · 刘敦桢《真如寺正殿》等</strong><small>1951年论文与1966年工匠墨书调查的书目线索；本链接是二次文献，非论文全文</small></span><span class="source-arrow">↗</span></a>
         </div>
         <p class="source-caveat">本原型为研究与表达练习，不代表寺方、文物主管部门或专业修缮单位的官方意见。公开网页信息需要与原始档案及专业人员核对。</p>
       </section>

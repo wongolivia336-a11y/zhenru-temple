@@ -324,7 +324,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     document.getElementById("walkPad").classList.toggle("is-visible", nextView === "inside" || isWalkView());
     document.getElementById("exploreHint").textContent = isWalkView()
       ? "拖动转头 · WASD 走动 · 移动端使用方向按键"
-      : nextView === "inside" ? "WASD 移动 · 佛像轮廓为待核占位"
+      : nextView === "inside" ? "WASD 移动 · 陈设为尺度示意，造像尚未复原"
       : nextView === "eave" ? "檐下近观 · 拖动查看瓦当与补间斗栱" : "拖动环绕 · 滚轮缩放 · 右键平移";
   }
 
@@ -334,8 +334,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     if (view === "inside") {
       moveCamera(new THREE.Vector3(0, 2.05, 4.2), new THREE.Vector3(0, 2.5, -2.4), "inside");
     } else if (view === "interior-walk") {
-      // Inside is first-person too. The silhouette altar is research-only:
-      // this is not a survey or a documented original Buddha sculpture.
+      // Inside is first-person too. The altar is a geometric placeholder;
+      // no unverified Buddha iconography is modeled.
       moveCamera(new THREE.Vector3(0, 1.72, 4.5), new THREE.Vector3(0, 2.55, -2.6), "interior-walk");
     } else if (view === "walk") {
       // Human-height first-person visit from an illustrative open courtyard.
@@ -1467,33 +1467,8 @@ function buildInteriorHint(hall, mats) {
     meshBox(interior, [0.1, 0.5, 0.08], [x, 1.55, -3.8], mats.woodDark, "frame");
   }
 
-  // Neutral silhouette only: replace after a permitted, multi-view altar survey.
-  const silhouetteMaterial = new THREE.MeshStandardMaterial({
-    color: 0x8b806b, roughness: 0.78, metalness: 0.02, transparent: true, opacity: 0.76
-  });
-  const figure = new THREE.Group();
-  figure.name = "unverified-statue-silhouette-placeholder";
-  figure.userData.part = "frame";
-  figure.userData.evidence = "spatial placeholder; iconography and dimensions unverified";
-  interior.add(figure);
-  const ellipsoid = (radius, scale, position) => {
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 14), silhouetteMaterial);
-    mesh.scale.set(...scale);
-    mesh.position.set(...position);
-    mesh.castShadow = true;
-    mesh.userData.part = "frame";
-    figure.add(mesh);
-  };
-  ellipsoid(1, [0.56, 0.27, 0.38], [0, 1.98, -3.78]);
-  ellipsoid(1, [0.4, 0.52, 0.32], [0, 2.34, -3.82]);
-  ellipsoid(1, [0.57, 0.24, 0.34], [0, 2.57, -3.82]);
-  ellipsoid(1, [0.19, 0.16, 0.2], [0, 2.82, -3.8]);
-  ellipsoid(1, [0.255, 0.31, 0.25], [0, 3.13, -3.8]);
-  ellipsoid(1, [0.09, 0.12, 0.09], [0, 3.53, -3.8]);
-  ellipsoid(1, [0.21, 0.13, 0.19], [-0.47, 2.35, -3.78]);
-  ellipsoid(1, [0.21, 0.13, 0.19], [0.47, 2.35, -3.78]);
-
-  // A plain backing plane records the altar's depth without inventing ornament.
+  // Only a plain altar volume and backing remain. Its scale is illustrative;
+  // adding a devotional sculpture without a verified reference would fabricate history.
   meshBox(interior, [4.7, 3.25, 0.12], [0, 3.2, -4.72], mats.woodDark, "frame");
   meshBox(interior, [4.36, 2.92, 0.035], [0, 3.2, -4.64], mats.woodLight, "frame");
 }

@@ -56,41 +56,101 @@ const stages = [
 const partNotes = {
   roof: {
     question: "屋面与檐口",
-    detail: "单檐、双檐的变化有公开记载；瓦作与檐口曲线待测绘。",
+    detail: "同一条檐，为什么会在不同年代增减？",
+    observe: "看两侧出檐、歇山端部和檐口下瓦当的排列；切换清代阶段找新增下檐。",
+    known: "公开资料记载光绪年间改为双檐，1963—64年落架大修后恢复单檐。",
+    unknown: "上檐举架、下檐尺寸、瓦件断面和具体新旧比例都缺原始测绘依据。",
     grade: "形制有记载 · 细部待测",
-    source: "上海市文旅推广网"
+    source: "上海市文旅推广网",
+    href: "https://www.meet-in-shanghai.net/cn/national-key-cultural-relics-protection-unit/it-is-really-like-the-main-hall-of-the-temple-415416/"
   },
   frame: {
     question: "梁架与屋架",
-    detail: "大修记录提到落架测绘与构件复原；节点与断面待原图校准。",
+    detail: "哪些木头承载屋顶，哪些曾经修换？",
+    observe: "切换构架透视，对照柱、梁、枋与屋架的相对关系。",
+    known: "上海院回顾了大修中的古架测绘与构件复原工作。",
+    unknown: "各根梁枋的断面、榫卯和构件新旧归属需修缮图纸与编号表。",
     grade: "修缮有记录 · 节点待证",
-    source: "上海建筑设计研究院"
+    source: "上海建筑设计研究院",
+    href: "https://www.siadr.com/70thdetails/5e7da86e72f5dd06b6d90d03/"
   },
   dougong: {
     question: "斗栱与出檐支承",
-    detail: "斗栱层级与尺度为形态示意，待测绘图复核。",
+    detail: "斗与栱为什么层层叠出？",
+    observe: "点「檐下细看」，找柱顶与柱间的层叠木构，观察它们怎样过渡到出檐。",
+    known: "公开报道讨论了真如寺大殿的斗栱与梁架；当前模型可帮助辨认位置关系。",
+    unknown: "铺作逐层构造、构件实际大小与原件年代不能由程序几何确认。",
     grade: "研究推定",
-    source: "待补：1963—64年修缮图纸"
+    source: "上海普陀报道；待补修缮图",
+    href: "https://www.shpt.gov.cn/tupianxinwen/20250416/958655.html"
   },
   door: {
     question: "门窗与隔扇",
-    detail: "格扇用于表达内外界面；分格与历史样式待核。",
+    detail: "门扇能告诉我们哪一代的建筑语言？",
+    observe: "对照门扇分格与檐下柱网，注意现在见到的和建造年代不是一个问题。",
+    known: "程序模型用格扇表达内外界面，便于观察空间开合关系。",
+    unknown: "历史式样、格心做法、颜色与每次更换的年代尚未核实。",
     grade: "照片观察 · 细节待核",
-    source: "项目现场照片；待补历史照片"
+    source: "项目现场笔记；待补历史照片",
+    href: "#fieldnotes"
   },
   columns: {
     question: "柱网与旧木",
-    detail: "资料记载16根柱中有10根元代柏木柱；旧柱具体位置未证。",
+    detail: "十根七百年前的木柱，究竟是哪十根？",
+    observe: "俯瞰柱网：先数16根柱。不要把模型的颜色当成木料年代编码。",
+    known: "公开资料记载16根柱中有10根为元代柏木柱。",
+    unknown: "哪10根是旧物，要靠编号、年轮／材料记录和修缮档案核对。",
     grade: "数量有记载 · 位置待证",
-    source: "上海市文旅推广网"
+    source: "上海市文旅推广网",
+    href: "https://www.meet-in-shanghai.net/cn/national-key-cultural-relics-protection-unit/it-is-really-like-the-main-hall-of-the-temple-415416/"
   },
   base: {
     question: "台基与柱础",
-    detail: "资料记载6个元代旧石柱础；分布与形制待核。",
+    detail: "一块石础如何成为年代证据？",
+    observe: "沿柱脚寻找木柱、石础和台基相接的位置。",
+    known: "公开资料记载6个石柱础为元代旧物。",
+    unknown: "六个旧础的位置、石作纹样与后期换补情况还需逐件记录。",
     grade: "数量有记载 · 形制待核",
-    source: "上海市文旅推广网"
+    source: "上海市文旅推广网",
+    href: "https://www.meet-in-shanghai.net/cn/national-key-cultural-relics-protection-unit/it-is-really-like-the-main-hall-of-the-temple-415416/"
   }
 };
+
+// A deliberately diagrammatic reading aid, not measured historic elevations.
+const roofReadings = [
+  {
+    phase: "1320 · 形制尚待证",
+    title: "1320 是时间证据，未必是外观答案。",
+    known: "元延祐七年的木构题记是重要时间线索；它指向建筑的历史年代。",
+    unknown: "仍没有足以逐项还原1320年完整立面、檐口和瓦件的测绘与影像证据。图中单檐只是用于比较的形制示意。",
+    alt: "元代题记节点的单檐研究示意，形制未经原状测绘确认",
+    href: "https://www.meet-in-shanghai.net/cn/national-key-cultural-relics-protection-unit/it-is-really-like-the-main-hall-of-the-temple-415416/"
+  },
+  {
+    phase: "1894—97 · 记载中的双檐",
+    title: "下檐增加，建筑的外轮廓也随之改变。",
+    known: "上海市文旅推广网记载光绪重修时将单檐改为双檐；研究文章据旧照讨论过五间重檐形态。",
+    unknown: "关于主体是否扩建，公开资料有不同表述。红色下檐的伸出范围、尺度与柱位都只是说明性画法。",
+    alt: "清代双檐研究示意，新增下檐用红色突出，比例与柱位未按历史测绘复原",
+    href: "https://www.thepaper.cn/newsDetail_forward_26636609"
+  },
+  {
+    phase: "1963—64 · 去除后加下檐",
+    title: "一次修缮，也是一种历史选择。",
+    known: "1963年开始落架大修，1964年竣工；相关资料明确提到去除后世下檐、恢复单檐形式。",
+    unknown: "恢复单檐不等于每根构件都回到1320年。沿用、替换、补配的清单仍应核对修缮档案。",
+    alt: "1963至1964年修缮后的单檐示意，虚线提示已去除的下檐历史层次",
+    href: "https://www.siadr.com/70thdetails/5e7da86e72f5dd06b6d90d03/"
+  },
+  {
+    phase: "现在 · 单檐可见",
+    title: "眼前的单檐，是多次修缮的结果。",
+    known: "今天可通过现场照片观察单檐歇山的外观、瓦件与色彩，并与档案中的修缮节点对照。",
+    unknown: "现状照片不是元代照片；当前视觉效果也不能逐项证明旧木、旧础或瓦件的年代。",
+    alt: "现状单檐示意，以虚线提醒清代下檐曾存在但今天已去除",
+    href: "#fieldnotes"
+  }
+];
 
 const timelineButtons = [...document.querySelectorAll(".time-step")];
 const stageSlider = document.querySelector("#stageSlider");
@@ -118,7 +178,11 @@ const inspector = {
   title: document.querySelector("#inspectorTitle"),
   text: document.querySelector("#inspectorText"),
   grade: document.querySelector("#inspectorGrade"),
-  source: document.querySelector("#inspectorSource")
+  source: document.querySelector("#inspectorSource"),
+  observe: document.querySelector("#inspectorObserve"),
+  known: document.querySelector("#inspectorKnown"),
+  unknown: document.querySelector("#inspectorUnknown"),
+  link: document.querySelector("#inspectorLink")
 };
 
 let activeStage = 0;
@@ -151,6 +215,25 @@ function setStage(value) {
   if (timelineYear) timelineYear.textContent = stage.year;
   if (hallScene) hallScene.setStage(stageProgress);
   if (ginkgoEra) ginkgoEra.textContent = ginkgoStageNotes[activeStage];
+  const roofLab = document.querySelector("#roofLab");
+  const reading = roofReadings[activeStage];
+  if (roofLab) roofLab.dataset.stage = String(activeStage);
+  document.querySelectorAll("[data-roof-stage]").forEach(button => {
+    const selected = Number(button.dataset.roofStage) === activeStage;
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  document.querySelector("#roofDiagramPhase").textContent = reading.phase;
+  document.querySelector("#roofDiagram").setAttribute("aria-label", reading.alt);
+  document.querySelector("#roofReadingTitle").textContent = reading.title;
+  document.querySelector("#roofReadingKnown").textContent = reading.known;
+  document.querySelector("#roofReadingUnknown").textContent = reading.unknown;
+  const readingSource = document.querySelector("#roofReadingSource");
+  readingSource.href = reading.href;
+  if (reading.href.startsWith("#")) {
+    readingSource.removeAttribute("target");
+  } else {
+    readingSource.target = "_blank";
+  }
   closeInspector();
 }
 
@@ -193,13 +276,34 @@ function setObservation(part) {
   });
   inspector.title.textContent = note.question;
   inspector.text.textContent = note.detail;
+  inspector.observe.textContent = note.observe;
+  inspector.known.textContent = note.known;
+  inspector.unknown.textContent = note.unknown;
   inspector.grade.textContent = note.grade;
   inspector.source.textContent = note.source;
+  inspector.link.href = note.href;
+  if (note.href.startsWith("#")) inspector.link.removeAttribute("target");
+  else inspector.link.target = "_blank";
   inspector.root.hidden = false;
   document.querySelector("#viewerFrame")?.classList.add("has-inspector");
 }
 
 timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
+document.querySelectorAll("[data-roof-stage]").forEach(button => {
+  button.addEventListener("click", () => setStage(Number(button.dataset.roofStage)));
+});
+document.querySelector("#roofToModel")?.addEventListener("click", () => {
+  hallScene?.setView("outside");
+  document.querySelector("#viewer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+document.querySelectorAll("[data-learn-part]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (!hallScene) return;
+    hallScene.setView(button.dataset.learnView || "outside");
+    setObservation(button.dataset.learnPart);
+    document.querySelector("#viewer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
 stageSlider?.addEventListener("input", (event) => setStage(Number(event.currentTarget.value)));
 stageSlider?.addEventListener("change", (event) => setStage(Math.round(Number(event.currentTarget.value))));
 stageSlider?.addEventListener("keydown", (event) => {
@@ -565,7 +669,7 @@ function onVisitZoneChanged(zone) {
   } else if(zone==="interior") {
     annotation.textContent="03 / THE MAIN HALL";
     title.textContent="从殿中重新感受空间的尺度。";
-    text.textContent="这是建筑研究性的室内空间。佛像轮廓与陈设尚未通过实测或寺方核验，不代表真实原状。";
+    text.textContent="这是建筑研究性的室内空间。仅保留不带造像的祭台体量示意；陈设未经测绘或寺方核验，不代表真实原状。";
     actions.hidden=true;
     if (presence.joined) presence.disconnect();
   } else {
