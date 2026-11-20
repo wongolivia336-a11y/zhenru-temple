@@ -17,8 +17,9 @@ const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 
 export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZone }) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#f0f3f0");
-  scene.fog = new THREE.Fog("#f0f3f0", 48, 96);
+  // Overcast archive-view light, not a claimed reconstruction of historical weather.
+  scene.background = new THREE.Color("#e9ecee");
+  scene.fog = new THREE.Fog("#e9ecee", 48, 96);
 
   const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 120);
   camera.position.copy(CAMERA_HOME);
@@ -47,8 +48,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   const cancelCameraTween = () => { cameraTween = null; cameraTouched = true; };
   controls.addEventListener("start", cancelCameraTween);
 
-  scene.add(new THREE.HemisphereLight(0xf6f8f6, 0x737b76, 1.7));
-  const keyLight = new THREE.DirectionalLight(0xfff5e3, 2.6);
+  scene.add(new THREE.HemisphereLight(0xf4f5f5, 0x73777a, 1.55));
+  const keyLight = new THREE.DirectionalLight(0xfff9f1, 2.35);
   keyLight.position.set(-13, 22, 15);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -59,7 +60,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   keyLight.shadow.bias = -0.00028;
   keyLight.shadow.normalBias = 0.035;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xc5d0ca, 1.15);
+  const fillLight = new THREE.DirectionalLight(0xd5dbdd, 1.02);
   fillLight.position.set(12, 10, -15);
   scene.add(fillLight);
   const warmInterior = new THREE.PointLight(0xe0bd82, 4.2, 17, 1.8);
@@ -74,15 +75,15 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     woodLight: new THREE.MeshStandardMaterial({ color: 0x80603d, roughness: 0.82 }),
     woodDark: new THREE.MeshStandardMaterial({ color: 0x30251d, roughness: 0.92 }),
     woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7548, roughness: 0.78 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xc9cec9, roughness: 0.95 }),
-    wallShadow: new THREE.MeshStandardMaterial({ color: 0x858d87, roughness: 0.96 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x777e79, roughness: 0.91, side: THREE.DoubleSide }),
-    roofSide: new THREE.MeshStandardMaterial({ color: 0x656e69, roughness: 0.93, side: THREE.DoubleSide }),
-    roofSun: new THREE.MeshStandardMaterial({ color: 0x858a84, roughness: 0.89, side: THREE.DoubleSide }),
-    roofTile: new THREE.LineBasicMaterial({ color: 0xa3aaa5, transparent: true, opacity: 0.52 }),
-    roofRib: new THREE.LineBasicMaterial({ color: 0x4b5550, transparent: true, opacity: 0.66 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xcfcfca, roughness: 0.95 }),
+    wallShadow: new THREE.MeshStandardMaterial({ color: 0x878987, roughness: 0.96 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x70777b, roughness: 0.91, side: THREE.DoubleSide }),
+    roofSide: new THREE.MeshStandardMaterial({ color: 0x626a6e, roughness: 0.93, side: THREE.DoubleSide }),
+    roofSun: new THREE.MeshStandardMaterial({ color: 0x7f8589, roughness: 0.89, side: THREE.DoubleSide }),
+    roofTile: new THREE.LineBasicMaterial({ color: 0x9da5a8, transparent: true, opacity: 0.52 }),
+    roofRib: new THREE.LineBasicMaterial({ color: 0x454f54, transparent: true, opacity: 0.66 }),
     brass: new THREE.MeshStandardMaterial({ color: 0xa98b59, roughness: 0.68, metalness: 0.12 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0xf0f2ef, roughness: 1 }),
+    ground: new THREE.MeshStandardMaterial({ color: 0xecefef, roughness: 1 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x35342e, roughness: 0.52, metalness: 0.02 })
   };
 
@@ -185,8 +186,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   let walkPitch = 0;
   let lookDrag = null;
   let lastVisitZone = "";
-  const visitColor = new THREE.Color("#e2e7df");
-  const archiveColor = new THREE.Color("#f0f3f0");
+  const visitColor = new THREE.Color("#e5e8e7");
+  const archiveColor = new THREE.Color("#e9ecee");
   let exploded = false;
   let explosionTarget = 0;
   let explosionAmount = 0;

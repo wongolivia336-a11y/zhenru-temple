@@ -54,9 +54,9 @@ python -m http.server 8000
 - 原生 JavaScript / CSS；无构建步骤
 - `prefers-reduced-motion`、键盘焦点、键盘/触屏移动控制与 WebGL 2 启动失败提示
 
-### V15｜字形、材料色与银杏叙事动线
+### V16｜字形、材料色与银杏叙事动线
 
-界面中文改用本地托管的 Noto Sans CJK SC（Regular/Bold 精简 WOFF2），以清晰的无衬线阅读体验区别于古建筑本体。网页继续使用白色底；深木褐作为文字和一个章节的暗底，瓦灰与银杏黄作为材料观察和少量交互提示。字体遵循 SIL Open Font License 1.1；许可全文及原项目署名见 `assets/fonts/OFL-NOTICE.txt`。如增删大量中文文案，请重新执行 `node scripts/build-font-subset.mjs` 补全字体子集。此脚本依赖系统字体 NotoSansCJK-{Regular,Bold}.ttc 及 Python FontTools、Brotli，不是网站运行依赖。
+界面中文改用本地托管的 Noto Sans CJK SC（Regular/Bold 精简 WOFF2），以清晰的无衬线阅读体验区别于古建筑本体。网页继续使用白色底；深木褐作为文字和一个章节的暗底，低饱和瓦灰用于建筑研究图示，砖红 `#A6503B` 仅用于重要操作、章节索引与证据入口。首屏的柔灰雾感来自 CSS 与研究模型的天气氛围，不代表任何历史时期的气候记录，也不是现场照片。字体遵循 SIL Open Font License 1.1；许可全文及原项目署名见 `assets/fonts/OFL-NOTICE.txt`。如增删大量中文文案，请重新执行 `node scripts/build-font-subset.mjs` 补全字体子集。此脚本依赖系统字体 NotoSansCJK-{Regular,Bold}.ttc 及 Python FontTools、Brotli，不是网站运行依赖。
 
 长页面中的银杏叶以原生 SVG 曲线和 `requestAnimationFrame` 随阅读位置移动；章节高度变化时会重新计算路径，支持 `prefers-reduced-motion`。它不接管原生滚动，也不额外创建 WebGL 画布。用户提供的 Framer Motion/React 示例是动效概念参考；本仓库目前并非 React/Tailwind/TypeScript/shadcn 项目，直接移植组件会引入一整套不必要的构建链。
 
