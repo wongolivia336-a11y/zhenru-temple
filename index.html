@@ -177,7 +177,8 @@
                 </div>
                 <label class="timeline-range-label" for="stageSlider">
                   <span class="sr-only">拖动查看大殿历史阶段</span>
-                  <input id="stageSlider" type="range" min="0" max="3" step="0.01" value="0" aria-valuetext="1320，元代题记节点" />
+                  <span class="sr-only" id="timelineScaleNote">四个等距刻度代表研究选取的形制阶段，并非按历史年份等距排列。可连续拖动，松手后平缓停靠在最近的节点。</span>
+                  <input id="stageSlider" type="range" min="0" max="3" step="0.01" value="0" aria-valuetext="1320，元代题记节点" aria-describedby="timelineScaleNote" />
                 </label>
                 <div class="timeline-ticks" role="group" aria-label="时间节点">
                   <button class="time-step is-active" type="button" data-stage="0" aria-pressed="true"><strong>1320</strong><small>元 · 题记</small></button>

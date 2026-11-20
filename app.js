@@ -190,6 +190,32 @@ const inspector = {
 let activeStage = 0;
 let stageProgress = 0;
 let hallScene = null;
+let timelineSettleFrame = 0;
+
+function stopTimelineSettle() {
+  if (timelineSettleFrame) cancelAnimationFrame(timelineSettleFrame);
+  timelineSettleFrame = 0;
+}
+
+function settleTimeline() {
+  stopTimelineSettle();
+  const start = stageProgress;
+  const target = Math.round(start);
+  if (Math.abs(target - start) < .005 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setStage(target);
+    return;
+  }
+  const startTime = performance.now();
+  const duration = 280;
+  function animate(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    setStage(start + (target - start) * eased);
+    if (t < 1) timelineSettleFrame = requestAnimationFrame(animate);
+    else timelineSettleFrame = 0;
+  }
+  timelineSettleFrame = requestAnimationFrame(animate);
+}
 
 function setStage(value) {
   stageProgress = Math.max(0, Math.min(stages.length - 1, Number(value) || 0));
@@ -300,9 +326,15 @@ function setObservation(part) {
   document.querySelector("#viewerFrame")?.classList.add("has-inspector");
 }
 
-timelineButtons.forEach((button) => button.addEventListener("click", () => setStage(Number(button.dataset.stage))));
+timelineButtons.forEach((button) => button.addEventListener("click", () => {
+  stopTimelineSettle();
+  setStage(Number(button.dataset.stage));
+}));
 document.querySelectorAll("[data-roof-stage]").forEach(button => {
-  button.addEventListener("click", () => setStage(Number(button.dataset.roofStage)));
+  button.addEventListener("click", () => {
+    stopTimelineSettle();
+    setStage(Number(button.dataset.roofStage));
+  });
 });
 document.querySelector("#roofToModel")?.addEventListener("click", () => {
   hallScene?.setView("outside");
@@ -316,22 +348,28 @@ document.querySelectorAll("[data-learn-part]").forEach(button => {
     document.querySelector("#viewer")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 });
-stageSlider?.addEventListener("input", (event) => setStage(Number(event.currentTarget.value)));
-stageSlider?.addEventListener("change", (event) => setStage(Math.round(Number(event.currentTarget.value))));
+stageSlider?.addEventListener("input", (event) => {
+  stopTimelineSettle();
+  setStage(Number(event.currentTarget.value));
+});
+stageSlider?.addEventListener("change", settleTimeline);
 stageSlider?.addEventListener("keydown", (event) => {
   const direction = event.key === "ArrowRight" || event.key === "ArrowUp" ? 1
     : event.key === "ArrowLeft" || event.key === "ArrowDown" ? -1 : 0;
   if (direction) {
     event.preventDefault();
     event.stopPropagation();
+    stopTimelineSettle();
     setStage(Math.max(0, Math.min(stages.length - 1, activeStage + direction)));
   } else if (event.key === "Home") {
     event.preventDefault();
     event.stopPropagation();
+    stopTimelineSettle();
     setStage(0);
   } else if (event.key === "End") {
     event.preventDefault();
     event.stopPropagation();
+    stopTimelineSettle();
     setStage(stages.length - 1);
   }
 });

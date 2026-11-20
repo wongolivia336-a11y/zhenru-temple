@@ -500,3 +500,123 @@ main#top { position: relative; }
   .scroll-leaf-route { display: none; }
   .scroll-leaf-trace { animation: none; }
 }
+
+/* V17 / A continuous architectural time ruler, not a form-field hairline.
+   The four study states are equally spaced here, not proportional to years. */
+.timeline-strip {
+  width: min(100%, 1120px);
+  min-height: 140px;
+  margin-inline: auto;
+  padding: 16px 25px 17px;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 14px 46px rgba(40, 39, 34, .11);
+  backdrop-filter: blur(17px);
+}
+.timeline-readout { min-height: 24px; align-items: center; }
+.timeline-context { gap: 15px; }
+.timeline-context #timelinePeriod {
+  color: var(--brick-dark); font-size: 13px; font-weight: 700;
+}
+.timeline-shape { color: #727b79; font-size: 11px; }
+#timelineYear { color: var(--wood); font: 600 15px/1.2 var(--mono); letter-spacing: -.01em; }
+.timeline-range-label {
+  position: relative; z-index: 2;
+  display: block; height: 42px; margin-top: 7px;
+}
+#stageSlider {
+  display: block; width: 100%; height: 42px; margin: 0;
+  appearance: none; -webkit-appearance: none;
+  background: transparent; cursor: grab;
+  touch-action: pan-y;
+}
+#stageSlider:active { cursor: grabbing; }
+#stageSlider::-webkit-slider-runnable-track {
+  height: 9px; border: 0; border-radius: 999px;
+  background: linear-gradient(90deg, var(--brick) var(--progress), #d7dcda var(--progress));
+  box-shadow: inset 0 1px 3px rgba(52, 55, 51, .12);
+}
+#stageSlider::-moz-range-track {
+  height: 9px; border: 0; border-radius: 999px;
+  background: #d7dcda; box-shadow: inset 0 1px 3px rgba(52, 55, 51, .12);
+}
+#stageSlider::-moz-range-progress {
+  height: 9px; border-radius: 999px; background: var(--brick);
+}
+#stageSlider::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 27px; height: 28px; margin-top: -9.5px;
+  border: 3px solid #fff; border-radius: 9px;
+  background: linear-gradient(#f7e7e0, #f7e7e0) center/8px 2px no-repeat, var(--brick);
+  box-shadow: 0 0 0 1px rgba(123, 56, 43, .58), 0 4px 11px rgba(64, 42, 37, .24);
+  transition: box-shadow .24s ease, transform .24s cubic-bezier(.22,1,.36,1);
+}
+#stageSlider::-moz-range-thumb {
+  width: 21px; height: 22px; border: 3px solid #fff; border-radius: 9px;
+  background: linear-gradient(#f7e7e0, #f7e7e0) center/8px 2px no-repeat, var(--brick);
+  box-shadow: 0 0 0 1px rgba(123, 56, 43, .58), 0 4px 11px rgba(64, 42, 37, .24);
+  transition: box-shadow .24s ease, transform .24s cubic-bezier(.22,1,.36,1);
+}
+#stageSlider:hover::-webkit-slider-thumb,
+#stageSlider:active::-webkit-slider-thumb { transform: scale(1.08); box-shadow: 0 0 0 5px rgba(166, 80, 59, .12), 0 5px 14px rgba(64,42,37,.25); }
+#stageSlider:hover::-moz-range-thumb,
+#stageSlider:active::-moz-range-thumb { transform: scale(1.08); box-shadow: 0 0 0 5px rgba(166, 80, 59, .12), 0 5px 14px rgba(64,42,37,.25); }
+#stageSlider:focus-visible { outline: none; }
+#stageSlider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(166,80,59,.28), 0 3px 12px rgba(64,42,37,.2); }
+#stageSlider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 5px rgba(166,80,59,.28), 0 3px 12px rgba(64,42,37,.2); }
+.timeline-ticks {
+  position: relative; z-index: 1;
+  display: block; height: 43px;
+  margin: 0 13.5px; /* matches the range thumb's centre at both ends */
+}
+.timeline-ticks .time-step {
+  position: absolute; top: 2px;
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 0; min-height: 39px; width: max-content;
+  padding: 0; text-align: center; align-items: center;
+  color: #59615e;
+  transition: color .2s ease;
+}
+.timeline-ticks .time-step:nth-child(1) { left: 0; align-items: flex-start; text-align: left; }
+.timeline-ticks .time-step:nth-child(2) { left: 33.3333%; transform: translateX(-50%); }
+.timeline-ticks .time-step:nth-child(3) { left: 66.6667%; transform: translateX(-50%); }
+.timeline-ticks .time-step:nth-child(4) { right: 0; align-items: flex-end; text-align: right; }
+.timeline-ticks .time-step::before {
+  content: ''; position: absolute; top: -27px; left: 50%;
+  width: 7px; height: 7px; transform: translateX(-50%);
+  border: 2px solid #fff; border-radius: 50%;
+  background: #959c99; box-shadow: 0 0 0 1px #959c99;
+  transition: background .24s ease, box-shadow .24s ease, transform .24s ease;
+}
+.timeline-ticks .time-step:first-child::before { left: 0; transform: none; }
+.timeline-ticks .time-step:last-child::before { left: auto; right: 0; transform: none; }
+.timeline-ticks .time-step.is-active::before { background: var(--brick); box-shadow: 0 0 0 1px var(--brick), 0 0 0 5px rgba(166,80,59,.11); }
+.timeline-ticks .time-step strong {
+  color: #4d5652; font: 600 11px/1.35 var(--mono); font-variant-numeric: tabular-nums;
+}
+.timeline-ticks .time-step small { color: #8b918c; font-size: 10px; line-height: 1.35; }
+.timeline-ticks .time-step.is-active strong { color: var(--brick-dark); }
+.timeline-ticks .time-step.is-active small { color: #8c6259; }
+.timeline-ticks .time-step:hover strong { color: var(--brick-dark); }
+.timeline-ticks .time-step:focus-visible { outline: 2px solid var(--brick); outline-offset: 5px; }
+
+@media (max-width: 650px) {
+  .timeline-strip { min-height: 124px; padding: 12px 15px 10px; }
+  html.viewer-only .timeline-strip { padding: 12px 15px 10px; }
+  .timeline-context { gap: 2px; }
+  .timeline-context #timelinePeriod { font-size: 12px; }
+  .timeline-shape { font-size: 10px; }
+  #timelineYear { font-size: 13px; }
+  .timeline-range-label, #stageSlider { height: 39px; }
+  .timeline-range-label { margin-top: 4px; }
+  .timeline-ticks { margin-inline: 13.5px; height: 39px; }
+  .timeline-ticks .time-step { gap: 3px; }
+  .timeline-ticks .time-step strong { font-size: 10px; }
+  .timeline-ticks .time-step small { font-size: 9px; }
+  .timeline-ticks .time-step::before { top: -25px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #stageSlider::-webkit-slider-thumb, #stageSlider::-moz-range-thumb,
+  .timeline-ticks .time-step, .timeline-ticks .time-step::before { transition: none; }
+}
