@@ -2,6 +2,7 @@ import { createQuietAir } from "./audio/quiet-air.js";
 import { createPresenceClient } from "./presence/client.js";
 import { PRESENCE_WEBSOCKET_URL } from "./presence/config.js";
 import { initEvidenceExperiences } from "./evidence-experiences.js";
+import { initScrollLeaf } from "./scroll-leaf.js";
 
 const stages = [
   {
@@ -523,6 +524,7 @@ if ("IntersectionObserver" in window) {
 
 setStage(0);
 initEvidenceExperiences();
+initScrollLeaf();
 
 function prepareWebGL2Context(canvas) {
   // Prefer a lightweight context first; Three.js reuses this canvas context.

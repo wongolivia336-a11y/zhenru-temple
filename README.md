@@ -54,6 +54,12 @@ python -m http.server 8000
 - 原生 JavaScript / CSS；无构建步骤
 - `prefers-reduced-motion`、键盘焦点、键盘/触屏移动控制与 WebGL 2 启动失败提示
 
+### V15｜字形、材料色与银杏叙事动线
+
+界面中文改用本地托管的 Noto Sans CJK SC（Regular/Bold 精简 WOFF2），以清晰的无衬线阅读体验区别于古建筑本体。网页继续使用白色底；深木褐作为文字和一个章节的暗底，瓦灰与银杏黄作为材料观察和少量交互提示。字体遵循 SIL Open Font License 1.1；许可全文及原项目署名见 `assets/fonts/OFL-NOTICE.txt`。如增删大量中文文案，请重新执行 `node scripts/build-font-subset.mjs` 补全字体子集。此脚本依赖系统字体 NotoSansCJK-{Regular,Bold}.ttc 及 Python FontTools、Brotli，不是网站运行依赖。
+
+长页面中的银杏叶以原生 SVG 曲线和 `requestAnimationFrame` 随阅读位置移动；章节高度变化时会重新计算路径，支持 `prefers-reduced-motion`。它不接管原生滚动，也不额外创建 WebGL 画布。用户提供的 Framer Motion/React 示例是动效概念参考；本仓库目前并非 React/Tailwind/TypeScript/shadcn 项目，直接移植组件会引入一整套不必要的构建链。
+
 ## 研究边界
 
 本项目是教育与交互表达用途的程序化研究模型，不是实测模型、考古复原、文物修缮方案或寺方官方数字资产。它不应用于测绘、施工、结构安全判断或文物保护决策。公开网页信息仍应与原始档案及专业人员交叉核验。照片公开或转交第三方前，请确认图片授权。

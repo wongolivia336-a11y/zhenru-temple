@@ -1,29 +1,47 @@
-/* V14 / A white editorial surface with a restrained saffron signal.
+/* V15 / A white editorial surface with deep timber, roof slate and ginkgo.
    This intentional theme layer replaces former bordered-card patterns while
    leaving the Three.js geometry, access rules and historical data untouched. */
+@font-face {
+  font-family: "Zhenru Reading";
+  src: url("./assets/fonts/noto-sans-sc-regular-subset.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zhenru Reading";
+  src: url("./assets/fonts/noto-sans-sc-bold-subset.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 :root {
   --paper: #fff;
-  --paper-deep: #f6f6f2;
-  --ink: #1f221f;
-  --ink-soft: #62665f;
-  --moss: #303630;
-  --moss-deep: #282c28;
-  --clay: #92700f;
-  --gold: #e4b62b;
-  --saffron: #e4b62b;
-  --saffron-text: #86620b;
-  --quiet: #f6f7f4;
-  --rule: rgba(32, 36, 31, .12);
+  --paper-deep: #f5f6f5;
+  --ink: #342d28;
+  --ink-soft: #746e68;
+  --wood: #342b25;
+  --roof-slate: #646f72;
+  --moss: #3e4646;
+  --moss-deep: #303737;
+  --clay: #97751b;
+  --gold: #d4a72f;
+  --saffron: #dfb534;
+  --saffron-text: #92701c;
+  --quiet: #f5f6f4;
+  --rule: rgba(52, 45, 40, .13);
+  --serif: "Zhenru Reading", "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sans: var(--serif);
 }
 html { scroll-behavior: smooth; }
-body { color: var(--ink); background: #fff; }
+body { color: var(--ink); background: #fff; font-family: var(--sans); }
 body::before { display: none; }
 ::selection { color: #1d211c; background: #f5dc7a; }
 
 /* Quiet identity. Typography and spaces take over from framed components. */
 .site-header { background: rgba(255,255,255,.96); border-bottom: 0; box-shadow: 0 1px 0 rgba(31,34,31,.055); }
 .brand-seal { color: #2d2a1c; background: var(--saffron); border-radius: 1px; }
-.brand-copy strong { color: #242722; }
+.brand-copy strong { color: var(--wood); }
 .main-nav a, .header-note { color: #737871; }
 .main-nav a { position: relative; }
 .main-nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; background: var(--saffron); transform: scaleX(0); transform-origin: left; transition: transform .32s cubic-bezier(.22,1,.36,1); }
@@ -41,7 +59,7 @@ h2 em, .section-heading h2 em { color: var(--saffron-text); }
 .viewer-shell { padding-top: 0; }
 .viewer-frame { border: 0; box-shadow: none; border-radius: 0; }
 .hero-copy::before { background: radial-gradient(ellipse 58% 55% at 25% 41%, #fff 0%, rgba(255,255,255,.92) 44%, rgba(255,255,255,0) 100%); }
-.hero h1 { color: #252923; }
+.hero h1 { color: var(--wood); }
 .hero-slash { color: var(--saffron-text); }
 .hero-deck { color: #242a24; font-size: 16px; }
 .hero-intro { color: #5c665d; font-size: 13px; line-height: 1.9; }
@@ -360,4 +378,95 @@ h2 em, .section-heading h2 em { color: var(--saffron-text); }
   .roof-reading.is-turning > :not(.roof-period-switch) { animation: none; }
   .main-nav a::after, .view-button, .archive-switch button, .guide-steps button,
   .guide-question button, .roof-period-switch button { transition: none; }
+}
+
+/* V15 typography: modern interpretive typography, not period-style imitation.
+   The building itself supplies the historical material; the interface stays legible. */
+.brand-copy strong { font-weight: 700; letter-spacing: .06em; }
+.brand-copy small, .header-note, .eyebrow { letter-spacing: .04em; }
+.eyebrow { gap: 12px; font-size: 10px; }
+.eyebrow .eyebrow-mark + span { display: none; }
+.hero h1 { font-weight: 700; font-size: clamp(64px, 7.2vw, 102px); line-height: 1.08; letter-spacing: -.075em; }
+.hero-deck { font-weight: 700; letter-spacing: -.025em; }
+.hero-intro { max-width: 420px; font-size: 13px; line-height: 2; }
+.intro-band p { font-weight: 400; letter-spacing: -.025em; line-height: 1.78; }
+.section-heading h2, .evidence-intro h2, .sources-heading h2,
+.archive-head h2, .guide-intro h2, .activation-heading h2,
+.next-steps h2 { font-weight: 700; line-height: 1.31; letter-spacing: -.055em; }
+.section-heading h2, .evidence-intro h2, .sources-heading h2 { font-size: clamp(37px, 5.3vw, 65px); }
+.archive-head h2 { font-size: clamp(35px, 4.3vw, 56px); }
+.guide-intro h2 { font-size: clamp(34px, 3.8vw, 49px); }
+.activation-heading h2, .next-steps h2 { font-size: clamp(36px, 4.75vw, 59px); }
+.story-copy h3, .roof-lab-heading h3, .roof-reading h4,
+.archive-record h3, .guide-panel h3, .anatomy-grid h3,
+.activation-grid h3, .evidence-card h3 { font-weight: 700; letter-spacing: -.035em; }
+.section-aside { max-width: 310px; font-size: 12px; line-height: 1.85; }
+.archive-head > p, .guide-head > p, .anatomy-heading .section-aside { display: none; }
+.archive-head { grid-template-columns: minmax(0,1fr); gap: 0; }
+.archive-head h2 { max-width: 710px; }
+.story-number { font-family: var(--mono); font-weight: 400; letter-spacing: -.095em; }
+.guide-stamp { border-color: rgba(151, 117, 27, .28); }
+
+/* Timber is the main dark note; the existing 3D slate roof becomes the second.
+   Gold belongs to wayfinding, not to every illustration or paragraph. */
+.hero, .viewer-frame { background: #f6f7f6; }
+.hero-copy::before { background: radial-gradient(ellipse 62% 57% at 26% 41%, #fff 0%, rgba(255,255,255,.92) 43%, rgba(255,255,255,0) 100%); }
+.hero-deck, .story-copy h3, .roof-lab-heading h3, .roof-reading h4,
+.archive-record h3, .guide-panel h3, .activation-grid h3 { color: var(--wood); }
+.view-button, .scene-pin { color: var(--wood); }
+.view-button:hover, .view-button.is-selected { color: #27221b; }
+.view-tools { accent-color: var(--saffron-text); }
+.roof-visual { background: #f1f2f1; }
+.roof-photo-evidence figcaption, .archive-visual-footer { background: #f0f2f1; }
+.roof-period-switch button { border-bottom-color: #d7dbdb; }
+.archive-visual, .archive-plate-historic, .archive-plate-drawing { background: #f0f2f2; }
+.archive-roof-upper, .archive-roof-lower { fill: #717a7d; stroke: #4f5b5e; }
+.archive-ink-detail { stroke: #566165; }
+.blueprint-grid { stroke: rgba(77,91,97,.11); }
+.blueprint-hall { stroke: #5a666b; }
+.archive-plate-model { background: #30383a; }
+.archive-model-orbit { box-shadow: inset 0 0 0 18px #394246, 0 0 0 15px rgba(190,196,198,.09); }
+.diagram-eave-label path { stroke: var(--saffron-text) !important; }
+.diagram-eave-label text { fill: var(--saffron-text) !important; }
+.guide-question { background: #f4f5f4; }
+.anatomy-section, .evidence-section { background: #f5f6f5; }
+.next-steps { background: var(--wood); color: #f2f2ee; }
+.next-steps h2 { color: #f6f6f0; }
+.next-steps h2 em { color: #e0b73a; }
+.next-steps .eyebrow { color: #c8c3bb; }
+.next-steps .eyebrow-mark { color: #e0b73a; }
+.steps-list, .steps-list > div { border-color: rgba(243,242,233,.18); }
+.steps-list p { color: #c5c1bb; font-size: 13px; }
+.steps-list strong { color: #f4f3ee; }
+.steps-list span, .next-source span { color: #e0b73a; }
+.next-source { color: #f0e6c8; border-bottom-color: #b69b50; }
+.source-list > a:hover { color: #735a25; }
+:where(button, a, input, [tabindex]):focus-visible { outline: 2px solid #a77d23; outline-offset: 4px; }
+
+/* An ink-thin route, drafted from the actual chapter locations. */
+main#top { position: relative; }
+.scroll-leaf-route {
+  position: absolute; top: 0; left: 0; width: 100%; z-index: 7;
+  pointer-events: none; opacity: .76; contain: layout style;
+}
+.scroll-leaf-route[hidden] { display: none; }
+.scroll-leaf-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.scroll-leaf-guide {
+  fill: none; stroke: #889396; stroke-width: 1.1; opacity: .34;
+  stroke-dasharray: 1 11; stroke-linecap: round;
+}
+.scroll-leaf-trace { fill: none; stroke: #bf9830; stroke-width: 1.7; stroke-linecap: round; }
+.ginkgo-body { fill: #dfb535; stroke: #9f7a1f; stroke-width: 1.05; stroke-linejoin: round; }
+.ginkgo-veins { fill: none; stroke: rgba(92,66,24,.55); stroke-width: .75; stroke-linecap: round; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: clamp(58px, 15vw, 75px); }
+  .section-heading h2, .evidence-intro h2, .sources-heading h2 { font-size: clamp(34px, 8.7vw, 48px); }
+  .archive-head h2, .guide-intro h2, .activation-heading h2 { font-size: clamp(33px, 8.2vw, 46px); }
+  .scroll-leaf-route { opacity: .48; }
+  .scroll-leaf-guide { stroke-width: .8; opacity: .24; }
+  .scroll-leaf-trace { stroke-width: 1.15; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-leaf-route { display: none; }
 }
