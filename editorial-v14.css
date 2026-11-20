@@ -399,6 +399,8 @@ h2 em, .section-heading h2 em { color: var(--saffron-text); }
 .hero h1 { font-weight: 700; font-size: clamp(64px, 7.2vw, 102px); line-height: 1.08; letter-spacing: -.075em; }
 .hero-deck { font-weight: 700; letter-spacing: -.025em; }
 .hero-intro { max-width: 420px; font-size: 13px; line-height: 2; }
+.hero-copy .visit-enter { margin-top: 12px; }
+.hero-copy .visit-entry-note { display: none; }
 .intro-band p { font-weight: 400; letter-spacing: -.025em; line-height: 1.78; }
 .section-heading h2, .evidence-intro h2, .sources-heading h2,
 .archive-head h2, .guide-intro h2, .activation-heading h2,
