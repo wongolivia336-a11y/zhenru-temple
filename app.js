@@ -192,6 +192,7 @@ let hallScene = null;
 
 function setStage(value) {
   stageProgress = Math.max(0, Math.min(stages.length - 1, Number(value) || 0));
+  const previousStage = activeStage;
   activeStage = Math.round(stageProgress);
   const stage = stages[activeStage];
   timelineButtons.forEach((button, buttonIndex) => {
@@ -234,6 +235,15 @@ function setStage(value) {
     readingSource.removeAttribute("target");
   } else {
     readingSource.target = "_blank";
+  }
+  if (activeStage !== previousStage && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    for (const target of [document.querySelector(".stage-story"), document.querySelector(".roof-reading")]) {
+      target?.classList.remove("is-turning");
+      if (target) {
+        void target.offsetWidth;
+        target.classList.add("is-turning");
+      }
+    }
   }
   closeInspector();
 }

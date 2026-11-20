@@ -125,6 +125,13 @@ function updateLink(link, href) {
   }
 }
 
+function animateEditorialReading(target) {
+  if (!target || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  target.classList.remove("is-turning");
+  void target.offsetWidth;
+  target.classList.add("is-turning");
+}
+
 function initArchiveDesk() {
   const tabs = [...document.querySelectorAll("[data-archive-layer]")];
   if (!tabs.length) return;
@@ -182,6 +189,7 @@ function initArchiveDesk() {
     arrow.setAttribute("aria-hidden", "true");
     arrow.textContent = record.action.slice(-1);
     originalLink.replaceChildren(document.createTextNode(record.action.slice(0, -2)), arrow);
+    animateEditorialReading(document.querySelector(".archive-record"));
   }
 
   tabs.forEach((tab, index) => {
@@ -265,6 +273,7 @@ function initFieldGuide() {
     const action = document.querySelector("#guideAction");
     action.textContent = stop.action;
     action.href = stop.href;
+    animateEditorialReading(panel);
   }
 
   tabs.forEach((tab, index) => {
