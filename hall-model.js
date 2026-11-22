@@ -18,8 +18,8 @@ const POST_Z = [-6.5, -3.9, 1.2, 6.5];
 export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZone }) {
   const scene = new THREE.Scene();
   // Overcast archive-view light, not a claimed reconstruction of historical weather.
-  scene.background = new THREE.Color("#e9ecee");
-  scene.fog = new THREE.Fog("#e9ecee", 48, 96);
+  scene.background = new THREE.Color("#fafbfa");
+  scene.fog = new THREE.Fog("#fafbfa", 52, 104);
 
   const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 120);
   camera.position.copy(CAMERA_HOME);
@@ -29,7 +29,7 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = 1.01;
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(TARGET_HOME);
@@ -48,8 +48,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   const cancelCameraTween = () => { cameraTween = null; cameraTouched = true; };
   controls.addEventListener("start", cancelCameraTween);
 
-  scene.add(new THREE.HemisphereLight(0xf4f5f5, 0x73777a, 1.55));
-  const keyLight = new THREE.DirectionalLight(0xfff9f1, 2.35);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8d8e89, 1.42));
+  const keyLight = new THREE.DirectionalLight(0xfffdf8, 1.86);
   keyLight.position.set(-13, 22, 15);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -60,30 +60,30 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   keyLight.shadow.bias = -0.00028;
   keyLight.shadow.normalBias = 0.035;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xd5dbdd, 1.02);
+  const fillLight = new THREE.DirectionalLight(0xe0e5e5, 0.88);
   fillLight.position.set(12, 10, -15);
   scene.add(fillLight);
-  const warmInterior = new THREE.PointLight(0xe0bd82, 4.2, 17, 1.8);
+  const warmInterior = new THREE.PointLight(0xe4cdb2, 2.85, 17, 1.8);
   warmInterior.position.set(0, 4.2, -0.8);
   scene.add(warmInterior);
 
   const mats = {
-    stone: new THREE.MeshStandardMaterial({ color: 0x969a96, roughness: 0.94 }),
-    stoneLight: new THREE.MeshStandardMaterial({ color: 0xd0d3ce, roughness: 0.9 }),
-    stoneDark: new THREE.MeshStandardMaterial({ color: 0x707873, roughness: 0.96 }),
-    wood: new THREE.MeshStandardMaterial({ color: 0x503724, roughness: 0.86 }),
-    woodLight: new THREE.MeshStandardMaterial({ color: 0x80603d, roughness: 0.82 }),
-    woodDark: new THREE.MeshStandardMaterial({ color: 0x30251d, roughness: 0.92 }),
-    woodEdge: new THREE.MeshStandardMaterial({ color: 0x9a7548, roughness: 0.78 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xcfcfca, roughness: 0.95 }),
-    wallShadow: new THREE.MeshStandardMaterial({ color: 0x878987, roughness: 0.96 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x70777b, roughness: 0.91, side: THREE.DoubleSide }),
-    roofSide: new THREE.MeshStandardMaterial({ color: 0x626a6e, roughness: 0.93, side: THREE.DoubleSide }),
-    roofSun: new THREE.MeshStandardMaterial({ color: 0x7f8589, roughness: 0.89, side: THREE.DoubleSide }),
-    roofTile: new THREE.LineBasicMaterial({ color: 0x9da5a8, transparent: true, opacity: 0.52 }),
-    roofRib: new THREE.LineBasicMaterial({ color: 0x454f54, transparent: true, opacity: 0.66 }),
-    brass: new THREE.MeshStandardMaterial({ color: 0xa98b59, roughness: 0.68, metalness: 0.12 }),
-    ground: new THREE.MeshStandardMaterial({ color: 0xecefef, roughness: 1 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0xa1a6a1, roughness: 0.94 }),
+    stoneLight: new THREE.MeshStandardMaterial({ color: 0xe1e4df, roughness: 0.94 }),
+    stoneDark: new THREE.MeshStandardMaterial({ color: 0x777e7b, roughness: 0.96 }),
+    wood: new THREE.MeshStandardMaterial({ color: 0x4b382e, roughness: 0.9 }),
+    woodLight: new THREE.MeshStandardMaterial({ color: 0x8c6d4f, roughness: 0.88 }),
+    woodDark: new THREE.MeshStandardMaterial({ color: 0x342922, roughness: 0.94 }),
+    woodEdge: new THREE.MeshStandardMaterial({ color: 0x92745b, roughness: 0.88 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xe5e7e3, roughness: 0.97 }),
+    wallShadow: new THREE.MeshStandardMaterial({ color: 0x9ea5a2, roughness: 0.96 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x697276, roughness: 0.96, side: THREE.DoubleSide }),
+    roofSide: new THREE.MeshStandardMaterial({ color: 0x576266, roughness: 0.97, side: THREE.DoubleSide }),
+    roofSun: new THREE.MeshStandardMaterial({ color: 0x7b8386, roughness: 0.95, side: THREE.DoubleSide }),
+    roofTile: new THREE.LineBasicMaterial({ color: 0xa7b0b1, transparent: true, opacity: 0.4 }),
+    roofRib: new THREE.LineBasicMaterial({ color: 0x465256, transparent: true, opacity: 0.57 }),
+    brass: new THREE.MeshStandardMaterial({ color: 0x94785e, roughness: 0.9, metalness: 0.04 }),
+    ground: new THREE.MeshStandardMaterial({ color: 0xfafbfa, roughness: 1 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x35342e, roughness: 0.52, metalness: 0.02 })
   };
 
@@ -186,8 +186,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
   let walkPitch = 0;
   let lookDrag = null;
   let lastVisitZone = "";
-  const visitColor = new THREE.Color("#e5e8e7");
-  const archiveColor = new THREE.Color("#e9ecee");
+  const visitColor = new THREE.Color("#e9ecea");
+  const archiveColor = new THREE.Color("#fafbfa");
   let exploded = false;
   let explosionTarget = 0;
   let explosionAmount = 0;
@@ -292,8 +292,8 @@ export function createHallScene({ canvas, frame, pins, onPart, onReady, onVisitZ
     visitCourtyard.setVisible(isCourtyardWalk());
     scene.background.copy(isWalkView() ? visitColor : archiveColor);
     scene.fog.color.copy(scene.background);
-    scene.fog.near = isWalkView() ? 28 : 48;
-    scene.fog.far = isWalkView() ? 71 : 96;
+    scene.fog.near = isWalkView() ? 28 : 52;
+    scene.fog.far = isWalkView() ? 71 : 104;
     if (isWalkView()) {
       const toward = target.clone().sub(position).normalize();
       walkYaw = Math.atan2(toward.x, -toward.z);
