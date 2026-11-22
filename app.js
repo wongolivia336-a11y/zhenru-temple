@@ -3,6 +3,7 @@ import { createPresenceClient } from "./presence/client.js";
 import { PRESENCE_WEBSOCKET_URL } from "./presence/config.js";
 import { initEvidenceExperiences } from "./evidence-experiences.js";
 import { initScrollLeaf } from "./scroll-leaf.js";
+import { initGalleryMotion } from "./gallery-motion.js";
 
 const stages = [
   {
@@ -563,6 +564,7 @@ if ("IntersectionObserver" in window) {
 setStage(0);
 initEvidenceExperiences();
 initScrollLeaf();
+initGalleryMotion();
 
 function prepareWebGL2Context(canvas) {
   // Prefer a lightweight context first; Three.js reuses this canvas context.
