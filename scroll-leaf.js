@@ -53,8 +53,8 @@ export function initScrollLeaf() {
     id: "zhenru-ginkgo-shade", x1: "0%", y1: "0%", x2: "92%", y2: "100%"
   });
   fade.append(
-    svgEl("stop", { offset: "0%", "stop-color": "#d2a18d" }),
-    svgEl("stop", { offset: "100%", "stop-color": "#9d6253" })
+    svgEl("stop", { offset: "0%", "stop-color": "#baa98d" }),
+    svgEl("stop", { offset: "100%", "stop-color": "#89725d" })
   );
   const clip = svgEl("clipPath", {
     id: "zhenru-leaf-reveal", clipPathUnits: "userSpaceOnUse"
