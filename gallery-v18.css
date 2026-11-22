@@ -83,7 +83,7 @@ section[id] { scroll-margin-top: 90px; }
 /* Hero: a specimen on white, uninterrupted by a model-card frame. */
 .hero {
   display: grid; grid-template-columns: minmax(330px,.71fr) minmax(0,1.29fr);
-  min-height: min(830px,calc(100svh - 76px));
+  height: auto; min-height: min(830px,calc(100svh - 76px));
   position: relative; isolation: isolate; overflow: hidden;
   color: var(--ink); background: #fff;
 }
@@ -92,14 +92,24 @@ section[id] { scroll-margin-top: 90px; }
   width: 58px; height: 1px; background: #aeaaa2; pointer-events: none;
 }
 .hero-copy {
-  z-index: 4; position: relative; align-items: flex-start;
+  /* Critical: undo the legacy absolute-positioned 210–290px column.
+     The old width + a large new padding left less than one ideograph of room. */
+  position: relative; inset: auto; top: auto; right: auto; bottom: auto; left: auto;
+  display: flex; flex-direction: column; align-items: flex-start; align-self: stretch;
+  z-index: 4; min-width: 0; width: 100%; max-width: none; min-height: 0;
+  box-sizing: border-box; pointer-events: auto;
   padding: clamp(78px,10vh,118px) 20px 54px max(42px,calc((100vw - 1320px)/2));
 }
+.hero-copy > * { pointer-events: auto; }
 .hero-copy::before { display: none; }
-.hero-copy .eyebrow { margin-bottom: 37px; }
+.hero-copy .eyebrow {
+  display: flex; flex-wrap: wrap; width: auto; max-width: 100%;
+  gap: 12px; margin-bottom: 37px; white-space: normal;
+}
 .hero h1 {
   color: var(--ink); font-weight: 700; font-size: clamp(74px,8.1vw,126px);
   line-height: 1.11; letter-spacing: -.095em; margin-left: -.06em;
+  white-space: nowrap; word-break: keep-all; overflow-wrap: normal;
 }
 .hero-slash { color: var(--brick); font-size: .41em; vertical-align: .52em; margin-inline: .15em; }
 .hero-deck {
